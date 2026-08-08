@@ -1,6 +1,6 @@
 # Snowmaking as a hidden load in Austrian day-ahead electricity forecasts
 
-### 📄 [Read the paper →](https://snowmaking-load-austria-baptiste7.vercel.app)
+### 📄 [Read the paper →](https://snowmaking-load-austria.vercel.app)
 
 **Status: pre-registered, tested, null.** Two of the three kill criteria in §5
 fired. The predictions and the stopping rules were written before any load data
