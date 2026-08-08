@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Snowmaking and the Austrian Day-Ahead Load Forecast: A Pre-Registered Null</title>
+<meta name="description" content="A pre-registered test of whether ski-resort snowmaking is a systematic blind spot in Austria's day-ahead electricity load forecast. 780 nights, 13 seasons. Null.">
+<style>
+:root {
+  --ink:#1a1a1a; --muted:#5a5a5a; --rule:#d8d4cc; --bg:#fdfdfb;
+  --accent:#7a2020; --link:#1a4c8b; --panel:#f5f3ee;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Latin Modern Roman","Computer Modern Serif",Georgia,"Times New Roman",serif;
+  font-size:17px; line-height:1.62;
+}
+.bar{
+  border-bottom:1px solid var(--rule); background:#fff;
+  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:12px; letter-spacing:.04em; color:var(--muted);
+}
+.bar .in{max-width:52rem;margin:0 auto;padding:.6rem 1.5rem;display:flex;
+  justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.bar b{color:var(--accent);font-weight:600}
+main{max-width:46rem;margin:0 auto;padding:3rem 1.5rem 6rem}
+h1{font-size:1.95rem;line-height:1.25;margin:0 0 1.1rem;font-weight:600;
+  letter-spacing:-.005em;text-wrap:balance}
+.byline{margin:0 0 .2rem;font-size:1.02rem}
+.affil{color:var(--muted);font-size:.9rem;margin:0 0 .3rem;font-style:italic}
+.dateline{color:var(--muted);font-size:.86rem;margin:0 0 2.2rem;
+  font-family:ui-sans-serif,system-ui,sans-serif}
+.abstract{
+  background:var(--panel); border:1px solid var(--rule); border-radius:2px;
+  padding:1.3rem 1.6rem; margin:0 0 1rem; font-size:.95rem; line-height:1.6;
+}
+.abstract h2{
+  font-size:.78rem;text-transform:uppercase;letter-spacing:.14em;
+  margin:0 0 .7rem;color:var(--muted);font-weight:600;
+  font-family:ui-sans-serif,system-ui,sans-serif;
+}
+.abstract p{margin:0 0 .7rem;text-align:justify;hyphens:auto}
+.abstract p:last-child{margin-bottom:0}
+.verdict{
+  border-left:3px solid var(--accent); background:#fff; padding:.9rem 1.2rem;
+  margin:0 0 2.4rem; font-size:.94rem;
+}
+.verdict strong{color:var(--accent)}
+h2.sec{
+  font-size:1.15rem;margin:2.6rem 0 .8rem;font-weight:600;
+  padding-bottom:.3rem;border-bottom:1px solid var(--rule);
+}
+h3{font-size:1rem;margin:1.8rem 0 .5rem;font-weight:600}
+p{margin:0 0 1rem;text-align:justify;hyphens:auto}
+ul,ol{margin:0 0 1rem;padding-left:1.3rem}
+li{margin:.35rem 0}
+a{color:var(--link);text-decoration:none;border-bottom:1px solid #c5d4e6}
+a:hover{border-bottom-color:var(--link)}
+code,.mono{
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  font-size:.86em;background:#f0eee9;padding:.1em .35em;border-radius:2px;
+}
+pre{background:var(--panel);border:1px solid var(--rule);border-radius:2px;
+  padding:.9rem 1.1rem;overflow-x:auto;font-size:.8rem;line-height:1.5;margin:0 0 1.2rem}
+pre code{background:none;padding:0}
+figure{margin:1.8rem 0;text-align:center}
+figure img{max-width:100%;height:auto;border:1px solid var(--rule);background:#fff}
+figcaption{
+  font-size:.83rem;color:var(--muted);margin-top:.7rem;text-align:left;
+  line-height:1.5;
+}
+figcaption b{color:var(--ink)}
+table{border-collapse:collapse;width:100%;font-size:.85rem;margin:.4rem 0 .5rem}
+th,td{padding:.42rem .55rem;border-bottom:1px solid var(--rule);text-align:left;
+  vertical-align:top}
+thead th{border-bottom:1.5px solid #b8b2a8;font-weight:600;font-size:.8rem;
+  text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;
+  font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.82rem}
+tbody tr.hl{background:#fbf6f6}
+tbody tr.hl td{font-weight:600}
+.tcap{font-size:.83rem;color:var(--muted);margin:.9rem 0 .4rem;line-height:1.5}
+.tcap b{color:var(--ink)}
+.kill{list-style:none;padding:0}
+.kill li{padding:.65rem 0 .65rem 2.1rem;position:relative;border-bottom:1px solid var(--rule);
+  font-size:.93rem}
+.kill li:before{position:absolute;left:0;top:.6rem;font-size:1rem}
+.kill li.fired:before{content:"✕";color:var(--accent);font-weight:700}
+.kill li.notrun:before{content:"○";color:var(--muted)}
+.kill li.fired em{color:var(--accent);font-style:normal;font-weight:600}
+.foot{margin-top:3.5rem;padding-top:1.2rem;border-top:1px solid var(--rule);
+  font-size:.82rem;color:var(--muted)}
+.refs{font-size:.84rem;line-height:1.55}
+.refs li{margin:.5rem 0}
+@media (max-width:640px){
+  body{font-size:16px} main{padding:2rem 1.1rem 4rem} h1{font-size:1.5rem}
+  table{font-size:.78rem} th,td{padding:.35rem .3rem}
+}
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="in">
+  <span><b>preprint</b> &nbsp;·&nbsp; energy economics / load forecasting</span>
+  <span>Pre-registered · data and code open</span>
+</div></div>
+
+<main>
+
+<h1>Snowmaking is absorbed by the day-ahead load forecast, not missed by it</h1>
+<p class="byline">Baptiste Cristofari</p>
+<p class="affil">Independent</p>
+<p class="dateline">August 2026 &nbsp;·&nbsp;
+  <a href="https://github.com/baptistecristo/Electricity-demand-forecasting-in-Austria">code and data</a>
+</p>
+
+<div class="abstract">
+<h2>Abstract</h2>
+<p>Austrian ski resorts consume roughly 281 GWh of electricity per season making
+artificial snow, concentrated into a few hundred cold night hours in November and
+December. At realistic fleet coincidence that is 0.6–1.1 GW, or 8–15% of Austria's
+overnight demand. Snowmaking is a task rather than a weather response: it runs only
+below a wet-bulb threshold near −2 °C, it stops once the base layer is built, and it
+is front-loaded before opening day. Two identical cold nights therefore draw very
+different amounts of power depending on how much snow has already been made.</p>
+<p>This paper pre-registers and tests whether that path dependence appears as a
+state-dependent error in the published day-ahead load forecast. Using thirteen
+seasons of Austrian Power Grid data (113,952 hourly observations, 2010–2022) joined
+to a pressure-corrected wet-bulb index built from thirteen alpine stations between
+1,221 and 2,327 m, the interaction between the threshold and season-to-date
+accumulated cold is <b>+1.3 MW (s.e. 11.8)</b> across 780 November–December nights.
+Campaign-start effects are likewise zero. The identical specification on the identical
+nights recovers the Christmas industrial shutdown at <b>−277 MW (t = −3.3)</b>, so the
+design detects effects of the size snowmaking would have to produce.</p>
+<p>The load is not invisible to the forecast; it is absorbed by it. A temperature
+coefficient fitted on thirteen years in which cold alpine nights <em>are</em>
+snowmaking nights prices in the average response without modelling snowmaking, and
+the operator's use of lagged actual load carries a running campaign into the next
+day's forecast. Two of three pre-registered kill criteria fired.</p>
+</div>
+
+<div class="verdict">
+<strong>Result:</strong> null, pre-registered, and not underpowered. Austria is
+also close to the best test case in the world by snowmaking-to-system-load ratio,
+which makes the null informative rather than a consequence of a poor choice of market.
+</div>
+
+<h2 class="sec">1. The question</h2>
+<p>Transmission system operators publish a day-ahead load forecast, and both the
+forecast and the realised load are free. The difference is the forecast error. If
+snowmaking is genuinely invisible to the forecasting model, the error should be
+positive on nights when snowmaking runs, and the size of the miss should depend on
+the state of the snowpack rather than on temperature alone.</p>
+<p>The interest is not the ski industry. It is whether a large, physically lumpy,
+path-dependent industrial load can hide inside a production forecast — a structure
+that recurs in Spanish irrigation pumping and North American grain drying.</p>
+
+<h2 class="sec">2. How big is the load</h2>
+<p>From a 2026 survey of 141 Austrian resorts (30 usable, 4,253 equipped hectares,
+34.0% of Austrian ski volume), extrapolated nationally:</p>
+
+<table>
+<thead><tr><th>Quantity</th><th class="num">Value</th></tr></thead>
+<tbody>
+<tr><td>Season electricity, Austria-wide</td><td class="num">281 GWh (260–309)</td></tr>
+<tr><td>Share of Austrian electricity consumption</td><td class="num">0.46%</td></tr>
+<tr><td>Mean operating hours per snowmaker per season</td><td class="num">184.6 h</td></tr>
+<tr><td>Snowmakers per hectare</td><td class="num">2.9</td></tr>
+<tr><td>Energy per hectare equipped</td><td class="num">22,449 kWh</td></tr>
+<tr><td>Energy per m³ of snow</td><td class="num">3.3 kWh</td></tr>
+</tbody></table>
+<p class="tcap"><b>Table 1.</b> Published snowmaking figures used throughout.</p>
+
+<p>Instantaneous power follows from energy over operating hours. The fleet-wide
+coincident ceiling is 281 GWh ÷ 184.6 h = <b>1.52 GW</b>, implying a mean draw of
+41.9 kW per snowmaker while running, which is consistent with a lance and fan-gun mix
+plus pumping and compressed air. At 40–70% coincidence the national draw is
+0.61–1.07 GW. Austrian weekday overnight load in November and December runs
+7.0–7.5 GW, so snowmaking is <b>8–15% of overnight demand</b>.</p>
+
+<h2 class="sec">3. Why a forecast might miss it — and why it might not</h2>
+<p>The naive version of the hypothesis is that load forecasts are temperature models
+and temperature models have no memory. Two mechanisms argue against it, and both were
+written down before the data was opened.</p>
+<p><b>A memoryless model still absorbs the average response.</b> The temperature
+coefficient is estimated on history in which cold nights are snowmaking nights. The
+model need not know snowmaking exists to price it in on average. What remains in the
+residual is the deviation from the conditional mean given temperature — the snowmaking
+anomaly, not the snowmaking load.</p>
+<p><b>Production forecasts are autoregressive.</b> APG publishes at 08:00 for the
+following day and lists its inputs as historical actual load, day type including the
+holiday calendar, and temperature forecast. Yesterday's actual is already in there, so
+any lagged-load term propagates a running campaign into tomorrow's forecast.</p>
+<p>Write α for the share of snowmaking load the forecast leaves unexplained. Both
+mechanisms push α down, and α turns out to be the binding constraint on the entire
+design.</p>
+
+<h2 class="sec">4. Identification</h2>
+<p>The obvious test — comparing nights just below the wet-bulb threshold to nights
+just above — is contaminated. At 1,800 m, −2 °C wet bulb corresponds to roughly −1 to
+0 °C air temperature, and every nonlinearity in heating load lives near freezing:
+heat-pump COP collapse and resistive backup cutover, defrost cycles, pipe and road
+trace heating. Humidity, which enters wet bulb, is itself a load driver.</p>
+<p>The identifying variation is therefore not the threshold crossing but its
+interaction with accumulated season-to-date cold:</p>
+<pre><code>err ~ below × cum_cold_hours
+      + dist + below:dist + holiday
+      + doy + doy² + season FE + dow FE
+
+err            = actual load − day-ahead forecast, MW
+below          = 1 if alpine wet-bulb index &lt; −2 °C
+dist           = wb_index − (−2)
+cum_cold_hours = hours below threshold since 1 Oct, current season</code></pre>
+<p>Heating load does not care how many cold hours the season has already delivered.
+Snowmaking does, because the base gets built and the guns stop. The interaction is the
+only coefficient in this design a temperature confound cannot produce.</p>
+
+<h3>4.1 Building the wet-bulb index</h3>
+<p>Three choices decide the answer before the econometrics do. Stations are selected
+by <b>altitude band</b> (900–2,600 m), because valley stations cross the threshold
+hundreds of hours later than the places snow is actually made. Wet bulb is corrected
+for <b>station pressure</b> — ISA pressure at 1,800 m is 815 hPa, and assuming sea
+level shifts wet bulb by 0.2–0.4 °C, comparable to the regression bandwidth. And the
+psychrometric equation is <b>solved</b> rather than approximated: the Stull (2011)
+closed form errs by 0.7–1.0 °C below freezing, worse than the effect being tested.
+Regions are weighted by state share of Austrian skier visits.</p>
+<p>The resulting index draws on Ischgl-Idalpe (2,327 m), Rudolfshütte (2,317 m),
+Patscherkofel (2,251 m), Villacher Alpe (2,140 m), Galzig (2,079 m) and
+Schmittenhöhe (1,956 m), among thirteen stations in total.</p>
+
+<h2 class="sec">5. Pre-registration</h2>
+<p><b>Primary prediction.</b> The <code>below × cum_cold_hours</code> coefficient is
+negative and significant at 5%.</p>
+<p><b>Supporting predictions.</b> The error spikes on the first night of a cold snap
+and decays over 24–48 hours as autoregressive terms catch up; the effect is smaller
+after resorts open, conditional on wet bulb and day of season; and the Netherlands and
+Denmark, run through the identical pipeline, show nothing.</p>
+<p><b>Kill criteria, committed before looking:</b></p>
+<ul class="kill">
+<li class="fired">The interaction is zero or positive with a tight confidence interval → no memory effect. Stop. <em>— fired</em></li>
+<li class="fired">The event-study profile is flat across campaign days → the forecast already absorbs it. Stop. <em>— fired</em></li>
+<li class="notrun">A cold, flat placebo country shows the same jump → the result is heating load. Stop. <em>— not run; moot once the first two fired</em></li>
+</ul>
+<p>All outcomes were committed to publication in advance. A null was named as the
+modal outcome.</p>
+
+<h2 class="sec">6. Statistical power</h2>
+<figure>
+<svg viewBox="0 0 680 310" width="100%" role="img" style="max-width:680px;font-family:ui-sans-serif,system-ui,sans-serif"><line x1="54" x2="530" y1="270.0" y2="270.0" stroke="#d8d4cc" stroke-width="1"/><text x="47" y="273.5" text-anchor="end" font-size="10" fill="#5a5a5a">0</text><line x1="54" x2="530" y1="221.2" y2="221.2" stroke="#d8d4cc" stroke-width="1"/><text x="47" y="224.7" text-anchor="end" font-size="10" fill="#5a5a5a">100</text><line x1="54" x2="530" y1="172.3" y2="172.3" stroke="#d8d4cc" stroke-width="1"/><text x="47" y="175.8" text-anchor="end" font-size="10" fill="#5a5a5a">200</text><line x1="54" x2="530" y1="123.5" y2="123.5" stroke="#d8d4cc" stroke-width="1"/><text x="47" y="127.0" text-anchor="end" font-size="10" fill="#5a5a5a">300</text><line x1="54" x2="530" y1="74.6" y2="74.6" stroke="#d8d4cc" stroke-width="1"/><text x="47" y="78.1" text-anchor="end" font-size="10" fill="#5a5a5a">400</text><line x1="54" x2="530" y1="25.8" y2="25.8" stroke="#d8d4cc" stroke-width="1"/><text x="47" y="29.3" text-anchor="end" font-size="10" fill="#5a5a5a">500</text><text x="54.0" y="286" text-anchor="middle" font-size="10" fill="#5a5a5a">2</text><text x="149.2" y="286" text-anchor="middle" font-size="10" fill="#5a5a5a">4</text><text x="244.4" y="286" text-anchor="middle" font-size="10" fill="#5a5a5a">6</text><text x="339.6" y="286" text-anchor="middle" font-size="10" fill="#5a5a5a">8</text><text x="434.8" y="286" text-anchor="middle" font-size="10" fill="#5a5a5a">10</text><text x="530.0" y="286" text-anchor="middle" font-size="10" fill="#5a5a5a">12</text><line x1="54" x2="530" y1="50.2" y2="50.2" stroke="#276749" stroke-width="1.3" stroke-dasharray="none"/><text x="537" y="53.7" font-size="9.5" fill="#276749">450 MW · half unmodelled</text><line x1="54" x2="530" y1="160.1" y2="160.1" stroke="#276749" stroke-width="1.3" stroke-dasharray="5 4"/><text x="537" y="163.6" font-size="9.5" fill="#276749">225 MW · quarter</text><line x1="54" x2="530" y1="226.0" y2="226.0" stroke="#276749" stroke-width="1.3" stroke-dasharray="2 3"/><text x="537" y="229.5" font-size="9.5" fill="#276749">90 MW · tenth</text><polyline points="54.0,196.9 101.6,210.3 149.2,218.3 196.8,223.8 244.4,227.8 292.0,230.9 339.6,233.5 387.2,235.5 434.8,237.3 482.4,238.8 530.0,240.2" fill="none" stroke="#2b6cb0" stroke-width="1.9"/><line x1="263.4" x2="279.4" y1="237.8" y2="237.8" stroke="#2b6cb0" stroke-width="1.9"/><text x="284.4" y="241.3" font-size="9.5" fill="#1a1a1a">MAE 1.5% (optimistic)</text><polyline points="54.0,117.7 101.6,145.7 149.2,162.3 196.8,173.7 244.4,182.1 292.0,188.6 339.6,193.9 387.2,198.2 434.8,201.9 482.4,205.1 530.0,207.8" fill="none" stroke="#c05621" stroke-width="1.9"/><line x1="263.4" x2="279.4" y1="248.5" y2="248.5" stroke="#c05621" stroke-width="1.9"/><text x="284.4" y="252.0" font-size="9.5" fill="#1a1a1a">MAE 3.14% (DE-LU)</text><polyline points="54.0,26.9 101.6,71.5 149.2,98.1 196.8,116.3 244.4,129.7 292.0,140.1 339.6,148.5 387.2,155.4 434.8,161.3 482.4,166.4 530.0,170.8" fill="none" stroke="#702459" stroke-width="1.9"/><line x1="263.4" x2="279.4" y1="259.3" y2="259.3" stroke="#702459" stroke-width="1.9"/><text x="284.4" y="262.8" font-size="9.5" fill="#1a1a1a">MAE 5% (small zone)</text><text transform="translate(13,143.0) rotate(-90)" text-anchor="middle" font-size="10.5" fill="#5a5a5a">Minimum detectable effect (MW)</text><text x="292.0" y="304" text-anchor="middle" font-size="10.5" fill="#5a5a5a">Seasons of data</text></svg>
+<figcaption><b>Figure 1.</b> Minimum detectable effect against seasons of data, for
+three assumptions about day-ahead forecast error, with the plausible residual signal
+overlaid. The pass mark is how much of the ~900 MW snowmaking load the forecast must
+leave unexplained. Additional seasons move it very little; α is the binding
+constraint.</figcaption>
+</figure>
+<p>Measured on the actual data, the Austrian day-ahead forecast turned out
+substantially noisier than the German-Luxembourg benchmark of 3.14% used to
+calibrate this: <b>6.50% MAE</b> on November–December night hours, standard deviation
+597 MW raw and 514 MW after fixed effects. That raised the pass mark to
+<b>α ≥ 25.4%</b> at thirteen seasons.</p>
+
+<h2 class="sec">7. Results</h2>
+<figure>
+<svg viewBox="0 0 680 300" width="100%" role="img" style="max-width:680px;font-family:ui-sans-serif,system-ui,sans-serif"><line x1="52" x2="670" y1="257.0" y2="257.0" stroke="#d8d4cc" stroke-width="1"/><text x="45" y="260.5" text-anchor="end" font-size="10" fill="#5a5a5a">-100</text><line x1="52" x2="670" y1="169.0" y2="169.0" stroke="#d8d4cc" stroke-width="1"/><text x="45" y="172.5" text-anchor="end" font-size="10" fill="#5a5a5a">0</text><line x1="52" x2="670" y1="81.0" y2="81.0" stroke="#d8d4cc" stroke-width="1"/><text x="45" y="84.5" text-anchor="end" font-size="10" fill="#5a5a5a">100</text><line x1="52" x2="670" y1="169.0" y2="169.0" stroke="#1a1a1a" stroke-width="1.2"/><rect x="62.8" y="73.9" width="29.9" height="95.1" fill="#2b6cb0"/><line x1="77.8" x2="77.8" y1="95.1" y2="52.8" stroke="#333" stroke-width="1.1"/><line x1="74.2" x2="81.2" y1="95.1" y2="95.1" stroke="#333" stroke-width="1.1"/><line x1="74.2" x2="81.2" y1="52.8" y2="52.8" stroke="#333" stroke-width="1.1"/><text x="77.8" y="273" text-anchor="middle" font-size="10" fill="#1a1a1a">Jan</text><rect x="114.3" y="150.5" width="29.9" height="18.5" fill="#2b6cb0"/><line x1="129.2" x2="129.2" y1="164.6" y2="136.4" stroke="#333" stroke-width="1.1"/><line x1="125.8" x2="132.8" y1="164.6" y2="164.6" stroke="#333" stroke-width="1.1"/><line x1="125.8" x2="132.8" y1="136.4" y2="136.4" stroke="#333" stroke-width="1.1"/><text x="129.2" y="273" text-anchor="middle" font-size="10" fill="#1a1a1a">Feb</text><rect x="165.8" y="162.8" width="29.9" height="6.2" fill="#2b6cb0"/><line x1="180.8" x2="180.8" y1="175.2" y2="150.5" stroke="#333" stroke-width="1.1"/><line x1="177.2" x2="184.2" y1="175.2" y2="175.2" stroke="#333" stroke-width="1.1"/><line x1="177.2" x2="184.2" y1="150.5" y2="150.5" stroke="#333" stroke-width="1.1"/><text x="180.8" y="273" text-anchor="middle" font-size="10" fill="#1a1a1a">Mar</text><rect x="217.3" y="169.0" width="29.9" height="26.4" fill="#2b6cb0"/><line x1="232.2" x2="232.2" y1="209.5" y2="181.3" stroke="#333" stroke-width="1.1"/><line x1="228.8" x2="235.8" y1="209.5" y2="209.5" stroke="#333" stroke-width="1.1"/><line x1="228.8" x2="235.8" y1="181.3" y2="181.3" stroke="#333" stroke-width="1.1"/><text x="232.2" y="273" text-anchor="middle" font-size="10" fill="#1a1a1a">Apr</text><rect x="268.8" y="169.0" width="29.9" height="26.4" fill="#2b6cb0"/><line x1="283.8" x2="283.8" y1="208.6" y2="182.2" stroke="#333" stroke-width="1.1"/><line x1="280.2" x2="287.2" y1="208.6" y2="208.6" stroke="#333" stroke-width="1.1"/><line x1="280.2" x2="287.2" y1="182.2" y2="182.2" stroke="#333" stroke-width="1.1"/><text x="283.8" y="273" text-anchor="middle" font-size="10" fill="#1a1a1a">May</text><rect x="320.3" y="162.0" width="29.9" height="7.0" fill="#2b6cb0"/><line x1="335.2" x2="335.2" y1="174.3" y2="149.6" stroke="#333" stroke-width="1.1"/><line x1="331.8" x2="338.8" y1="174.3" y2="174.3" stroke="#333" stroke-width="1.1"/><line x1="331.8" x2="338.8" y1="149.6" y2="149.6" stroke="#333" stroke-width="1.1"/><text x="335.2" y="273" text-anchor="middle" font-size="10" fill="#1a1a1a">Jun</text><rect x="371.8" y="169.0" width="29.9" height="57.2" fill="#2b6cb0"/><line x1="386.8" x2="386.8" y1="237.7" y2="214.8" stroke="#333" stroke-width="1.1"/><line x1="383.2" x2="390.2" y1="237.7" y2="237.7" stroke="#333" stroke-width="1.1"/><line x1="383.2" x2="390.2" y1="214.8" y2="214.8" stroke="#333" stroke-width="1.1"/><text x="386.8" y="273" text-anchor="middle" font-size="10" fill="#1a1a1a">Jul</text><rect x="423.3" y="147.0" width="29.9" height="22.0" fill="#2b6cb0"/><line x1="438.2" x2="438.2" y1="161.1" y2="132.9" stroke="#333" stroke-width="1.1"/><line x1="434.8" x2="441.8" y1="161.1" y2="161.1" stroke="#333" stroke-width="1.1"/><line x1="434.8" x2="441.8" y1="132.9" y2="132.9" stroke="#333" stroke-width="1.1"/><text x="438.2" y="273" text-anchor="middle" font-size="10" fill="#1a1a1a">Aug</text><rect x="474.8" y="169.0" width="29.9" height="12.3" fill="#2b6cb0"/><line x1="489.8" x2="489.8" y1="198.9" y2="163.7" stroke="#333" stroke-width="1.1"/><line x1="486.2" x2="493.2" y1="198.9" y2="198.9" stroke="#333" stroke-width="1.1"/><line x1="486.2" x2="493.2" y1="163.7" y2="163.7" stroke="#333" stroke-width="1.1"/><text x="489.8" y="273" text-anchor="middle" font-size="10" fill="#1a1a1a">Sep</text><rect x="526.3" y="107.4" width="29.9" height="61.6" fill="#2b6cb0"/><line x1="541.2" x2="541.2" y1="121.5" y2="93.3" stroke="#333" stroke-width="1.1"/><line x1="537.8" x2="544.8" y1="121.5" y2="121.5" stroke="#333" stroke-width="1.1"/><line x1="537.8" x2="544.8" y1="93.3" y2="93.3" stroke="#333" stroke-width="1.1"/><text x="541.2" y="273" text-anchor="middle" font-size="10" fill="#1a1a1a">Oct</text><rect x="577.8" y="53.7" width="29.9" height="115.3" fill="#c05621"/><line x1="592.8" x2="592.8" y1="73.1" y2="34.3" stroke="#333" stroke-width="1.1"/><line x1="589.2" x2="596.2" y1="73.1" y2="73.1" stroke="#333" stroke-width="1.1"/><line x1="589.2" x2="596.2" y1="34.3" y2="34.3" stroke="#333" stroke-width="1.1"/><text x="592.8" y="273" text-anchor="middle" font-size="10" fill="#1a1a1a">Nov</text><rect x="629.3" y="169.0" width="29.9" height="8.8" fill="#2b6cb0"/><line x1="644.2" x2="644.2" y1="204.2" y2="151.4" stroke="#333" stroke-width="1.1"/><line x1="640.8" x2="647.8" y1="204.2" y2="204.2" stroke="#333" stroke-width="1.1"/><line x1="640.8" x2="647.8" y1="151.4" y2="151.4" stroke="#333" stroke-width="1.1"/><text x="644.2" y="273" text-anchor="middle" font-size="10" fill="#1a1a1a">Dec</text><text transform="translate(13,136.0) rotate(-90)" text-anchor="middle" font-size="10.5" fill="#5a5a5a">Night forecast error (MW)</text></svg>
+<figcaption><b>Figure 2.</b> Night forecast error by month, 2010–2022, night-level
+observations. November is the most under-forecast month of the year at
++131 ± 22 MW. Bars are ±1 s.e.</figcaption>
+</figure>
+
+<figure>
+<svg viewBox="0 0 680 310" width="100%" role="img" style="max-width:680px;font-family:ui-sans-serif,system-ui,sans-serif"><line x1="52" x2="670" y1="111.4" y2="111.4" stroke="#d8d4cc" stroke-width="1"/><text x="45" y="114.9" text-anchor="end" font-size="10" fill="#5a5a5a">0</text><line x1="52" x2="670" y1="111.4" y2="111.4" stroke="#1a1a1a" stroke-width="1.2"/><rect x="73.6" y="89.1" width="59.7" height="22.2" fill="#2b6cb0"/><line x1="103.5" x2="103.5" y1="96.0" y2="82.3" stroke="#333" stroke-width="1.1"/><line x1="100.0" x2="107.0" y1="96.0" y2="96.0" stroke="#333" stroke-width="1.1"/><line x1="100.0" x2="107.0" y1="82.3" y2="82.3" stroke="#333" stroke-width="1.1"/><text x="103.5" y="271" text-anchor="middle" font-size="10" fill="#1a1a1a">Nov</text><text x="103.5" y="282" text-anchor="middle" font-size="10" fill="#1a1a1a">1–10</text><rect x="176.6" y="88.3" width="59.7" height="23.1" fill="#2b6cb0"/><line x1="206.5" x2="206.5" y1="98.8" y2="77.7" stroke="#333" stroke-width="1.1"/><line x1="203.0" x2="210.0" y1="98.8" y2="98.8" stroke="#333" stroke-width="1.1"/><line x1="203.0" x2="210.0" y1="77.7" y2="77.7" stroke="#333" stroke-width="1.1"/><text x="206.5" y="271" text-anchor="middle" font-size="10" fill="#1a1a1a">Nov</text><text x="206.5" y="282" text-anchor="middle" font-size="10" fill="#1a1a1a">11–20</text><rect x="279.6" y="48.1" width="59.7" height="63.2" fill="#c05621"/><line x1="309.5" x2="309.5" y1="61.5" y2="34.7" stroke="#333" stroke-width="1.1"/><line x1="306.0" x2="313.0" y1="61.5" y2="61.5" stroke="#333" stroke-width="1.1"/><line x1="306.0" x2="313.0" y1="34.7" y2="34.7" stroke="#333" stroke-width="1.1"/><text x="309.5" y="271" text-anchor="middle" font-size="10" fill="#1a1a1a">Nov</text><text x="309.5" y="282" text-anchor="middle" font-size="10" fill="#1a1a1a">21–30</text><rect x="382.6" y="46.4" width="59.7" height="64.9" fill="#c05621"/><line x1="412.5" x2="412.5" y1="58.7" y2="34.2" stroke="#333" stroke-width="1.1"/><line x1="409.0" x2="416.0" y1="58.7" y2="58.7" stroke="#333" stroke-width="1.1"/><line x1="409.0" x2="416.0" y1="34.2" y2="34.2" stroke="#333" stroke-width="1.1"/><text x="412.5" y="271" text-anchor="middle" font-size="10" fill="#1a1a1a">Dec</text><text x="412.5" y="282" text-anchor="middle" font-size="10" fill="#1a1a1a">1–10</text><rect x="485.6" y="69.8" width="59.7" height="41.6" fill="#2b6cb0"/><line x1="515.5" x2="515.5" y1="82.9" y2="56.7" stroke="#333" stroke-width="1.1"/><line x1="512.0" x2="519.0" y1="82.9" y2="82.9" stroke="#333" stroke-width="1.1"/><line x1="512.0" x2="519.0" y1="56.7" y2="56.7" stroke="#333" stroke-width="1.1"/><text x="515.5" y="271" text-anchor="middle" font-size="10" fill="#1a1a1a">Dec</text><text x="515.5" y="282" text-anchor="middle" font-size="10" fill="#1a1a1a">11–20</text><rect x="588.6" y="111.4" width="59.7" height="109.1" fill="#9a9a9a"/><line x1="618.5" x2="618.5" y1="235.8" y2="205.1" stroke="#333" stroke-width="1.1"/><line x1="615.0" x2="622.0" y1="235.8" y2="235.8" stroke="#333" stroke-width="1.1"/><line x1="615.0" x2="622.0" y1="205.1" y2="205.1" stroke="#333" stroke-width="1.1"/><text x="618.5" y="271" text-anchor="middle" font-size="10" fill="#1a1a1a">Dec</text><text x="618.5" y="282" text-anchor="middle" font-size="10" fill="#1a1a1a">21–30</text><text transform="translate(13,135.0) rotate(-90)" text-anchor="middle" font-size="10.5" fill="#5a5a5a">Night forecast error (MW)</text></svg>
+<figcaption><b>Figure 3.</b> The same error in 10-day bins across November and
+December. The bias climbs to +228 ± 43 MW in early December and then collapses at
+the Christmas industrial shutdown. This is the shape, magnitude and timing snowmaking
+would produce — and also what a seasonal heating ramp produces.</figcaption>
+</figure>
+
+<p>The unconditional seasonal profile was encouraging. November is the most
+under-forecast month of the year, and within November–December the bias climbs to
++228 ± 43 MW in early December before collapsing at Christmas. That is the right
+shape, magnitude and timing for snowmaking: too warm to make snow in early November,
+a ramp into the opening-day crunch, decline as bases are built. It is also exactly
+what a seasonal heating ramp produces.</p>
+
+<p>Conditional on weather, it vanishes.</p>
+
+<figure>
+<svg viewBox="0 0 680 250" width="100%" role="img" style="max-width:680px;font-family:ui-sans-serif,system-ui,sans-serif"><line x1="235.3" x2="235.3" y1="16" y2="210" stroke="#d8d4cc" stroke-width="1"/><text x="235.3" y="226" text-anchor="middle" font-size="10" fill="#5a5a5a">-400</text><line x1="310.4" x2="310.4" y1="16" y2="210" stroke="#d8d4cc" stroke-width="1"/><text x="310.4" y="226" text-anchor="middle" font-size="10" fill="#5a5a5a">-300</text><line x1="385.5" x2="385.5" y1="16" y2="210" stroke="#d8d4cc" stroke-width="1"/><text x="385.5" y="226" text-anchor="middle" font-size="10" fill="#5a5a5a">-200</text><line x1="460.6" x2="460.6" y1="16" y2="210" stroke="#d8d4cc" stroke-width="1"/><text x="460.6" y="226" text-anchor="middle" font-size="10" fill="#5a5a5a">-100</text><line x1="535.7" x2="535.7" y1="16" y2="210" stroke="#d8d4cc" stroke-width="1"/><text x="535.7" y="226" text-anchor="middle" font-size="10" fill="#5a5a5a">0</text><line x1="610.8" x2="610.8" y1="16" y2="210" stroke="#d8d4cc" stroke-width="1"/><text x="610.8" y="226" text-anchor="middle" font-size="10" fill="#5a5a5a">100</text><line x1="535.7" x2="535.7" y1="16" y2="210" stroke="#1a1a1a" stroke-width="1.2" stroke-dasharray="4 3"/><line x1="519.3" x2="554.0" y1="40.2" y2="40.2" stroke="#333" stroke-width="1.6"/><line x1="519.3" x2="519.3" y1="36.2" y2="44.2" stroke="#333" stroke-width="1.4"/><line x1="554.0" x2="554.0" y1="36.2" y2="44.2" stroke="#333" stroke-width="1.4"/><circle cx="536.6" cy="40.2" r="5" fill="#276749"/><text x="158" y="38.2" text-anchor="end" font-size="10.5" fill="#1a1a1a">below × cum100</text><text x="158" y="49.2" text-anchor="end" font-size="10.5" fill="#1a1a1a">(PRE-REGISTERED)</text><line x1="460.8" x2="615.6" y1="88.8" y2="88.8" stroke="#333" stroke-width="1.6"/><line x1="460.8" x2="460.8" y1="84.8" y2="92.8" stroke="#333" stroke-width="1.4"/><line x1="615.6" x2="615.6" y1="84.8" y2="92.8" stroke="#333" stroke-width="1.4"/><circle cx="538.2" cy="88.8" r="5" fill="#9a9a9a"/><text x="158" y="92.2" text-anchor="end" font-size="10.5" fill="#1a1a1a">below</text><line x1="417.7" x2="624.3" y1="137.2" y2="137.2" stroke="#333" stroke-width="1.6"/><line x1="417.7" x2="417.7" y1="133.2" y2="141.2" stroke="#333" stroke-width="1.4"/><line x1="624.3" x2="624.3" y1="133.2" y2="141.2" stroke="#333" stroke-width="1.4"/><circle cx="521.0" cy="137.2" r="5" fill="#9a9a9a"/><text x="158" y="140.8" text-anchor="end" font-size="10.5" fill="#1a1a1a">campaign start</text><line x1="203.7" x2="451.2" y1="185.8" y2="185.8" stroke="#333" stroke-width="1.6"/><line x1="203.7" x2="203.7" y1="181.8" y2="189.8" stroke="#333" stroke-width="1.4"/><line x1="451.2" x2="451.2" y1="181.8" y2="189.8" stroke="#333" stroke-width="1.4"/><circle cx="327.4" cy="185.8" r="5" fill="#c05621"/><text x="158" y="189.2" text-anchor="end" font-size="10.5" fill="#1a1a1a">holiday (Christmas)</text><text x="414.0" y="244" text-anchor="middle" font-size="10.5" fill="#5a5a5a">Coefficient (MW), 95% CI</text></svg>
+<figcaption><b>Figure 4.</b> Coefficients from the primary specification with 95%
+intervals. The pre-registered interaction sits on zero. The same model, on the same
+nights, places the Christmas shutdown at −277 MW — so the design is not blind to
+effects of the size snowmaking would have to produce.</figcaption>
+</figure>
+
+<table>
+<thead><tr>
+  <th>Specification</th><th class="num">n</th>
+  <th class="num">below × cum100</th><th class="num">below</th><th class="num">holiday</th>
+</tr></thead>
+<tbody>
+<tr class="hl"><td>Nov–Dec, all nights</td><td class="num">780</td>
+  <td class="num">+1.3 (11.8)</td><td class="num">+3.4 (52.6)</td><td class="num">−277.3 (84.1)</td></tr>
+<tr><td>Bandwidth |wb+2| ≤ 3 °C</td><td class="num">412</td>
+  <td class="num">+1.1 (15.2)</td><td class="num">−33.8 (96.1)</td><td class="num">−190.4 (123.8)</td></tr>
+<tr><td>With campaign-start dummies</td><td class="num">780</td>
+  <td class="num">+0.4 (12.0)</td><td class="num">+13.6 (52.3)</td><td class="num">−273.0 (85.7)</td></tr>
+<tr><td>Seasons 2016–2022 only</td><td class="num">420</td>
+  <td class="num">−7.1 (11.4)</td><td class="num">+28.7 (49.2)</td><td class="num">−373.1 (92.2)</td></tr>
+</tbody></table>
+<p class="tcap"><b>Table 2.</b> Coefficients in MW, HC1 standard errors in
+parentheses, night-level observations. The primary coefficient is zero in every
+specification. The holiday control is strongly significant in every specification.</p>
+
+<table>
+<thead><tr><th>Campaign-start terms</th><th class="num">Coef.</th><th class="num">s.e.</th><th class="num">t</th></tr></thead>
+<tbody>
+<tr><td>First night of a cold snap</td><td class="num">−19.5</td><td class="num">70.2</td><td class="num">−0.28</td></tr>
+<tr><td>Second night</td><td class="num">−78.5</td><td class="num">104.8</td><td class="num">−0.75</td></tr>
+</tbody></table>
+<p class="tcap"><b>Table 3.</b> The scenario where α should be highest, because
+autoregressive terms have not yet caught up. Zero, and wrong-signed.</p>
+
+<h3>7.1 Why this is a null rather than an absence of evidence</h3>
+<p>The specification is not underpowered for effects of the relevant size. On the same
+780 nights, with the same fixed effects and the same standard errors, it recovers the
+Christmas industrial shutdown at −277 MW with t = −3.3, rising to −373 MW and
+t = −4.1 in recent seasons. A real night-level swing of a few hundred megawatts is
+visible to this design. The snowmaking interaction is 0 ± 12.</p>
+<p>The most likely explanation is the one anticipated in §3. The +131 MW November
+bias survives as a real seasonal feature; it is simply not attributable to snowmaking
+by this design.</p>
+
+<h3>7.2 The opening-date test cannot be identified from calendar dates</h3>
+<p>Austrian opening dates are tightly clustered — glaciers from late September at
+3–5% of equipped capacity, Obergurgl 16 November, Ischgl 25 November, St Anton
+1 December, the bulk of the country between 8 and 20 December. Encoding that as a
+capacity-open share and interacting it with the threshold gives −301.8 (s.e. 266.6).
+The sign is the predicted one and the precision is useless, for a mechanical reason:
+regressing the opening curve on the day-of-season controls already in the
+specification gives <b>R² = 0.798</b>. A fixed calendar curve is four-fifths
+explained by a smooth function of the date.</p>
+<p>Identifying it requires season-varying opening dates — resorts open late in bad
+snow years and early in good ones, and that variation is orthogonal to the calendar.
+This pre-registered test is closed as <em>not identifiable with the data collected</em>,
+which is a different statement from tested and null.</p>
+
+<h2 class="sec">8. Was Austria a badly chosen case?</h2>
+<p>A null is only interesting if the test was fair. Ranking systems by snowmaking
+energy per gigawatt of winter overnight load puts Austria near the top of the world.</p>
+
+<table>
+<thead><tr><th>System</th><th class="num">GWh/season</th><th class="num">O/n load (GW)</th>
+  <th class="num">Ratio</th><th>Free forecast?</th></tr></thead>
+<tbody>
+<tr><td>ISO-NE Vermont region</td><td class="num">40–90*</td><td class="num">~0.65</td>
+  <td class="num">62–140</td><td>Yes, per region</td></tr>
+<tr><td>Italy-North</td><td class="num">~560*</td><td class="num">~12–13</td>
+  <td class="num">~45</td><td>Yes, Terna</td></tr>
+<tr class="hl"><td>Austria (this study)</td><td class="num">281</td><td class="num">~7</td>
+  <td class="num">43</td><td>Yes</td></tr>
+<tr><td>ISO-NE New Hampshire</td><td class="num">22–54*</td><td class="num">~1.25</td>
+  <td class="num">18–43</td><td>Yes</td></tr>
+<tr><td>PSCO (Colorado)</td><td class="num">45–70*</td><td class="num">~4</td>
+  <td class="num">11–18</td><td>Yes, EIA-930</td></tr>
+<tr><td>Switzerland</td><td class="num">60–65</td><td class="num">~8.4</td>
+  <td class="num">7.1–7.7</td><td>Yes, Swissgrid</td></tr>
+<tr><td>France</td><td class="num">&gt;110</td><td class="num">~60</td>
+  <td class="num">1.8</td><td>Yes, ODRÉ</td></tr>
+<tr><td>Germany</td><td class="num">≤43†</td><td class="num">~52</td>
+  <td class="num">≤0.8</td><td>Yes, SMARD</td></tr>
+</tbody></table>
+<p class="tcap"><b>Table 4.</b> Worldwide ranking. *Derived by scaling equipped
+hectares at the Austrian intensity of 22,449 kWh/ha; no published national total
+exists outside Austria, Switzerland and France. †Germany's figure covers lifts and
+snowmaking together.</p>
+
+<p>Only two systems plausibly beat Austria, and one is a sub-region rather than a
+country. Switzerland is six times worse, France twenty-four, Germany fifty. This is
+not the null of a badly chosen case.</p>
+<p><b>The best remaining test is Vermont.</b> ISO-NE publishes an hourly demand
+forecast per reliability region, and Vermont's ~0.65 GW zonal load sits under a
+snowmaking fleet covering close to 100% of trail acreage, because Northeast resorts
+snowmake far harder than the Alps where natural snowfall is unreliable. Resort-level
+derivations put Northeast intensity at 3–7× the Austrian figure. Rhode Island gives a
+same-forecaster, same-weather, zero-snowmaking placebo inside the same feed. One
+caveat has to be resolved first: ISO-NE's regional report may allocate a system
+forecast to regions by load-share factors rather than forecasting each region
+independently, in which case a positive result would mean "no regional model" rather
+than "snowmaking is missed."</p>
+<p><b>Andorra has the best physics on earth and no data.</b> Snowmaking at Grandvalira
+and Pal Arinsal against a 570 GWh national system is plausibly a several-percent share
+of national load, but FEDA sits outside ENTSO-E and publishes no hourly series. The
+same holds for China's Chongli cluster.</p>
+
+<h2 class="sec">9. Limitations</h2>
+<ul>
+<li>Roughly 360 relevant hours per season, heavily autocorrelated. Effective sample
+size is nights, not hours, which is why estimation is at night level.</li>
+<li>The published forecast is the operator's transparency artefact, not the trading
+consensus. A bias in it demonstrates a blind spot in APG's forecast, <b>not</b> a
+market mispricing. Establishing the latter needs day-ahead price or imbalance as the
+outcome.</li>
+<li>APG's published load excludes a corridor in Vorarlberg, which carries weight 0.10
+in the wet-bulb index while some of its load is absent from the dependent variable.</li>
+<li>The index is weighted by state share of skier visits, not equipped hectares.</li>
+<li><code>cum_cold_hours</code> proxies snow stock by accumulated hours below
+threshold. It ignores melt and counts cold hours whether or not guns actually ran.</li>
+<li>The opening-date and placebo tests were not identified and not run respectively.</li>
+</ul>
+
+<h2 class="sec">10. Data and reproduction</h2>
+<p>No API token is required. Austrian Power Grid publishes both load series back to
+2009 as nested per-year ZIP archives with no registration, and GeoSphere Austria's
+station API needs no key. A single script reproduces everything:</p>
+<pre><code>git clone https://github.com/baptistecristo/Electricity-demand-forecasting-in-Austria
+pip install -r requirements.txt
+python src/apg_pipeline.py</code></pre>
+<p>For cross-country work, energy-charts.info (Fraunhofer ISE) serves day-ahead load
+forecast, actual load and day-ahead spot price for most European bidding zones with no
+token. Electricity <em>futures</em> settlement history is paywalled at EEX and ICE, so
+a futures-lag test is not feasible on free data; day-ahead spot is the honest
+substitute.</p>
+
+<h2 class="sec">References</h2>
+<ol class="refs">
+<li>Aigner, Steiger &amp; Mayer (2026). Snowmaking in Austria: resource consumption and
+greenhouse gas emissions. <em>Journal of Sustainable Tourism</em>.
+<a href="https://ciss-journal.org/article/view/11546">figures</a></li>
+<li>Olefs, Fischer &amp; Lang (2010). Boundary conditions for artificial snow production
+in the Austrian Alps. <em>J. Appl. Meteorol. Climatol.</em> 49(6).
+<a href="https://journals.ametsoc.org/view/journals/apme/49/6/2010jamc2251.1.xml">link</a></li>
+<li>Stull (2011). Wet-bulb temperature from relative humidity and air temperature.
+<em>J. Appl. Meteorol. Climatol.</em> 50(11). Used as a benchmark, not in the pipeline.</li>
+<li>Austrian Power Grid. <a href="https://markt.apg.at/en/transparency/load/actual-total-load/">Actual total load</a>
+and <a href="https://markt.apg.at/en/transparency/load/total-load-forecast/">total load forecast</a>.</li>
+<li>GeoSphere Austria. <a href="https://dataset.api.hub.geosphere.at/v1/docs/">Dataset API</a>.</li>
+<li>Maldonado et al. <a href="https://ar5iv.labs.arxiv.org/html/2302.11017">arXiv:2302.11017</a>
+— DE-LU day-ahead load forecast MAE.</li>
+<li>ISO New England. <a href="https://www.iso-ne.com/isoexpress/web/reports/load-and-demand/-/tree/three-day-reliability-region-demand-forecast">Three-day reliability region demand forecast</a>.</li>
+<li>Fraunhofer ISE. <a href="https://api.energy-charts.info/">energy-charts API</a>.</li>
+</ol>
+
+<div class="foot">
+<p>Pre-registration and results are separate commits in the repository; the commit
+history establishes that the stopping rules predate the data. Code and figures are
+MIT-licensed.</p>
+<p><a href="https://github.com/baptistecristo/Electricity-demand-forecasting-in-Austria">github.com/baptistecristo/Electricity-demand-forecasting-in-Austria</a></p>
+</div>
+
+</main>
+</body>
+</html>

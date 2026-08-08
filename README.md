@@ -1,5 +1,7 @@
 # Snowmaking as a hidden load in Austrian day-ahead electricity forecasts
 
+### 📄 [Read the paper →](https://snowmaking-load-austria-baptiste7.vercel.app)
+
 **Status: pre-registered, tested, null.** Two of the three kill criteria in §5
 fired. The predictions and the stopping rules were written before any load data
 was examined; commit history is the proof. Results in §8.
@@ -374,6 +376,38 @@ carry the wrong sign.
 The NL/DK placebo was not run. With two of three criteria met it is moot: there
 is no effect for a placebo to discredit.
 
+### 8.5b The opening-date test cannot be identified from calendar dates
+
+The third supporting prediction — that the effect shrinks once resorts open — was
+run and is reported here for completeness, with the caveat that it does not
+identify anything.
+
+Austrian opening dates are tightly clustered: glaciers from late September
+(Sölden, Kitzsteinhorn, Hintertux year-round) at roughly 3–5% of equipped capacity,
+Obergurgl 16 November, Ischgl 25 November, Obertauern late November, St Anton
+1 December, and the bulk of the country between 8 and 20 December. Encoding that as
+a capacity-open share and interacting it with the threshold gives:
+
+| Term | Coefficient | SE | t |
+|---|---|---|---|
+| `below × open_share` | −301.8 | 266.6 | −1.13 |
+| `below × open_share`, bandwidth 3 °C | −246.8 | 387.2 | −0.64 |
+
+The sign is the predicted one. The precision is useless, and the reason is
+mechanical: regressing the opening-share curve on the day-of-season controls
+already in the specification gives **R² = 0.798**. A fixed calendar curve is four-
+fifths explained by a smooth function of the date, so only a fifth of its variation
+is available to identify anything. Adding it also inflates the standard error on the
+primary interaction from 11.8 to 30.3, which is collinearity rather than
+information.
+
+**What would fix it:** season-varying opening dates. Resorts open late in bad snow
+years and early in good ones, and that variation is orthogonal to the calendar.
+Recovering it means resort-level opening dates for each of the thirteen seasons,
+which is a Wayback Machine exercise across ~30 resorts and was not attempted here.
+The pre-registration is closed as *not identifiable with the data collected*,
+which is a different statement from *tested and null*.
+
 ### 8.6 Why this is a null and not merely an absence of evidence
 
 The specification is not underpowered for effects of the relevant size. On the
@@ -399,12 +433,74 @@ attributable to snowmaking by this design.
   remaining source of variation orthogonal to temperature.
 - **Price and imbalance as outcomes.** §9 already notes the load forecast error is
   the TSO's error, not the market's. A null here does not rule out a price effect.
-- **Larger, less well-forecast markets.** The binding constraint was α, not sample
-  size. Systems where the load is a larger share of demand, or where the operator
-  forecasts less well, face a lower bar. Spanish irrigation pumping is the obvious
-  next case, with one caveat: irrigation *responds to price*, which makes the load
-  endogenous to the thing being explained and requires an instrument. Snowmaking
-  was the clean case precisely because its constraint is physical.
+- **Systems where the load is a larger share of demand.** The binding constraint was
+  α, not sample size. See §8.8 for the worldwide ranking.
+
+### 8.8 Was Austria a badly chosen case? Mostly not
+
+A null is only interesting if the test was fair. Ranking candidate systems by
+snowmaking energy per gigawatt of winter overnight load — Austria's 281 GWh ÷ ~7 GW
+= **43 GWh/GW** — puts Austria near the top of the world, not the middle.
+
+| System | Snowmaking (GWh/season) | Winter overnight load (GW) | Ratio | Free day-ahead forecast? |
+|---|---|---|---|---|
+| **ISO-NE Vermont region** | 40–90 *(derived)* | ~0.62–0.70 | **62–140** | Yes, hourly, per region, ~9 yr |
+| Italy-North | ~560 *(derived)* | ~12–13 | ~45 | Yes, Terna, per bidding zone |
+| **Austria (this study)** | **281 (published)** | **~7** | **43** | Yes |
+| ISO-NE New Hampshire | 22–54 *(derived)* | ~1.25 | 18–43 | Yes |
+| PSCO (Xcel Colorado) | 45–70 *(derived)* | ~3.5–4.5 | 11–18 | Yes, EIA-930 |
+| Switzerland | 60–65 (published) | ~8.4 | 7.1–7.7 | Yes, Swissgrid |
+| France | >110 (published) | ~60 | 1.8 | Yes, ODRÉ éCO2mix |
+| Germany | ≤43 incl. lifts | ~52 | ≤0.8 | Yes, SMARD |
+
+Derived figures scale equipped hectares by the Austrian intensity of 22,449 kWh/ha.
+No published national snowmaking-energy total exists outside Austria, Switzerland
+and France, so everything else in that column is an estimate.
+
+**Austria was a fair test.** Only two systems plausibly beat it, and one is a
+sub-region rather than a country. Switzerland is six times worse, France
+twenty-four, Germany fifty. This is not the null of a badly chosen case.
+
+**The best remaining test is Vermont, not a country.** ISO-NE publishes an hourly
+demand forecast *per reliability region*. Vermont's ~0.65 GW zonal load sits under a
+snowmaking fleet covering close to 100% of trail acreage, because US Northeast
+resorts snowmake far harder than the Alps where natural snowfall is unreliable.
+Resort-level derivations (Jiminy Peak, Sugarbush) put Northeast intensity at
+**3–7× the Austrian 22.4 MWh/ha**. Rhode Island provides a same-forecaster,
+same-weather, zero-snowmaking placebo inside the same data feed.
+
+One caveat must be resolved first: ISO-NE's regional report expresses each region as
+a percentage of the zonal total, which suggests the system forecast may be allocated
+to regions by load-share factors rather than each region being forecast
+independently. If so the forecast is structurally incapable of seeing a
+Vermont-specific anomaly, and a positive result would mean "no regional model"
+rather than "snowmaking is missed."
+
+**Andorra has the best physics on earth and no data.** Snowmaking at Grandvalira and
+Pal Arinsal against a 570 GWh national system is plausibly a several-percent share of
+national load, but FEDA sits outside ENTSO-E and publishes no hourly series. Same for
+China's Chongli cluster, built in a very dry climate for the 2022 Olympics.
+
+### 8.9 The ENTSO-E token was never necessary
+
+Two data findings, either of which would have saved days of assumed waiting.
+
+**APG's archives go back to 2009**, not 2024 as the web view implies, as nested
+per-year ZIPs with no registration. That alone covered this entire study.
+
+**energy-charts.info (Fraunhofer ISE) serves day-ahead load forecast and actual load
+for most European bidding zones with no token and no registration:**
+
+```
+https://api.energy-charts.info/public_power_forecast?country=XX&production_type=load&forecast_type=day-ahead
+https://api.energy-charts.info/public_power?country=XX          # series "Load"
+https://api.energy-charts.info/price?bzn=XX                     # day-ahead spot
+```
+
+On futures: EEX and ICE historical settlement data is paywalled (EEX Group
+DataSource, roughly €45–80/month, redistribution prohibited), so a futures-lag test
+is not feasible on free data. Day-ahead *spot* is free from the endpoint above and is
+the honest substitute, labelled as spot rather than futures.
 
 ## 9. Limitations
 

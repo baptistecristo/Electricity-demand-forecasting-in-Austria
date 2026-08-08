@@ -23,3 +23,10 @@ env/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# site build scratch
+site/*_web.png
+site/index.min.html
+site/shot_*.png
+site/chk*.png
+site/fig1.png
