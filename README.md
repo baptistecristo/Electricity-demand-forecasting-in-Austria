@@ -442,6 +442,11 @@ A null is only interesting if the test was fair. Ranking candidate systems by
 snowmaking energy per gigawatt of winter overnight load — Austria's 281 GWh ÷ ~7 GW
 = **43 GWh/GW** — puts Austria near the top of the world, not the middle.
 
+> **No country other than Austria was analysed.** Everything in this section is
+> desk scoping: published or derived snowmaking energy divided by published system
+> load. No load series, forecast series or regression was run for any other system.
+> These are targets for replication, not results.
+
 | System | Snowmaking (GWh/season) | Winter overnight load (GW) | Ratio | Free day-ahead forecast? |
 |---|---|---|---|---|
 | **ISO-NE Vermont region** | 40–90 *(derived)* | ~0.62–0.70 | **62–140** | Yes, hourly, per region, ~9 yr |
