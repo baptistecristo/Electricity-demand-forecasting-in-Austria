@@ -19,13 +19,13 @@ se     = [24, 16, 14, 16, 15, 14, 13, 16, 20, 16, 22, 30]
 
 # --- panel B: Nov 1 - Dec 30 in 10-day bins ----------------------------
 bins   = ["Nov\n1-10","Nov\n11-20","Nov\n21-30","Dec\n1-10","Dec\n11-20","Dec\n21-30"]
-bbias  = [78, 81, 222, 228, 146, -383]
-bse    = [24, 37, 47, 43, 46, 54]
+bbias  = [80, 90, 223, 223, 134, -383]
+bse    = [25, 37, 48, 41, 47, 54]
 
 # --- panel C: coefficients, primary spec -------------------------------
 terms  = ["below x cum100\n(PRE-REGISTERED)", "below", "campaign\nstart", "holiday\n(Christmas)"]
-coef   = [1.3, 3.4, -19.5, -277.3]
-cse    = [11.8, 52.6, 70.2, 84.1]
+coef   = [5.1, 27.2, 6.3, -273.6]
+cse    = [11.9, 53.2, 58.6, 84.0]
 
 fig, axes = plt.subplots(1, 3, figsize=(15.5, 5.2),
                          gridspec_kw={"width_ratios": [1.15, 1, 1.15]})

@@ -142,12 +142,12 @@ is front-loaded before opening day. Two identical cold nights therefore draw ver
 different amounts of power depending on how much snow has already been made.</p>
 <p>This paper pre-registers and tests whether that path dependence appears as a
 state-dependent error in the published day-ahead load forecast. Using thirteen
-seasons of Austrian Power Grid data (113,952 hourly observations, 2010–2022) joined
+seasons of Austrian Power Grid data (113,939 hourly observations, 2010–2022) joined
 to a pressure-corrected wet-bulb index built from thirteen alpine stations between
 1,221 and 2,327 m, the interaction between the threshold and season-to-date
-accumulated cold is <b>+1.3 MW (s.e. 11.8)</b> across 780 November–December nights.
+accumulated cold is <b>+5.1 MW (s.e. 11.9)</b> across 780 November–December nights.
 Campaign-start effects are likewise zero. The identical specification on the identical
-nights recovers the Christmas industrial shutdown at <b>−277 MW (t = −3.3)</b>, so the
+nights recovers the Christmas industrial shutdown at <b>−274 MW (t = −3.3)</b>, so the
 design detects effects of the size snowmaking would have to produce.</p>
 <p>The load is not invisible to the forecast; it is absorbed by it. A temperature
 coefficient fitted on thirteen years in which cold alpine nights <em>are</em>
@@ -272,9 +272,9 @@ constraint.</figcaption>
 </figure>
 <p>Measured on the actual data, the Austrian day-ahead forecast turned out
 substantially noisier than the German-Luxembourg benchmark of 3.14% used to
-calibrate this: <b>6.50% MAE</b> on November–December night hours, standard deviation
-597 MW raw and 514 MW after fixed effects. That raised the pass mark to
-<b>α ≥ 25.4%</b> at thirteen seasons.</p>
+calibrate this: <b>6.48% MAE</b> on November–December night hours, standard deviation
+608 MW raw and 554 MW after fixed effects. That raised the pass mark to
+<b>α ≥ 27.4%</b> at thirteen seasons.</p>
 
 <h2 class="sec">7. Results</h2>
 <figure>
@@ -287,14 +287,14 @@ observations. November is the most under-forecast month of the year at
 <figure>
 {FIG_BINS}
 <figcaption><b>Figure 3.</b> The same error in 10-day bins across November and
-December. The bias climbs to +228 ± 43 MW in early December and then collapses at
+December. The bias climbs to +223 ± 41 MW in early December and then collapses at
 the Christmas industrial shutdown. This is the shape, magnitude and timing snowmaking
 would produce — and also what a seasonal heating ramp produces.</figcaption>
 </figure>
 
 <p>The unconditional seasonal profile was encouraging. November is the most
 under-forecast month of the year, and within November–December the bias climbs to
-+228 ± 43 MW in early December before collapsing at Christmas. That is the right
++223 ± 41 MW in early December before collapsing at Christmas. That is the right
 shape, magnitude and timing for snowmaking: too warm to make snow in early November,
 a ramp into the opening-day crunch, decline as bases are built. It is also exactly
 what a seasonal heating ramp produces.</p>
@@ -305,7 +305,7 @@ what a seasonal heating ramp produces.</p>
 {FIG_COEFS}
 <figcaption><b>Figure 4.</b> Coefficients from the primary specification with 95%
 intervals. The pre-registered interaction sits on zero. The same model, on the same
-nights, places the Christmas shutdown at −277 MW — so the design is not blind to
+nights, places the Christmas shutdown at −274 MW — so the design is not blind to
 effects of the size snowmaking would have to produce.</figcaption>
 </figure>
 
@@ -316,13 +316,13 @@ effects of the size snowmaking would have to produce.</figcaption>
 </tr></thead>
 <tbody>
 <tr class="hl"><td>Nov–Dec, all nights</td><td class="num">780</td>
-  <td class="num">+1.3 (11.8)</td><td class="num">+3.4 (52.6)</td><td class="num">−277.3 (84.1)</td></tr>
-<tr><td>Bandwidth |wb+2| ≤ 3 °C</td><td class="num">412</td>
-  <td class="num">+1.1 (15.2)</td><td class="num">−33.8 (96.1)</td><td class="num">−190.4 (123.8)</td></tr>
+  <td class="num">+5.1 (11.9)</td><td class="num">+27.2 (53.2)</td><td class="num">−273.6 (84.0)</td></tr>
+<tr><td>Bandwidth |wb+2| ≤ 3 °C</td><td class="num">418</td>
+  <td class="num">+4.2 (14.7)</td><td class="num">+39.8 (83.1)</td><td class="num">−210.0 (121.2)</td></tr>
 <tr><td>With campaign-start dummies</td><td class="num">780</td>
-  <td class="num">+0.4 (12.0)</td><td class="num">+13.6 (52.3)</td><td class="num">−273.0 (85.7)</td></tr>
+  <td class="num">+5.4 (12.0)</td><td class="num">+23.1 (55.1)</td><td class="num">−273.7 (84.0)</td></tr>
 <tr><td>Seasons 2016–2022 only</td><td class="num">420</td>
-  <td class="num">−7.1 (11.4)</td><td class="num">+28.7 (49.2)</td><td class="num">−373.1 (92.2)</td></tr>
+  <td class="num">−7.9 (11.5)</td><td class="num">−3.3 (49.5)</td><td class="num">−372.0 (92.7)</td></tr>
 </tbody></table>
 <p class="tcap"><b>Table 2.</b> Coefficients in MW, HC1 standard errors in
 parentheses, night-level observations. The primary coefficient is zero in every
@@ -331,18 +331,19 @@ specification. The holiday control is strongly significant in every specificatio
 <table>
 <thead><tr><th>Campaign-start terms</th><th class="num">Coef.</th><th class="num">s.e.</th><th class="num">t</th></tr></thead>
 <tbody>
-<tr><td>First night of a cold snap</td><td class="num">−19.5</td><td class="num">70.2</td><td class="num">−0.28</td></tr>
-<tr><td>Second night</td><td class="num">−78.5</td><td class="num">104.8</td><td class="num">−0.75</td></tr>
+<tr><td>First night of a cold snap</td><td class="num">+6.3</td><td class="num">58.6</td><td class="num">0.11</td></tr>
+<tr><td>Second night</td><td class="num">−91.7</td><td class="num">86.7</td><td class="num">−1.06</td></tr>
 </tbody></table>
 <p class="tcap"><b>Table 3.</b> The scenario where α should be highest, because
-autoregressive terms have not yet caught up. Zero, and wrong-signed.</p>
+autoregressive terms have not yet caught up. Both dummies enter the same
+specification. Zero, and the first night carries the wrong sign.</p>
 
 <h3>7.1 Why this is a null rather than an absence of evidence</h3>
 <p>The specification is not underpowered for effects of the relevant size. On the same
 780 nights, with the same fixed effects and the same standard errors, it recovers the
-Christmas industrial shutdown at −277 MW with t = −3.3, rising to −373 MW and
-t = −4.1 in recent seasons. A real night-level swing of a few hundred megawatts is
-visible to this design. The snowmaking interaction is 0 ± 12.</p>
+Christmas industrial shutdown at −274 MW with t = −3.3, rising to −372 MW and
+t = −4.0 in recent seasons. A real night-level swing of a few hundred megawatts is
+visible to this design. The snowmaking interaction is +5 ± 12.</p>
 <p>The most likely explanation is the one anticipated in §3. The +131 MW November
 bias survives as a real seasonal feature; it is simply not attributable to snowmaking
 by this design.</p>
@@ -360,6 +361,29 @@ explained by a smooth function of the date.</p>
 snow years and early in good ones, and that variation is orthogonal to the calendar.
 This pre-registered test is closed as <em>not identifiable with the data collected</em>,
 which is a different statement from tested and null.</p>
+<p class="tcap">The two coefficients in this subsection are the only numbers on this
+page that the published pipeline does not regenerate: they need per-resort opening
+dates, which are not in the repository. They still carry the timezone error described
+in 7.3.</p>
+
+<h3>7.3 Correction</h3>
+<p>The numbers first published here were computed in a browser JavaScript context,
+because the machine that ran the analysis had no route to APG or GeoSphere.
+<code>src/apg_pipeline.py</code> is the portable Python reimplementation, and nobody
+had run it start to finish until now. Doing so found four defects, and the figures
+and tables above report the corrected output.</p>
+<p>GeoSphere stamps its timestamps UTC while APG publishes local CET/CEST wall clock,
+and both runs joined them on the raw hour string, so every load hour drew the wet bulb
+of the following local hour. Correcting it moves the primary interaction from
++1.3 (11.8) to +5.1 (11.9), which is still indistinguishable from zero and still
+wrong-signed against the prediction. The season-to-date cold accumulator had also been
+built after the night filter, halving it and inflating every coefficient attached to it
+by a factor near 2.05. Austria's daylight-saving hour, which APG writes as
+<code>2A</code> and <code>2B</code>, crashed the parser outright. And the gate
+statistics in section 6 had been measured on a 21:00–05:59 night rather than the
+registered 20:00–06:59 one, which is where the earlier 6.50% MAE came from.</p>
+<p>None of it changes the verdict. The pre-registration, the kill criteria and the
+power calculation are unchanged.</p>
 
 <h2 class="sec">8. Was Austria a badly chosen case?</h2>
 <p>A null is only interesting if the test was fair. Ranking systems by snowmaking

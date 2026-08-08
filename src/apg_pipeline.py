@@ -72,7 +72,12 @@ def _apg_series(url: str, name: str, inner_pat: str) -> pd.Series:
         csv_name = next(n for n in inner.namelist() if n.lower().endswith(".csv"))
         df = pd.read_csv(io.BytesIO(inner.read(csv_name)))
         df.columns = ["t_from", "t_to", "value"]
-        df["hour"] = df["t_from"].str.slice(0, 13)
+        # APG writes the DST-repeated October hour as '2A' (02:00 CEST) and
+        # '2B' (02:00 CET) instead of a numeric hour. Fold both onto '02' so the
+        # groupby below averages them, as the docstring describes.
+        df["hour"] = (df["t_from"].str.slice(0, 13)
+                      .str.replace(r"^(\d{4}-\d{2}-\d{2}) 2[AB]$", r"\1 02",
+                                   regex=True))
         frames.append(df.groupby("hour")["value"].mean())
     if not frames:
         raise RuntimeError(f"no members matched {inner_pat} in {name}")
@@ -143,11 +148,18 @@ def wetbulb_index(stations: pd.DataFrame) -> pd.Series:
     ids = ",".join(stations.id.astype(str))
     num, den = {}, {}
     for year in YEARS:
+        # GeoSphere stamps everything UTC ('2015-12-01T00:00+00:00'); APG
+        # publishes local CET/CEST wall clock. Joining the raw strings misaligns
+        # the index by an hour (two under CEST), so convert first. The query
+        # starts a day early because 1 Oct 00:00 local precedes 1 Oct 00:00 UTC.
         url = (f"{GS}/station/historical/klima-v2-1h?parameters=tl,rf"
-               f"&start={year}-10-01T00:00&end={year}-12-31T23:00"
+               f"&start={year}-09-30T00:00&end={year}-12-31T23:00"
                f"&station_ids={ids}&output_format=geojson")
         g = requests.get(url, timeout=600).json()
-        stamps = [s[:13].replace("T", " ") for s in g["timestamps"]]
+        local = pd.DatetimeIndex(
+            pd.to_datetime(g["timestamps"], utc=True)).tz_convert("Europe/Vienna")
+        stamps = local.strftime("%Y-%m-%d %H")
+        in_season = local.month.isin([10, 11, 12])
         for feat in g["features"]:
             props = feat["properties"]
             sid = str(props.get("station", props.get("id")))
@@ -161,8 +173,8 @@ def wetbulb_index(stations: pd.DataFrame) -> pd.Series:
             ok = np.isfinite(tl) & np.isfinite(rf)
             wb = np.full(tl.shape, np.nan)
             wb[ok] = wet_bulb(tl[ok], rf[ok], p)
-            for s, v in zip(stamps, wb):
-                if np.isfinite(v):
+            for s, v, keep in zip(stamps, wb, in_season):
+                if keep and np.isfinite(v):
                     num[s] = num.get(s, 0.0) + v * w
                     den[s] = den.get(s, 0.0) + w
     idx = {k: num[k] / den[k] for k in num if den[k] > 0.5}
@@ -171,20 +183,25 @@ def wetbulb_index(stations: pd.DataFrame) -> pd.Series:
 
 # ------------------------------------------------------------ night panel ----
 def night_panel(load: pd.DataFrame, wb: pd.Series) -> pd.DataFrame:
-    df = load.join(wb, how="inner")
-    df = df[df.M.isin([10, 11, 12]) & df.H.isin(NIGHT_HOURS)].copy()
+    full = load.join(wb, how="inner")
+    full = full[full.M.isin([10, 11, 12])].copy().sort_index()
+    full["season"] = full["Y"]
 
+    # cum_cold_h accumulates hours below threshold from 1 Oct, lagged so the
+    # current hour never contributes to its own regressor. It runs over EVERY
+    # hour of the season, not only night hours: the base a resort has already
+    # built is the product of all the cold it has had, daytime included. Taking
+    # the cumsum after the night filter would halve the running variable
+    # (~497 h/season instead of ~1,011) and inflate every cum100 coefficient
+    # and standard error by the same factor of ~2.05.
+    below_h = (full["wb"] < WB_THRESHOLD).astype(int)
+    full["cum_cold_h"] = (below_h.groupby(full["season"])
+                          .transform(lambda s: s.shift(1).fillna(0).cumsum()))
+
+    df = full[full.H.isin(NIGHT_HOURS)].copy()
     ts = pd.to_datetime(df.index, format="%Y-%m-%d %H")
     # A night runs 20:00-06:59 and is labelled by the date of its 20:00 hour.
     df["night_date"] = (ts - pd.Timedelta(hours=7)).date
-    df["season"] = df["Y"]
-
-    # cum_cold_h accumulates hours below threshold from 1 Oct, lagged so the
-    # current night never contributes to its own regressor.
-    df = df.sort_index()
-    below_h = (df["wb"] < WB_THRESHOLD).astype(int)
-    df["cum_cold_h"] = (below_h.groupby(df["season"])
-                        .transform(lambda s: s.shift(1).fillna(0).cumsum()))
 
     g = df.groupby("night_date")
     p = pd.DataFrame({
@@ -212,6 +229,17 @@ def night_panel(load: pd.DataFrame, wb: pd.Series) -> pd.DataFrame:
             if b[i] and not b[i - 1] and not b[i - 2]:
                 starts[a.index[i]] = 1
     p["campaign_start"] = starts
+    # campaign_night2: the night immediately after a start. Tested separately
+    # because the highest-alpha scenario is the one where the forecast's
+    # autoregressive terms have not yet caught up with a running campaign.
+    night2 = np.zeros(len(p), dtype=int)
+    for _, idx in p.groupby("season").groups.items():
+        a = p.loc[idx].sort_values("night_date")
+        cs = a.campaign_start.to_numpy()
+        for i in range(1, len(cs)):
+            if cs[i - 1] == 1:
+                night2[a.index[i]] = 1
+    p["campaign_night2"] = night2
     return p[p.month.isin([11, 12])].reset_index(drop=True)
 
 
@@ -232,19 +260,65 @@ def estimate(p: pd.DataFrame, label: str, extra: str = "") -> None:
           .round(2).to_string())
 
 
+def descriptives(load: pd.DataFrame) -> None:
+    """README 8.3: night-level forecast bias by month and in 10-day bins.
+
+    Estimated at night level, so the standard errors count nights rather than
+    the heavily autocorrelated hours inside them.
+    """
+    d = load[load.H.isin(NIGHT_HOURS)].copy()
+    ts = pd.to_datetime(d.index, format="%Y-%m-%d %H")
+    d["night_date"] = (ts - pd.Timedelta(hours=7)).date
+    g = d.groupby("night_date")
+    n = pd.DataFrame({"err": g["err"].mean(), "n_hours": g.size()})
+    n = n[n.n_hours >= MIN_NIGHT_HOURS].reset_index()
+    dt = pd.to_datetime(n.night_date)
+    n["month"], n["day"] = dt.dt.month, dt.dt.day
+
+    print("\n8.3 — night bias by month (MW, +- s.e.)")
+    m = n.groupby("month")["err"].agg(["mean", "sem"]).round(1)
+    print("  " + "  ".join(f"{i:02d}:{r['mean']:+.0f}+-{r['sem']:.0f}"
+                           for i, r in m.iterrows()))
+
+    print("8.3 — Nov 1 - Dec 30 in 10-day bins (Dec 31 excluded)")
+    b = n[(n.month.isin([11, 12])) & (n.day <= 30)].copy()
+    b["bin"] = b.month.map({11: "Nov", 12: "Dec"}) + " " + pd.cut(
+        b.day, [0, 10, 20, 30], labels=["1-10", "11-20", "21-30"]).astype(str)
+    order = [f"{mo} {d}" for mo in ("Nov", "Dec")
+             for d in ("1-10", "11-20", "21-30")]
+    r = b.groupby("bin")["err"].agg(["mean", "sem", "count"]).reindex(order)
+    print(r.round(1).to_string())
+
+
 def main() -> None:
     print("downloading APG load series ...")
     load = load_panel()
     print(f"  hourly observations: {len(load):,}  "
           f"{load.index.min()} .. {load.index.max()}")
 
-    night_all = load[load.H.isin(NIGHT_HOURS) & load.M.isin([11, 12])]
+    # The gate uses the same 20:00-06:59 night as the estimation sample.
+    night_all = load[load.H.isin(NIGHT_HOURS) & load.M.isin([11, 12])].copy()
+    mae = night_all.err.abs().mean()
     print(f"\nGATE — Nov-Dec night hours, day-ahead forecast error")
     print(f"  mean load : {night_all.actual.mean():,.0f} MW")
     print(f"  bias      : {night_all.err.mean():+,.1f} MW")
     print(f"  sd        : {night_all.err.std():,.1f} MW")
-    print(f"  MAE       : {night_all.err.abs().mean():,.1f} MW "
-          f"({100*night_all.err.abs().mean()/night_all.actual.mean():.2f}% of load)")
+    print(f"  MAE       : {mae:,.1f} MW "
+          f"({100*mae/night_all.actual.mean():.2f}% of load)")
+
+    # sd after hour/dow/season fixed effects, and the alpha pass mark it
+    # implies through the detectability formula in src/power.py.
+    import statsmodels.formula.api as smf
+    night_all["dow"] = pd.to_datetime(night_all.index,
+                                      format="%Y-%m-%d %H").dayofweek
+    sd_fe = smf.ols("err ~ C(H) + C(dow) + C(Y)", data=night_all).fit().resid.std()
+    n_ep = 13 * 9                                   # seasons x episodes/season
+    alpha = (2.80 * sd_fe * np.sqrt(0.7 + 0.3 / 8)
+             * np.sqrt(2 / (n_ep * 0.5)) / 900)
+    print(f"  sd after hour/dow/season FE : {sd_fe:,.1f} MW")
+    print(f"  implied alpha pass mark, 13 seasons : {alpha:.1%}")
+
+    descriptives(load)
 
     print("\nselecting alpine stations ...")
     stations = pick_stations()
@@ -256,13 +330,16 @@ def main() -> None:
           f"{100*(wb < WB_THRESHOLD).mean():.1f}%")
 
     p = night_panel(load, wb)
-    print(f"\nnight panel: {len(p)} nights across {p.season.nunique()} seasons")
+    print(f"\nnight panel: {len(p)} nights across {p.season.nunique()} seasons, "
+          f"{int(p.campaign_start.sum())} campaign starts")
     p.to_csv("data/night_panel.csv", index=False)
 
     estimate(p, "PRIMARY — Nov-Dec, all nights")
     estimate(p[p.dist.abs() <= 3], "Bandwidth |wb+2| <= 3 C")
     estimate(p, "With campaign-start dummy", extra=" + campaign_start")
     estimate(p[p.season >= 2016], "Seasons 2016-2022 only")
+    estimate(p, "Campaign start + second night",
+             extra=" + campaign_start + campaign_night2")
 
 
 if __name__ == "__main__":

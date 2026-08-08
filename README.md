@@ -7,9 +7,9 @@ fired. The predictions and the stopping rules were written before any load data
 was examined; commit history is the proof. Results in §8.
 
 **Headline:** on 780 November–December nights across 13 seasons, the pre-registered
-interaction is **+1.3 MW ± 11.8** — indistinguishable from zero. The identical
+interaction is **+5.1 MW ± 11.9** — indistinguishable from zero. The identical
 specification, on the identical nights, recovers the Christmas industrial shutdown
-at **−277 MW (t = −3.3)**. The design can see effects of the size snowmaking would
+at **−274 MW (t = −3.3)**. The design can see effects of the size snowmaking would
 have to produce. It does not see snowmaking.
 
 ---
@@ -269,8 +269,10 @@ Raw data is not committed. `data/README.md` documents exactly how to fetch it.
 
 ## 8. Results
 
-Everything above this line was written first. Nothing above it has been edited
-since the data was opened.
+Sections 1–7 were written first and have not been edited since the data was
+opened; the commit history is the proof. The headline block at the top of this
+file reports results, so it tracks them, and it was corrected along with §8 in
+the pass described in §8.10.
 
 ![Results](figures/results.png)
 
@@ -282,12 +284,12 @@ the critical path. Forecast coverage starts 2010, so:
 
 | | |
 |---|---|
-| Joined hourly observations | 113,952 (2010-01-01 to 2022-12-31) |
+| Joined hourly observations | 113,939 (2010-01-01 to 2022-12-31) |
 | Seasons | 13 |
 | Nov–Dec nights, ≥8 hours in the 20:00–06:59 window | **780** |
 | Alpine stations in the wet-bulb index | 13, deduplicated, 1,221–2,327 m |
 | Index hours (Oct–Dec) | 28,704 |
-| Campaign starts identified | 49 |
+| Campaign starts identified | 52 |
 
 Stations include Ischgl-Idalpe (2,327 m), Rudolfshütte (2,317 m), Patscherkofel
 (2,251 m), Galzig (2,079 m), Villacher Alpe (2,140 m) and Schmittenhöhe (1,956 m) —
@@ -297,17 +299,23 @@ the index sits where snow is actually made, not in the valleys.
 
 | Nov–Dec night hours, 2010–2022 | |
 |---|---|
-| Mean load | 6,420 MW |
-| Bias (actual − forecast) | **+59.5 MW** |
-| MAE | 417 MW, **6.50% of load** |
-| sd, raw | 597 MW |
-| sd, after hour/dow/season fixed effects | **514 MW** |
-| Implied α pass mark, 13 seasons | **25.4%** |
+| Mean load | 6,585 MW |
+| Bias (actual − forecast) | **+59.6 MW** |
+| MAE | 427 MW, **6.48% of load** |
+| sd, raw | 608 MW |
+| sd, after hour/dow/season fixed effects | **554 MW** |
+| Implied α pass mark, 13 seasons | **27.4%** |
 
 The DE-LU benchmark used in §6 was 3.14%. Austria is roughly twice as hard to
 forecast, worse than the most pessimistic of the three scenarios. The bar the
-hypothesis had to clear was therefore ~25% of the snowmaking load left
+hypothesis had to clear was therefore ~27% of the snowmaking load left
 unexplained, not the ~19% anticipated.
+
+These figures are computed over the same 20:00–06:59 night used for estimation.
+The first published version of this table used a narrower 21:00–05:59 window by
+mistake, which is where its 6,420 MW / 417 MW / 597 MW came from; see §8.10. The
+ratio that the argument actually turns on barely moved — 6.48% against 6.50% —
+so the conclusion of this section is unchanged.
 
 ### 8.3 What the raw seasonal profile looked like
 
@@ -326,7 +334,7 @@ December then collapses:
 
 | Nov 1–10 | Nov 11–20 | Nov 21–30 | Dec 1–10 | Dec 11–20 | Dec 21–30 |
 |---|---|---|---|---|---|
-| +78 ± 24 | +81 ± 37 | +222 ± 47 | **+228 ± 43** | +146 ± 46 | −383 ± 54 |
+| +80 ± 25 | +90 ± 37 | +223 ± 48 | **+223 ± 41** | +134 ± 47 | −383 ± 54 |
 
 That hump is the right shape and the right order of magnitude for snowmaking:
 too warm to make snow in early November, a ramp into the opening-day crunch, then
@@ -343,29 +351,30 @@ night-level observations, HC1 standard errors.
 
 | Specification | n | `below:cum100` **(primary)** | `below` | `holiday` |
 |---|---|---|---|---|
-| Nov–Dec, all nights | 780 | **+1.3** (11.8), t = 0.11 | +3.4 (52.6) | **−277.3** (84.1), t = −3.30 |
-| Bandwidth \|wb+2\| ≤ 3 °C | 412 | **+1.1** (15.2), t = 0.07 | −33.8 (96.1) | −190.4 (123.8) |
-| With campaign-start dummies | 780 | **+0.4** (12.0), t = 0.03 | +13.6 (52.3) | −273.0 (85.7), t = −3.19 |
-| Seasons 2016–2022 only | 420 | **−7.1** (11.4), t = −0.63 | +28.7 (49.2) | **−373.1** (92.2), t = −4.05 |
+| Nov–Dec, all nights | 780 | **+5.1** (11.9), t = 0.43 | +27.2 (53.2) | **−273.6** (84.0), t = −3.26 |
+| Bandwidth \|wb+2\| ≤ 3 °C | 418 | **+4.2** (14.7), t = 0.29 | +39.8 (83.1) | −210.0 (121.2) |
+| With campaign-start dummies | 780 | **+5.4** (12.0), t = 0.45 | +23.1 (55.1) | −273.7 (84.0), t = −3.26 |
+| Seasons 2016–2022 only | 420 | **−7.9** (11.5), t = −0.69 | −3.3 (49.5) | **−372.0** (92.7), t = −4.01 |
 
 Standard errors in parentheses.
 
 Campaign-start effects, testing the highest-α scenario where autoregressive terms
-have not yet caught up:
+have not yet caught up. Both dummies enter the same specification:
 
 | Term | Coefficient | SE | t |
 |---|---|---|---|
-| `campaign_start` (first night of a cold snap) | −19.5 | 70.2 | −0.28 |
-| `campaign_night2` | −78.5 | 104.8 | −0.75 |
+| `campaign_start` (first night of a cold snap) | +6.3 | 58.6 | 0.11 |
+| `campaign_night2` | −91.7 | 86.7 | −1.06 |
 
 ### 8.5 Verdict against the pre-registered kill criteria
 
 > *"The interaction coefficient is zero or positive with a tight confidence
 > interval → no memory effect. Stop."*
 
-**Fired.** +1.3 MW with a standard error of 11.8, stable across four
-specifications, and negative-signed only in the subsample where it is least
-precise. The 95% interval is roughly [−22, +25] MW per 100 accumulated cold hours.
+**Fired.** +5.1 MW with a standard error of 11.9, stable across four
+specifications and carrying the wrong sign in three of them; the one negative
+estimate, −7.9 in the 2016–2022 subsample, is smaller than its own standard
+error. The 95% interval is roughly [−18, +28] MW per 100 accumulated cold hours.
 
 > *"The event-study profile is flat across campaign days → the forecast already
 > absorbs it. Stop."*
@@ -398,8 +407,15 @@ mechanical: regressing the opening-share curve on the day-of-season controls
 already in the specification gives **R² = 0.798**. A fixed calendar curve is four-
 fifths explained by a smooth function of the date, so only a fifth of its variation
 is available to identify anything. Adding it also inflates the standard error on the
-primary interaction from 11.8 to 30.3, which is collinearity rather than
+primary interaction from 11.9 to roughly 30, which is collinearity rather than
 information.
+
+The two coefficients in the table above are the only numbers in §8 that the
+corrected pipeline does not regenerate: they need per-resort opening dates, and
+`data/opening_dates.csv` is not in this repository. They are carried over from the
+first run and therefore still contain the timezone error described in §8.10. The
+conclusion does not depend on them — the test is closed as not identifiable on the
+strength of R² = 0.798, which is a property of the calendar, not of the estimate.
 
 **What would fix it:** season-varying opening dates. Resorts open late in bad snow
 years and early in good ones, and that variation is orthogonal to the calendar.
@@ -412,9 +428,9 @@ which is a different statement from *tested and null*.
 
 The specification is not underpowered for effects of the relevant size. On the
 same 780 nights, with the same fixed effects and the same standard errors, it
-recovers the Christmas industrial shutdown at −277 MW with t = −3.3, rising to
-−373 MW and t = −4.1 in recent seasons. A real night-level swing of a few hundred
-megawatts is visible to this design. The snowmaking interaction is 0 ± 12.
+recovers the Christmas industrial shutdown at −274 MW with t = −3.3, rising to
+−372 MW and t = −4.0 in recent seasons. A real night-level swing of a few hundred
+megawatts is visible to this design. The snowmaking interaction is +5 ± 12.
 
 The most likely explanation is the one anticipated in §3. Snowmaking is not
 invisible to the forecast; it is *absorbed* by it. A temperature coefficient
@@ -506,6 +522,51 @@ On futures: EEX and ICE historical settlement data is paywalled (EEX Group
 DataSource, roughly €45–80/month, redistribution prohibited), so a futures-lag test
 is not feasible on free data. Day-ahead *spot* is free from the endpoint above and is
 the honest substitute, labelled as spot rather than futures.
+
+### 8.10 Correction: four defects found when the pipeline first ran end to end
+
+The numbers first published in §8 came out of a browser JavaScript context,
+because the machine that ran the analysis had no network route to APG or
+GeoSphere. `src/apg_pipeline.py` is the portable Python reimplementation, and
+until now nobody had run it start to finish. Running it found four problems. The
+tables above report the corrected output.
+
+**1. The wet-bulb index sat an hour off.** GeoSphere stamps its timestamps UTC
+(`2015-12-01T00:00+00:00`). APG publishes local CET/CEST wall clock
+(`Time from [CET/CEST]`). Both runs joined the two on the raw hour string, so each
+load hour drew the wet bulb of the next local hour, and of the hour after that
+during October's CEST. Only this correction moves the headline: the primary
+interaction shifts from +1.3 (11.8) to +5.1 (11.9). It still cannot be told apart
+from zero and still carries the sign opposite to the prediction, so §8.5 stands.
+
+**2. The cold accumulator counted night hours only.** The code built `cum_cold_h`
+after filtering the panel to 20:00–06:59, so it summed about 497 below-threshold
+hours per season where the pre-registration asks for hours below threshold since
+1 October, about 1,011 of them. The running variable came out half its intended
+size, which inflated each coefficient and standard error attached to it by a
+factor near 2.05.
+
+**3. Daylight saving crashed the parser.** APG writes the repeated October hour as
+`2A` and `2B` instead of a number. The Python did not handle it and crashed on the
+first run, before producing a single number. Folding both onto hour 02 and
+averaging them, which the function's docstring already claimed to do, costs 13
+hours and leaves 113,939.
+
+**4. The gate table measured a different night than the sample it described.** The
+original 6,420 MW, 417 MW and 597 MW in §8.2 reproduce to the decimal on a
+21:00–05:59 night rather than the registered 20:00–06:59 one. §8.2 now uses the
+registered window. The MAE ratio the argument rests on moves from 6.50% to 6.48%.
+
+One number resisted every specification tried: the 514 MW standard deviation after
+hour, day-of-week and season fixed effects. The registered window gives 554 MW,
+which lifts the implied α pass mark from 25.4% to 27.4%. §8.2 reports 554.
+
+Two of the six 10-day bins in §8.3 also shifted by about 10 MW against standard
+errors near 40, and the cause is not identified. The seasonal shape they describe
+is the same.
+
+Nothing above §8 changed. The pre-registration, the kill criteria and the power
+calculation stand as committed.
 
 ## 9. Limitations
 
