@@ -5,8 +5,13 @@ scale on mobile, and keep the deployed page small enough to ship in one piece.
 All numbers come from src/apg_pipeline.py.
 """
 
-INK, MUTED, RULE = "#1a1a1a", "#5a5a5a", "#d8d4cc"
-BLUE, RED, GREY, GREEN = "#2b6cb0", "#c05621", "#9a9a9a", "#276749"
+# The figures are inline SVG in the page, so they can read the page's CSS custom
+# properties directly. That is what keeps them legible in both themes without
+# shipping two copies of every chart.
+INK, MUTED, RULE = "var(--fg)", "var(--muted)", "var(--rule)"
+BLUE, RED, GREY, GREEN = ("var(--c-blue)", "var(--c-red)",
+                          "var(--c-grey)", "var(--c-green)")
+PLUM = "var(--c-plum)"
 
 
 def _esc(s):
@@ -59,10 +64,10 @@ def bar_chart(labels, values, errors, colors, *, w=680, h=300,
         out.append(f'<rect x="{cx-bw/2:.1f}" y="{top:.1f}" width="{bw:.1f}" '
                    f'height="{max(bot-top,0.5):.1f}" fill="{c}"/>')
         out.append(f'<line x1="{cx:.1f}" x2="{cx:.1f}" y1="{y(v-e):.1f}" y2="{y(v+e):.1f}" '
-                   f'stroke="#333" stroke-width="1.1"/>')
+                   f'stroke="{INK}" stroke-width="1.1"/>')
         for yy in (y(v - e), y(v + e)):
             out.append(f'<line x1="{cx-3.5:.1f}" x2="{cx+3.5:.1f}" y1="{yy:.1f}" '
-                       f'y2="{yy:.1f}" stroke="#333" stroke-width="1.1"/>')
+                       f'y2="{yy:.1f}" stroke="{INK}" stroke-width="1.1"/>')
         for k, line in enumerate(str(lab).split("|")):
             out.append(f'<text x="{cx:.1f}" y="{h-pad_b+15+k*11}" text-anchor="middle" '
                        f'font-size="10" fill="{INK}">{_esc(line)}</text>')
@@ -110,10 +115,10 @@ def coef_plot(terms, coefs, ses, colors, *, w=680, h=250, pad_l=170,
     for i, (term, c, s, col) in enumerate(zip(terms, coefs, ses, colors)):
         cy = pad_t + slot * (i + 0.5)
         out.append(f'<line x1="{x(c-1.96*s):.1f}" x2="{x(c+1.96*s):.1f}" '
-                   f'y1="{cy:.1f}" y2="{cy:.1f}" stroke="#333" stroke-width="1.6"/>')
+                   f'y1="{cy:.1f}" y2="{cy:.1f}" stroke="{INK}" stroke-width="1.6"/>')
         for xx in (x(c - 1.96 * s), x(c + 1.96 * s)):
             out.append(f'<line x1="{xx:.1f}" x2="{xx:.1f}" y1="{cy-4:.1f}" '
-                       f'y2="{cy+4:.1f}" stroke="#333" stroke-width="1.4"/>')
+                       f'y2="{cy+4:.1f}" stroke="{INK}" stroke-width="1.4"/>')
         out.append(f'<circle cx="{x(c):.1f}" cy="{cy:.1f}" r="5" fill="{col}"/>')
         for k, line in enumerate(term.split("|")):
             out.append(f'<text x="{pad_l-12}" y="{cy+3.5-((len(term.split("|"))-1)*5.5)+k*11:.1f}" '
@@ -130,7 +135,7 @@ def mde_chart(*, w=680, h=310, pad_l=54, pad_r=150, pad_t=16, pad_b=40):
     seasons = list(range(2, 13))
     series = [
         ("MAE 1.5% (optimistic)", 132, BLUE), ("MAE 3.14% (DE-LU)", 275, RED),
-        ("MAE 5% (small zone)", 439, "#702459"),
+        ("MAE 5% (small zone)", 439, PLUM),
     ]
     import math
     def mde(ns, sd):

@@ -5,116 +5,246 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Snowmaking and the Austrian Day-Ahead Load Forecast: A Pre-Registered Null</title>
 <meta name="description" content="A pre-registered test of whether ski-resort snowmaking is a systematic blind spot in Austria's day-ahead electricity load forecast. 780 nights, 13 seasons. Null.">
+<script>try{var s=localStorage.getItem('snowtheme');if(s)document.documentElement.setAttribute('data-theme',s);}catch(e){}</script>
 <style>
 :root {
-  --ink:#1a1a1a; --muted:#5a5a5a; --rule:#d8d4cc; --bg:#fdfdfb;
-  --accent:#7a2020; --link:#1a4c8b; --panel:#f5f3ee;
+  --bg:#ffffff; --fg:#0a0a0a; --muted:#737373; --rule:#e5e5e5;
+  --accent:#0079F2; --accent-line:rgba(0,121,242,.18);
+  --panel:rgba(0,121,242,.035); --code-bg:#f4f4f5; --hl:rgba(0,121,242,.05);
+  --c-blue:#2b6cb0; --c-red:#c05621; --c-green:#276749; --c-grey:#9a9a9a;
+  --c-plum:#702459;
+  --serif:'Crimson Pro',Georgia,'Times New Roman',serif;
+  --sans:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
 }
-*{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+:root[data-theme="dark"]{
+  --bg:#0a0a0a; --fg:#e5e5e5; --muted:#a3a3a3; --rule:#404040;
+  --accent:#3b9eff; --accent-line:rgba(59,158,255,.32);
+  --panel:rgba(59,158,255,.07); --code-bg:rgba(255,255,255,.07);
+  --hl:rgba(59,158,255,.09);
+  --c-blue:#5aa9f0; --c-red:#ee8a4d; --c-green:#4bb07a; --c-grey:#8a8a8a;
+  --c-plum:#d571a6;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0a0a0a; --fg:#e5e5e5; --muted:#a3a3a3; --rule:#404040;
+    --accent:#3b9eff; --accent-line:rgba(59,158,255,.32);
+    --panel:rgba(59,158,255,.07); --code-bg:rgba(255,255,255,.07);
+    --hl:rgba(59,158,255,.09);
+    --c-blue:#5aa9f0; --c-red:#ee8a4d; --c-green:#4bb07a; --c-grey:#8a8a8a;
+    --c-plum:#d571a6;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
 body{
-  margin:0; background:var(--bg); color:var(--ink);
-  font-family:"Latin Modern Roman","Computer Modern Serif",Georgia,"Times New Roman",serif;
-  font-size:17px; line-height:1.62;
+  background:var(--bg); color:var(--fg); font-family:var(--serif);
+  font-size:1.1875rem; line-height:1.8;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
 }
-.bar{
-  border-bottom:1px solid var(--rule); background:#fff;
-  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:12px; letter-spacing:.04em; color:var(--muted);
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+
+/* ---- sidebar index ---- */
+aside{
+  position:fixed; top:0; left:0; height:100vh; width:20rem; z-index:30;
+  padding:3rem 2rem; overflow-y:auto; border-right:1px solid var(--rule);
+  background:var(--bg);
 }
-.bar .in{max-width:52rem;margin:0 auto;padding:.6rem 1.5rem;display:flex;
-  justify-content:space-between;gap:1rem;flex-wrap:wrap}
-.bar b{color:var(--accent);font-weight:600}
-main{max-width:46rem;margin:0 auto;padding:3rem 1.5rem 6rem}
-h1{font-size:1.95rem;line-height:1.25;margin:0 0 1.1rem;font-weight:600;
-  letter-spacing:-.005em;text-wrap:balance}
-.byline{margin:0 0 .2rem;font-size:1.02rem}
-.affil{color:var(--muted);font-size:.9rem;margin:0 0 .3rem;font-style:italic}
-.dateline{color:var(--muted);font-size:.86rem;margin:0 0 2.2rem;
-  font-family:ui-sans-serif,system-ui,sans-serif}
-.abstract{
-  background:var(--panel); border:1px solid var(--rule); border-radius:2px;
-  padding:1.3rem 1.6rem; margin:0 0 1rem; font-size:.95rem; line-height:1.6;
+.idx-eyebrow{
+  font-family:var(--sans); font-size:.72rem; font-weight:600;
+  letter-spacing:.18em; text-transform:uppercase; color:var(--muted);
+  margin-bottom:2rem;
 }
+.idx{list-style:none}
+.idx li{margin:0 0 .1rem}
+.idx a{
+  display:flex; gap:1rem; align-items:baseline; text-decoration:none;
+  color:var(--muted); font-size:.95rem; line-height:1.45; padding:.42rem 0;
+  border:0; transition:color .15s;
+}
+.idx a:hover,.idx a:focus-visible{color:var(--fg)}
+.idx .n{
+  font-family:var(--sans); font-size:.72rem; font-variant-numeric:tabular-nums;
+  color:var(--muted); opacity:.7; flex-shrink:0; letter-spacing:.04em;
+}
+.idx .grp{
+  font-family:var(--sans); font-size:.68rem; font-weight:600;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--muted);
+  margin:2rem 0 .8rem; opacity:.75;
+}
+
+/* ---- theme toggle ---- */
+.toggle{
+  position:fixed; top:1.6rem; right:2rem; z-index:40;
+  background:var(--bg); border:1px solid var(--rule); border-radius:999px;
+  width:2.5rem; height:2.5rem; display:grid; place-items:center;
+  cursor:pointer; color:var(--muted); transition:color .15s,border-color .15s;
+}
+.toggle:hover{color:var(--fg);border-color:var(--muted)}
+.toggle svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6}
+.toggle .sun{display:none}
+:root[data-theme="dark"] .toggle .sun{display:block}
+:root[data-theme="dark"] .toggle .moon{display:none}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) .toggle .sun{display:block}
+  :root:not([data-theme="light"]) .toggle .moon{display:none}
+}
+
+/* ---- layout ---- */
+main{margin-left:20rem;padding-bottom:6rem}
+.container{max-width:48rem;margin:0 auto;padding:0 4rem}
+
+/* ---- masthead ---- */
+.masthead{padding:6rem 0 3rem}
+.kicker{
+  font-family:var(--sans); font-size:.8rem; font-weight:500;
+  letter-spacing:.15em; text-transform:uppercase; color:var(--accent);
+  margin-bottom:1.6rem;
+}
+h1{
+  font-size:3.4rem; line-height:1.1; font-weight:400; letter-spacing:-.01em;
+  text-wrap:balance; margin-bottom:1.4rem;
+}
+.byline{font-size:1.05rem;margin-bottom:.15rem}
+.affil{color:var(--muted);font-size:.95rem;font-style:italic;margin-bottom:.5rem}
+.dateline{
+  font-family:var(--sans); font-size:.85rem; color:var(--muted);
+  letter-spacing:.025em; padding-bottom:2.5rem; border-bottom:1px solid var(--rule);
+}
+
+/* ---- abstract + verdict ---- */
+.abstract{margin:2.5rem 0 1.5rem}
 .abstract h2{
-  font-size:.78rem;text-transform:uppercase;letter-spacing:.14em;
-  margin:0 0 .7rem;color:var(--muted);font-weight:600;
-  font-family:ui-sans-serif,system-ui,sans-serif;
+  font-family:var(--sans); font-size:.78rem; font-weight:600;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--muted);
+  margin-bottom:1rem;
 }
-.abstract p{margin:0 0 .7rem;text-align:justify;hyphens:auto}
+.abstract p{margin-bottom:1rem;opacity:.9}
 .abstract p:last-child{margin-bottom:0}
 .verdict{
-  border-left:3px solid var(--accent); background:#fff; padding:.9rem 1.2rem;
-  margin:0 0 2.4rem; font-size:.94rem;
+  background:var(--panel); border:1px solid var(--accent-line); border-radius:8px;
+  padding:1.6rem 1.8rem; margin:2rem 0 3rem;
+  font-family:var(--sans); font-size:.95rem; line-height:1.65;
 }
-.verdict strong{color:var(--accent)}
-h2.sec{
-  font-size:1.15rem;margin:2.6rem 0 .8rem;font-weight:600;
-  padding-bottom:.3rem;border-bottom:1px solid var(--rule);
+.verdict strong{color:var(--accent);font-weight:600}
+
+/* ---- sections ---- */
+article{margin-bottom:5rem}
+.chapter-label{
+  font-family:var(--sans); font-size:.82rem; font-weight:500;
+  letter-spacing:.15em; text-transform:uppercase; color:var(--accent);
+  opacity:.85; display:block; margin-bottom:.9rem;
 }
-h3{font-size:1rem;margin:1.8rem 0 .5rem;font-weight:600}
-p{margin:0 0 1rem;text-align:justify;hyphens:auto}
-ul,ol{margin:0 0 1rem;padding-left:1.3rem}
-li{margin:.35rem 0}
-a{color:var(--link);text-decoration:none;border-bottom:1px solid #c5d4e6}
-a:hover{border-bottom-color:var(--link)}
+h2.sec{font-size:2.6rem;line-height:1.15;font-weight:400;margin-bottom:1.8rem;
+  letter-spacing:-.01em;text-wrap:balance}
+h3{font-size:1.4rem;line-height:1.3;font-weight:600;margin:2.8rem 0 1.1rem}
+p{margin-bottom:1.15rem}
+ul,ol{margin:0 0 1.2rem;padding-left:1.4rem}
+li{margin:.45rem 0}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-line)}
+a:hover{border-bottom-color:var(--accent)}
 code,.mono{
-  font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
-  font-size:.86em;background:#f0eee9;padding:.1em .35em;border-radius:2px;
+  font-family:var(--mono); font-size:.84em; background:var(--code-bg);
+  padding:.12em .38em; border-radius:4px;
 }
-pre{background:var(--panel);border:1px solid var(--rule);border-radius:2px;
-  padding:.9rem 1.1rem;overflow-x:auto;font-size:.8rem;line-height:1.5;margin:0 0 1.2rem}
+pre{background:var(--code-bg);border:1px solid var(--rule);border-radius:8px;
+  padding:1.1rem 1.3rem;overflow-x:auto;font-size:.82rem;line-height:1.6;
+  margin-bottom:1.4rem;font-family:var(--mono)}
 pre code{background:none;padding:0}
-figure{margin:1.8rem 0;text-align:center}
-figure img{max-width:100%;height:auto;border:1px solid var(--rule);background:#fff}
+
+/* ---- figures ---- */
+figure{margin:2.4rem 0}
+figure svg{display:block;margin:0 auto;max-width:100%;height:auto}
+figure img{max-width:100%;height:auto;border:1px solid var(--rule);border-radius:8px}
 figcaption{
-  font-size:.83rem;color:var(--muted);margin-top:.7rem;text-align:left;
-  line-height:1.5;
+  font-family:var(--sans); font-size:.82rem; color:var(--muted);
+  margin-top:1rem; line-height:1.6;
 }
-figcaption b{color:var(--ink)}
-table{border-collapse:collapse;width:100%;font-size:.85rem;margin:.4rem 0 .5rem}
-th,td{padding:.42rem .55rem;border-bottom:1px solid var(--rule);text-align:left;
-  vertical-align:top}
-thead th{border-bottom:1.5px solid #b8b2a8;font-weight:600;font-size:.8rem;
-  text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
-td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;
-  font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.82rem}
-tbody tr.hl{background:#fbf6f6}
+figcaption b{color:var(--fg);font-weight:600}
+
+/* ---- tables ---- */
+.twrap{overflow-x:auto;margin:1rem 0 .5rem}
+table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:.86rem}
+th,td{padding:.6rem .7rem;border-bottom:1px solid var(--rule);text-align:left;
+  vertical-align:top;line-height:1.5}
+thead th{
+  border-bottom:1px solid var(--muted); font-weight:600; font-size:.72rem;
+  text-transform:uppercase; letter-spacing:.09em; color:var(--muted);
+}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tbody tr.hl{background:var(--hl)}
 tbody tr.hl td{font-weight:600}
-.tcap{font-size:.83rem;color:var(--muted);margin:.9rem 0 .4rem;line-height:1.5}
-.tcap b{color:var(--ink)}
+.tcap{font-family:var(--sans);font-size:.82rem;color:var(--muted);
+  margin:1rem 0 .4rem;line-height:1.6}
+.tcap b{color:var(--fg);font-weight:600}
+
+/* ---- kill criteria ---- */
 .kill{list-style:none;padding:0}
-.kill li{padding:.65rem 0 .65rem 2.1rem;position:relative;border-bottom:1px solid var(--rule);
-  font-size:.93rem}
-.kill li:before{position:absolute;left:0;top:.6rem;font-size:1rem}
+.kill li{padding:.8rem 0 .8rem 2.2rem;position:relative;
+  border-bottom:1px solid var(--rule);font-size:1.02rem}
+.kill li:before{position:absolute;left:0;top:.85rem;font-size:1rem;
+  font-family:var(--sans)}
 .kill li.fired:before{content:"✕";color:var(--accent);font-weight:700}
 .kill li.notrun:before{content:"○";color:var(--muted)}
 .kill li.fired em{color:var(--accent);font-style:normal;font-weight:600}
-.foot{margin-top:3.5rem;padding-top:1.2rem;border-top:1px solid var(--rule);
-  font-size:.82rem;color:var(--muted)}
-.refs{font-size:.84rem;line-height:1.55}
-.refs li{margin:.5rem 0}
+
+/* ---- footer ---- */
+.foot{margin-top:4rem;padding-top:1.6rem;border-top:1px solid var(--rule);
+  font-family:var(--sans);font-size:.82rem;color:var(--muted);line-height:1.7}
+.foot p{margin-bottom:.7rem}
+.refs{font-size:.92rem;line-height:1.6}
+.refs li{margin:.6rem 0}
+
+/* ---- mobile ---- */
+.navbtn{display:none;position:fixed;top:1.6rem;left:1.25rem;z-index:40;
+  background:var(--bg);border:1px solid var(--rule);border-radius:999px;
+  width:2.5rem;height:2.5rem;place-items:center;cursor:pointer;color:var(--muted)}
+.navbtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7}
+@media (max-width:1100px){
+  aside{transform:translateX(-100%);transition:transform .25s ease;
+    box-shadow:0 0 40px rgba(0,0,0,.18);
+    padding-top:5.6rem}   /* clear the fixed menu button */
+  body.nav-open aside{transform:none}
+  .navbtn{display:grid}
+  main{margin-left:0}
+  .container{padding:0 1.6rem}
+  .masthead{padding:5rem 0 2.5rem}
+}
 @media (max-width:640px){
-  body{font-size:16px} main{padding:2rem 1.1rem 4rem} h1{font-size:1.5rem}
-  table{font-size:.78rem} th,td{padding:.35rem .3rem}
+  body{font-size:1.06rem;line-height:1.75}
+  h1{font-size:2.2rem} h2.sec{font-size:1.75rem} h3{font-size:1.2rem}
+  .container{padding:0 1.15rem}
+  .toggle{right:1.25rem}
+  .verdict{padding:1.2rem 1.3rem}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{transition:none!important;animation:none!important}
 }
 </style>
 </head>
 <body>
 
-<div class="bar"><div class="in">
-  <span><b>preprint</b> &nbsp;·&nbsp; energy economics / load forecasting</span>
-  <span>Pre-registered · data and code open</span>
-</div></div>
+<button class="navbtn" id="navbtn" aria-label="Open contents" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+<button class="toggle" id="themebtn" aria-label="Switch colour theme"><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg></button>
+
+<aside id="sidebar">
+<div class="idx-eyebrow">Index</div>
+<ul class="idx"><li><a href="#sec-1"><span class="n">01</span><span>The question</span></a></li><li><a href="#sec-2"><span class="n">02</span><span>How big is the load</span></a></li><li><a href="#sec-3"><span class="n">03</span><span>Why a forecast might miss it — and why it might not</span></a></li><li><a href="#sec-4"><span class="n">04</span><span>Identification</span></a></li><li><a href="#sec-5"><span class="n">05</span><span>Pre-registration</span></a></li><li><a href="#sec-6"><span class="n">06</span><span>Statistical power</span></a></li><li><a href="#sec-7"><span class="n">07</span><span>Results</span></a></li><li><a href="#sec-8"><span class="n">08</span><span>Was Austria a badly chosen case?</span></a></li><li><a href="#sec-9"><span class="n">09</span><span>Limitations</span></a></li><li><a href="#sec-10"><span class="n">10</span><span>Data and reproduction</span></a></li><li><a href="#sec-11"><span class="n">&nbsp;</span><span>References</span></a></li></ul>
+</aside>
 
 <main>
+<div class="container">
 
+<header class="masthead">
+<div class="kicker">Pre-registered · tested · null</div>
 <h1>Snowmaking is absorbed by the day-ahead load forecast, not missed by it</h1>
 <p class="byline">Baptiste Cristofari</p>
 <p class="affil">Independent</p>
-<p class="dateline">August 2026 &nbsp;·&nbsp;
+<p class="dateline">August 2026 &nbsp;·&nbsp; Energy economics / load forecasting &nbsp;·&nbsp;
   <a href="https://github.com/baptistecristo/Electricity-demand-forecasting-in-Austria">code and data</a>
 </p>
+</header>
 
 <div class="abstract">
 <h2>Abstract</h2>
@@ -147,7 +277,7 @@ also close to the best test case in the world by snowmaking-to-system-load ratio
 which makes the null informative rather than a consequence of a poor choice of market.
 </div>
 
-<h2 class="sec">1. The question</h2>
+<span class="chapter-label">Section 01</span><h2 class="sec" id="sec-1">The question</h2>
 <p>Transmission system operators publish a day-ahead load forecast, and both the
 forecast and the realised load are free. The difference is the forecast error. If
 snowmaking is genuinely invisible to the forecasting model, the error should be
@@ -157,11 +287,11 @@ the state of the snowpack rather than on temperature alone.</p>
 path-dependent industrial load can hide inside a production forecast — a structure
 that recurs in Spanish irrigation pumping and North American grain drying.</p>
 
-<h2 class="sec">2. How big is the load</h2>
+<span class="chapter-label">Section 02</span><h2 class="sec" id="sec-2">How big is the load</h2>
 <p>From a 2026 survey of 141 Austrian resorts (30 usable, 4,253 equipped hectares,
 34.0% of Austrian ski volume), extrapolated nationally:</p>
 
-<table>
+<div class="twrap"><table>
 <thead><tr><th>Quantity</th><th class="num">Value</th></tr></thead>
 <tbody>
 <tr><td>Season electricity, Austria-wide</td><td class="num">281 GWh (260–309)</td></tr>
@@ -170,7 +300,7 @@ that recurs in Spanish irrigation pumping and North American grain drying.</p>
 <tr><td>Snowmakers per hectare</td><td class="num">2.9</td></tr>
 <tr><td>Energy per hectare equipped</td><td class="num">22,449 kWh</td></tr>
 <tr><td>Energy per m³ of snow</td><td class="num">3.3 kWh</td></tr>
-</tbody></table>
+</tbody></table></div>
 <p class="tcap"><b>Table 1.</b> Published snowmaking figures used throughout.</p>
 
 <p>Instantaneous power follows from energy over operating hours. The fleet-wide
@@ -180,7 +310,7 @@ plus pumping and compressed air. At 40–70% coincidence the national draw is
 0.61–1.07 GW. Austrian weekday overnight load in November and December runs
 7.0–7.5 GW, so snowmaking is <b>8–15% of overnight demand</b>.</p>
 
-<h2 class="sec">3. Why a forecast might miss it — and why it might not</h2>
+<span class="chapter-label">Section 03</span><h2 class="sec" id="sec-3">Why a forecast might miss it — and why it might not</h2>
 <p>The naive version of the hypothesis is that load forecasts are temperature models
 and temperature models have no memory. Two mechanisms argue against it, and both were
 written down before the data was opened.</p>
@@ -197,7 +327,7 @@ any lagged-load term propagates a running campaign into tomorrow's forecast.</p>
 mechanisms push α down, and α turns out to be the binding constraint on the entire
 design.</p>
 
-<h2 class="sec">4. Identification</h2>
+<span class="chapter-label">Section 04</span><h2 class="sec" id="sec-4">Identification</h2>
 <p>The obvious test — comparing nights just below the wet-bulb threshold to nights
 just above — is contaminated. At 1,800 m, −2 °C wet bulb corresponds to roughly −1 to
 0 °C air temperature, and every nonlinearity in heating load lives near freezing:
@@ -230,7 +360,7 @@ Regions are weighted by state share of Austrian skier visits.</p>
 Patscherkofel (2,251 m), Villacher Alpe (2,140 m), Galzig (2,079 m) and
 Schmittenhöhe (1,956 m), among thirteen stations in total.</p>
 
-<h2 class="sec">5. Pre-registration</h2>
+<span class="chapter-label">Section 05</span><h2 class="sec" id="sec-5">Pre-registration</h2>
 <p><b>Primary prediction.</b> The <code>below × cum_cold_hours</code> coefficient is
 negative and significant at 5%.</p>
 <p><b>Supporting predictions.</b> The error spikes on the first night of a cold snap
@@ -246,9 +376,9 @@ Denmark, run through the identical pipeline, show nothing.</p>
 <p>All outcomes were committed to publication in advance. A null was named as the
 modal outcome.</p>
 
-<h2 class="sec">6. Statistical power</h2>
+<span class="chapter-label">Section 06</span><h2 class="sec" id="sec-6">Statistical power</h2>
 <figure>
-<svg viewBox="0 0 680 310" width="100%" role="img" style="max-width:680px;font-family:ui-sans-serif,system-ui,sans-serif"><line x1="54" x2="530" y1="270.0" y2="270.0" stroke="#d8d4cc" stroke-width="1"/><text x="47" y="273.5" text-anchor="end" font-size="10" fill="#5a5a5a">0</text><line x1="54" x2="530" y1="221.2" y2="221.2" stroke="#d8d4cc" stroke-width="1"/><text x="47" y="224.7" text-anchor="end" font-size="10" fill="#5a5a5a">100</text><line x1="54" x2="530" y1="172.3" y2="172.3" stroke="#d8d4cc" stroke-width="1"/><text x="47" y="175.8" text-anchor="end" font-size="10" fill="#5a5a5a">200</text><line x1="54" x2="530" y1="123.5" y2="123.5" stroke="#d8d4cc" stroke-width="1"/><text x="47" y="127.0" text-anchor="end" font-size="10" fill="#5a5a5a">300</text><line x1="54" x2="530" y1="74.6" y2="74.6" stroke="#d8d4cc" stroke-width="1"/><text x="47" y="78.1" text-anchor="end" font-size="10" fill="#5a5a5a">400</text><line x1="54" x2="530" y1="25.8" y2="25.8" stroke="#d8d4cc" stroke-width="1"/><text x="47" y="29.3" text-anchor="end" font-size="10" fill="#5a5a5a">500</text><text x="54.0" y="286" text-anchor="middle" font-size="10" fill="#5a5a5a">2</text><text x="149.2" y="286" text-anchor="middle" font-size="10" fill="#5a5a5a">4</text><text x="244.4" y="286" text-anchor="middle" font-size="10" fill="#5a5a5a">6</text><text x="339.6" y="286" text-anchor="middle" font-size="10" fill="#5a5a5a">8</text><text x="434.8" y="286" text-anchor="middle" font-size="10" fill="#5a5a5a">10</text><text x="530.0" y="286" text-anchor="middle" font-size="10" fill="#5a5a5a">12</text><line x1="54" x2="530" y1="50.2" y2="50.2" stroke="#276749" stroke-width="1.3" stroke-dasharray="none"/><text x="537" y="53.7" font-size="9.5" fill="#276749">450 MW · half unmodelled</text><line x1="54" x2="530" y1="160.1" y2="160.1" stroke="#276749" stroke-width="1.3" stroke-dasharray="5 4"/><text x="537" y="163.6" font-size="9.5" fill="#276749">225 MW · quarter</text><line x1="54" x2="530" y1="226.0" y2="226.0" stroke="#276749" stroke-width="1.3" stroke-dasharray="2 3"/><text x="537" y="229.5" font-size="9.5" fill="#276749">90 MW · tenth</text><polyline points="54.0,196.9 101.6,210.3 149.2,218.3 196.8,223.8 244.4,227.8 292.0,230.9 339.6,233.5 387.2,235.5 434.8,237.3 482.4,238.8 530.0,240.2" fill="none" stroke="#2b6cb0" stroke-width="1.9"/><line x1="263.4" x2="279.4" y1="237.8" y2="237.8" stroke="#2b6cb0" stroke-width="1.9"/><text x="284.4" y="241.3" font-size="9.5" fill="#1a1a1a">MAE 1.5% (optimistic)</text><polyline points="54.0,117.7 101.6,145.7 149.2,162.3 196.8,173.7 244.4,182.1 292.0,188.6 339.6,193.9 387.2,198.2 434.8,201.9 482.4,205.1 530.0,207.8" fill="none" stroke="#c05621" stroke-width="1.9"/><line x1="263.4" x2="279.4" y1="248.5" y2="248.5" stroke="#c05621" stroke-width="1.9"/><text x="284.4" y="252.0" font-size="9.5" fill="#1a1a1a">MAE 3.14% (DE-LU)</text><polyline points="54.0,26.9 101.6,71.5 149.2,98.1 196.8,116.3 244.4,129.7 292.0,140.1 339.6,148.5 387.2,155.4 434.8,161.3 482.4,166.4 530.0,170.8" fill="none" stroke="#702459" stroke-width="1.9"/><line x1="263.4" x2="279.4" y1="259.3" y2="259.3" stroke="#702459" stroke-width="1.9"/><text x="284.4" y="262.8" font-size="9.5" fill="#1a1a1a">MAE 5% (small zone)</text><text transform="translate(13,143.0) rotate(-90)" text-anchor="middle" font-size="10.5" fill="#5a5a5a">Minimum detectable effect (MW)</text><text x="292.0" y="304" text-anchor="middle" font-size="10.5" fill="#5a5a5a">Seasons of data</text></svg>
+<svg viewBox="0 0 680 310" width="100%" role="img" style="max-width:680px;font-family:ui-sans-serif,system-ui,sans-serif"><line x1="54" x2="530" y1="270.0" y2="270.0" stroke="var(--rule)" stroke-width="1"/><text x="47" y="273.5" text-anchor="end" font-size="10" fill="var(--muted)">0</text><line x1="54" x2="530" y1="221.2" y2="221.2" stroke="var(--rule)" stroke-width="1"/><text x="47" y="224.7" text-anchor="end" font-size="10" fill="var(--muted)">100</text><line x1="54" x2="530" y1="172.3" y2="172.3" stroke="var(--rule)" stroke-width="1"/><text x="47" y="175.8" text-anchor="end" font-size="10" fill="var(--muted)">200</text><line x1="54" x2="530" y1="123.5" y2="123.5" stroke="var(--rule)" stroke-width="1"/><text x="47" y="127.0" text-anchor="end" font-size="10" fill="var(--muted)">300</text><line x1="54" x2="530" y1="74.6" y2="74.6" stroke="var(--rule)" stroke-width="1"/><text x="47" y="78.1" text-anchor="end" font-size="10" fill="var(--muted)">400</text><line x1="54" x2="530" y1="25.8" y2="25.8" stroke="var(--rule)" stroke-width="1"/><text x="47" y="29.3" text-anchor="end" font-size="10" fill="var(--muted)">500</text><text x="54.0" y="286" text-anchor="middle" font-size="10" fill="var(--muted)">2</text><text x="149.2" y="286" text-anchor="middle" font-size="10" fill="var(--muted)">4</text><text x="244.4" y="286" text-anchor="middle" font-size="10" fill="var(--muted)">6</text><text x="339.6" y="286" text-anchor="middle" font-size="10" fill="var(--muted)">8</text><text x="434.8" y="286" text-anchor="middle" font-size="10" fill="var(--muted)">10</text><text x="530.0" y="286" text-anchor="middle" font-size="10" fill="var(--muted)">12</text><line x1="54" x2="530" y1="50.2" y2="50.2" stroke="var(--c-green)" stroke-width="1.3" stroke-dasharray="none"/><text x="537" y="53.7" font-size="9.5" fill="var(--c-green)">450 MW · half unmodelled</text><line x1="54" x2="530" y1="160.1" y2="160.1" stroke="var(--c-green)" stroke-width="1.3" stroke-dasharray="5 4"/><text x="537" y="163.6" font-size="9.5" fill="var(--c-green)">225 MW · quarter</text><line x1="54" x2="530" y1="226.0" y2="226.0" stroke="var(--c-green)" stroke-width="1.3" stroke-dasharray="2 3"/><text x="537" y="229.5" font-size="9.5" fill="var(--c-green)">90 MW · tenth</text><polyline points="54.0,196.9 101.6,210.3 149.2,218.3 196.8,223.8 244.4,227.8 292.0,230.9 339.6,233.5 387.2,235.5 434.8,237.3 482.4,238.8 530.0,240.2" fill="none" stroke="var(--c-blue)" stroke-width="1.9"/><line x1="263.4" x2="279.4" y1="237.8" y2="237.8" stroke="var(--c-blue)" stroke-width="1.9"/><text x="284.4" y="241.3" font-size="9.5" fill="var(--fg)">MAE 1.5% (optimistic)</text><polyline points="54.0,117.7 101.6,145.7 149.2,162.3 196.8,173.7 244.4,182.1 292.0,188.6 339.6,193.9 387.2,198.2 434.8,201.9 482.4,205.1 530.0,207.8" fill="none" stroke="var(--c-red)" stroke-width="1.9"/><line x1="263.4" x2="279.4" y1="248.5" y2="248.5" stroke="var(--c-red)" stroke-width="1.9"/><text x="284.4" y="252.0" font-size="9.5" fill="var(--fg)">MAE 3.14% (DE-LU)</text><polyline points="54.0,26.9 101.6,71.5 149.2,98.1 196.8,116.3 244.4,129.7 292.0,140.1 339.6,148.5 387.2,155.4 434.8,161.3 482.4,166.4 530.0,170.8" fill="none" stroke="var(--c-plum)" stroke-width="1.9"/><line x1="263.4" x2="279.4" y1="259.3" y2="259.3" stroke="var(--c-plum)" stroke-width="1.9"/><text x="284.4" y="262.8" font-size="9.5" fill="var(--fg)">MAE 5% (small zone)</text><text transform="translate(13,143.0) rotate(-90)" text-anchor="middle" font-size="10.5" fill="var(--muted)">Minimum detectable effect (MW)</text><text x="292.0" y="304" text-anchor="middle" font-size="10.5" fill="var(--muted)">Seasons of data</text></svg>
 <figcaption><b>Figure 1.</b> Minimum detectable effect against seasons of data, for
 three assumptions about day-ahead forecast error, with the plausible residual signal
 overlaid. The pass mark is how much of the ~900 MW snowmaking load the forecast must
@@ -261,16 +391,16 @@ calibrate this: <b>6.48% MAE</b> on November–December night hours, standard de
 608 MW raw and 554 MW after fixed effects. That raised the pass mark to
 <b>α ≥ 27.4%</b> at thirteen seasons.</p>
 
-<h2 class="sec">7. Results</h2>
+<span class="chapter-label">Section 07</span><h2 class="sec" id="sec-7">Results</h2>
 <figure>
-<svg viewBox="0 0 680 300" width="100%" role="img" style="max-width:680px;font-family:ui-sans-serif,system-ui,sans-serif"><line x1="52" x2="670" y1="257.0" y2="257.0" stroke="#d8d4cc" stroke-width="1"/><text x="45" y="260.5" text-anchor="end" font-size="10" fill="#5a5a5a">-100</text><line x1="52" x2="670" y1="169.0" y2="169.0" stroke="#d8d4cc" stroke-width="1"/><text x="45" y="172.5" text-anchor="end" font-size="10" fill="#5a5a5a">0</text><line x1="52" x2="670" y1="81.0" y2="81.0" stroke="#d8d4cc" stroke-width="1"/><text x="45" y="84.5" text-anchor="end" font-size="10" fill="#5a5a5a">100</text><line x1="52" x2="670" y1="169.0" y2="169.0" stroke="#1a1a1a" stroke-width="1.2"/><rect x="62.8" y="73.9" width="29.9" height="95.1" fill="#2b6cb0"/><line x1="77.8" x2="77.8" y1="95.1" y2="52.8" stroke="#333" stroke-width="1.1"/><line x1="74.2" x2="81.2" y1="95.1" y2="95.1" stroke="#333" stroke-width="1.1"/><line x1="74.2" x2="81.2" y1="52.8" y2="52.8" stroke="#333" stroke-width="1.1"/><text x="77.8" y="273" text-anchor="middle" font-size="10" fill="#1a1a1a">Jan</text><rect x="114.3" y="150.5" width="29.9" height="18.5" fill="#2b6cb0"/><line x1="129.2" x2="129.2" y1="164.6" y2="136.4" stroke="#333" stroke-width="1.1"/><line x1="125.8" x2="132.8" y1="164.6" y2="164.6" stroke="#333" stroke-width="1.1"/><line x1="125.8" x2="132.8" y1="136.4" y2="136.4" stroke="#333" stroke-width="1.1"/><text x="129.2" y="273" text-anchor="middle" font-size="10" fill="#1a1a1a">Feb</text><rect x="165.8" y="162.8" width="29.9" height="6.2" fill="#2b6cb0"/><line x1="180.8" x2="180.8" y1="175.2" y2="150.5" stroke="#333" stroke-width="1.1"/><line x1="177.2" x2="184.2" y1="175.2" y2="175.2" stroke="#333" stroke-width="1.1"/><line x1="177.2" x2="184.2" y1="150.5" y2="150.5" stroke="#333" stroke-width="1.1"/><text x="180.8" y="273" text-anchor="middle" font-size="10" fill="#1a1a1a">Mar</text><rect x="217.3" y="169.0" width="29.9" height="26.4" fill="#2b6cb0"/><line x1="232.2" x2="232.2" y1="209.5" y2="181.3" stroke="#333" stroke-width="1.1"/><line x1="228.8" x2="235.8" y1="209.5" y2="209.5" stroke="#333" stroke-width="1.1"/><line x1="228.8" x2="235.8" y1="181.3" y2="181.3" stroke="#333" stroke-width="1.1"/><text x="232.2" y="273" text-anchor="middle" font-size="10" fill="#1a1a1a">Apr</text><rect x="268.8" y="169.0" width="29.9" height="26.4" fill="#2b6cb0"/><line x1="283.8" x2="283.8" y1="208.6" y2="182.2" stroke="#333" stroke-width="1.1"/><line x1="280.2" x2="287.2" y1="208.6" y2="208.6" stroke="#333" stroke-width="1.1"/><line x1="280.2" x2="287.2" y1="182.2" y2="182.2" stroke="#333" stroke-width="1.1"/><text x="283.8" y="273" text-anchor="middle" font-size="10" fill="#1a1a1a">May</text><rect x="320.3" y="162.0" width="29.9" height="7.0" fill="#2b6cb0"/><line x1="335.2" x2="335.2" y1="174.3" y2="149.6" stroke="#333" stroke-width="1.1"/><line x1="331.8" x2="338.8" y1="174.3" y2="174.3" stroke="#333" stroke-width="1.1"/><line x1="331.8" x2="338.8" y1="149.6" y2="149.6" stroke="#333" stroke-width="1.1"/><text x="335.2" y="273" text-anchor="middle" font-size="10" fill="#1a1a1a">Jun</text><rect x="371.8" y="169.0" width="29.9" height="57.2" fill="#2b6cb0"/><line x1="386.8" x2="386.8" y1="237.7" y2="214.8" stroke="#333" stroke-width="1.1"/><line x1="383.2" x2="390.2" y1="237.7" y2="237.7" stroke="#333" stroke-width="1.1"/><line x1="383.2" x2="390.2" y1="214.8" y2="214.8" stroke="#333" stroke-width="1.1"/><text x="386.8" y="273" text-anchor="middle" font-size="10" fill="#1a1a1a">Jul</text><rect x="423.3" y="147.0" width="29.9" height="22.0" fill="#2b6cb0"/><line x1="438.2" x2="438.2" y1="161.1" y2="132.9" stroke="#333" stroke-width="1.1"/><line x1="434.8" x2="441.8" y1="161.1" y2="161.1" stroke="#333" stroke-width="1.1"/><line x1="434.8" x2="441.8" y1="132.9" y2="132.9" stroke="#333" stroke-width="1.1"/><text x="438.2" y="273" text-anchor="middle" font-size="10" fill="#1a1a1a">Aug</text><rect x="474.8" y="169.0" width="29.9" height="12.3" fill="#2b6cb0"/><line x1="489.8" x2="489.8" y1="198.9" y2="163.7" stroke="#333" stroke-width="1.1"/><line x1="486.2" x2="493.2" y1="198.9" y2="198.9" stroke="#333" stroke-width="1.1"/><line x1="486.2" x2="493.2" y1="163.7" y2="163.7" stroke="#333" stroke-width="1.1"/><text x="489.8" y="273" text-anchor="middle" font-size="10" fill="#1a1a1a">Sep</text><rect x="526.3" y="107.4" width="29.9" height="61.6" fill="#2b6cb0"/><line x1="541.2" x2="541.2" y1="121.5" y2="93.3" stroke="#333" stroke-width="1.1"/><line x1="537.8" x2="544.8" y1="121.5" y2="121.5" stroke="#333" stroke-width="1.1"/><line x1="537.8" x2="544.8" y1="93.3" y2="93.3" stroke="#333" stroke-width="1.1"/><text x="541.2" y="273" text-anchor="middle" font-size="10" fill="#1a1a1a">Oct</text><rect x="577.8" y="53.7" width="29.9" height="115.3" fill="#c05621"/><line x1="592.8" x2="592.8" y1="73.1" y2="34.3" stroke="#333" stroke-width="1.1"/><line x1="589.2" x2="596.2" y1="73.1" y2="73.1" stroke="#333" stroke-width="1.1"/><line x1="589.2" x2="596.2" y1="34.3" y2="34.3" stroke="#333" stroke-width="1.1"/><text x="592.8" y="273" text-anchor="middle" font-size="10" fill="#1a1a1a">Nov</text><rect x="629.3" y="169.0" width="29.9" height="8.8" fill="#2b6cb0"/><line x1="644.2" x2="644.2" y1="204.2" y2="151.4" stroke="#333" stroke-width="1.1"/><line x1="640.8" x2="647.8" y1="204.2" y2="204.2" stroke="#333" stroke-width="1.1"/><line x1="640.8" x2="647.8" y1="151.4" y2="151.4" stroke="#333" stroke-width="1.1"/><text x="644.2" y="273" text-anchor="middle" font-size="10" fill="#1a1a1a">Dec</text><text transform="translate(13,136.0) rotate(-90)" text-anchor="middle" font-size="10.5" fill="#5a5a5a">Night forecast error (MW)</text></svg>
+<svg viewBox="0 0 680 300" width="100%" role="img" style="max-width:680px;font-family:ui-sans-serif,system-ui,sans-serif"><line x1="52" x2="670" y1="257.0" y2="257.0" stroke="var(--rule)" stroke-width="1"/><text x="45" y="260.5" text-anchor="end" font-size="10" fill="var(--muted)">-100</text><line x1="52" x2="670" y1="169.0" y2="169.0" stroke="var(--rule)" stroke-width="1"/><text x="45" y="172.5" text-anchor="end" font-size="10" fill="var(--muted)">0</text><line x1="52" x2="670" y1="81.0" y2="81.0" stroke="var(--rule)" stroke-width="1"/><text x="45" y="84.5" text-anchor="end" font-size="10" fill="var(--muted)">100</text><line x1="52" x2="670" y1="169.0" y2="169.0" stroke="var(--fg)" stroke-width="1.2"/><rect x="62.8" y="73.9" width="29.9" height="95.1" fill="var(--c-blue)"/><line x1="77.8" x2="77.8" y1="95.1" y2="52.8" stroke="var(--fg)" stroke-width="1.1"/><line x1="74.2" x2="81.2" y1="95.1" y2="95.1" stroke="var(--fg)" stroke-width="1.1"/><line x1="74.2" x2="81.2" y1="52.8" y2="52.8" stroke="var(--fg)" stroke-width="1.1"/><text x="77.8" y="273" text-anchor="middle" font-size="10" fill="var(--fg)">Jan</text><rect x="114.3" y="150.5" width="29.9" height="18.5" fill="var(--c-blue)"/><line x1="129.2" x2="129.2" y1="164.6" y2="136.4" stroke="var(--fg)" stroke-width="1.1"/><line x1="125.8" x2="132.8" y1="164.6" y2="164.6" stroke="var(--fg)" stroke-width="1.1"/><line x1="125.8" x2="132.8" y1="136.4" y2="136.4" stroke="var(--fg)" stroke-width="1.1"/><text x="129.2" y="273" text-anchor="middle" font-size="10" fill="var(--fg)">Feb</text><rect x="165.8" y="162.8" width="29.9" height="6.2" fill="var(--c-blue)"/><line x1="180.8" x2="180.8" y1="175.2" y2="150.5" stroke="var(--fg)" stroke-width="1.1"/><line x1="177.2" x2="184.2" y1="175.2" y2="175.2" stroke="var(--fg)" stroke-width="1.1"/><line x1="177.2" x2="184.2" y1="150.5" y2="150.5" stroke="var(--fg)" stroke-width="1.1"/><text x="180.8" y="273" text-anchor="middle" font-size="10" fill="var(--fg)">Mar</text><rect x="217.3" y="169.0" width="29.9" height="26.4" fill="var(--c-blue)"/><line x1="232.2" x2="232.2" y1="209.5" y2="181.3" stroke="var(--fg)" stroke-width="1.1"/><line x1="228.8" x2="235.8" y1="209.5" y2="209.5" stroke="var(--fg)" stroke-width="1.1"/><line x1="228.8" x2="235.8" y1="181.3" y2="181.3" stroke="var(--fg)" stroke-width="1.1"/><text x="232.2" y="273" text-anchor="middle" font-size="10" fill="var(--fg)">Apr</text><rect x="268.8" y="169.0" width="29.9" height="26.4" fill="var(--c-blue)"/><line x1="283.8" x2="283.8" y1="208.6" y2="182.2" stroke="var(--fg)" stroke-width="1.1"/><line x1="280.2" x2="287.2" y1="208.6" y2="208.6" stroke="var(--fg)" stroke-width="1.1"/><line x1="280.2" x2="287.2" y1="182.2" y2="182.2" stroke="var(--fg)" stroke-width="1.1"/><text x="283.8" y="273" text-anchor="middle" font-size="10" fill="var(--fg)">May</text><rect x="320.3" y="162.0" width="29.9" height="7.0" fill="var(--c-blue)"/><line x1="335.2" x2="335.2" y1="174.3" y2="149.6" stroke="var(--fg)" stroke-width="1.1"/><line x1="331.8" x2="338.8" y1="174.3" y2="174.3" stroke="var(--fg)" stroke-width="1.1"/><line x1="331.8" x2="338.8" y1="149.6" y2="149.6" stroke="var(--fg)" stroke-width="1.1"/><text x="335.2" y="273" text-anchor="middle" font-size="10" fill="var(--fg)">Jun</text><rect x="371.8" y="169.0" width="29.9" height="57.2" fill="var(--c-blue)"/><line x1="386.8" x2="386.8" y1="237.7" y2="214.8" stroke="var(--fg)" stroke-width="1.1"/><line x1="383.2" x2="390.2" y1="237.7" y2="237.7" stroke="var(--fg)" stroke-width="1.1"/><line x1="383.2" x2="390.2" y1="214.8" y2="214.8" stroke="var(--fg)" stroke-width="1.1"/><text x="386.8" y="273" text-anchor="middle" font-size="10" fill="var(--fg)">Jul</text><rect x="423.3" y="147.0" width="29.9" height="22.0" fill="var(--c-blue)"/><line x1="438.2" x2="438.2" y1="161.1" y2="132.9" stroke="var(--fg)" stroke-width="1.1"/><line x1="434.8" x2="441.8" y1="161.1" y2="161.1" stroke="var(--fg)" stroke-width="1.1"/><line x1="434.8" x2="441.8" y1="132.9" y2="132.9" stroke="var(--fg)" stroke-width="1.1"/><text x="438.2" y="273" text-anchor="middle" font-size="10" fill="var(--fg)">Aug</text><rect x="474.8" y="169.0" width="29.9" height="12.3" fill="var(--c-blue)"/><line x1="489.8" x2="489.8" y1="198.9" y2="163.7" stroke="var(--fg)" stroke-width="1.1"/><line x1="486.2" x2="493.2" y1="198.9" y2="198.9" stroke="var(--fg)" stroke-width="1.1"/><line x1="486.2" x2="493.2" y1="163.7" y2="163.7" stroke="var(--fg)" stroke-width="1.1"/><text x="489.8" y="273" text-anchor="middle" font-size="10" fill="var(--fg)">Sep</text><rect x="526.3" y="107.4" width="29.9" height="61.6" fill="var(--c-blue)"/><line x1="541.2" x2="541.2" y1="121.5" y2="93.3" stroke="var(--fg)" stroke-width="1.1"/><line x1="537.8" x2="544.8" y1="121.5" y2="121.5" stroke="var(--fg)" stroke-width="1.1"/><line x1="537.8" x2="544.8" y1="93.3" y2="93.3" stroke="var(--fg)" stroke-width="1.1"/><text x="541.2" y="273" text-anchor="middle" font-size="10" fill="var(--fg)">Oct</text><rect x="577.8" y="53.7" width="29.9" height="115.3" fill="var(--c-red)"/><line x1="592.8" x2="592.8" y1="73.1" y2="34.3" stroke="var(--fg)" stroke-width="1.1"/><line x1="589.2" x2="596.2" y1="73.1" y2="73.1" stroke="var(--fg)" stroke-width="1.1"/><line x1="589.2" x2="596.2" y1="34.3" y2="34.3" stroke="var(--fg)" stroke-width="1.1"/><text x="592.8" y="273" text-anchor="middle" font-size="10" fill="var(--fg)">Nov</text><rect x="629.3" y="169.0" width="29.9" height="8.8" fill="var(--c-blue)"/><line x1="644.2" x2="644.2" y1="204.2" y2="151.4" stroke="var(--fg)" stroke-width="1.1"/><line x1="640.8" x2="647.8" y1="204.2" y2="204.2" stroke="var(--fg)" stroke-width="1.1"/><line x1="640.8" x2="647.8" y1="151.4" y2="151.4" stroke="var(--fg)" stroke-width="1.1"/><text x="644.2" y="273" text-anchor="middle" font-size="10" fill="var(--fg)">Dec</text><text transform="translate(13,136.0) rotate(-90)" text-anchor="middle" font-size="10.5" fill="var(--muted)">Night forecast error (MW)</text></svg>
 <figcaption><b>Figure 2.</b> Night forecast error by month, 2010–2022, night-level
 observations. November is the most under-forecast month of the year at
 +131 ± 22 MW. Bars are ±1 s.e.</figcaption>
 </figure>
 
 <figure>
-<svg viewBox="0 0 680 310" width="100%" role="img" style="max-width:680px;font-family:ui-sans-serif,system-ui,sans-serif"><line x1="52" x2="670" y1="111.4" y2="111.4" stroke="#d8d4cc" stroke-width="1"/><text x="45" y="114.9" text-anchor="end" font-size="10" fill="#5a5a5a">0</text><line x1="52" x2="670" y1="111.4" y2="111.4" stroke="#1a1a1a" stroke-width="1.2"/><rect x="73.6" y="88.6" width="59.7" height="22.8" fill="#2b6cb0"/><line x1="103.5" x2="103.5" y1="95.7" y2="81.5" stroke="#333" stroke-width="1.1"/><line x1="100.0" x2="107.0" y1="95.7" y2="95.7" stroke="#333" stroke-width="1.1"/><line x1="100.0" x2="107.0" y1="81.5" y2="81.5" stroke="#333" stroke-width="1.1"/><text x="103.5" y="271" text-anchor="middle" font-size="10" fill="#1a1a1a">Nov</text><text x="103.5" y="282" text-anchor="middle" font-size="10" fill="#1a1a1a">1–10</text><rect x="176.6" y="85.7" width="59.7" height="25.6" fill="#2b6cb0"/><line x1="206.5" x2="206.5" y1="96.3" y2="75.2" stroke="#333" stroke-width="1.1"/><line x1="203.0" x2="210.0" y1="96.3" y2="96.3" stroke="#333" stroke-width="1.1"/><line x1="203.0" x2="210.0" y1="75.2" y2="75.2" stroke="#333" stroke-width="1.1"/><text x="206.5" y="271" text-anchor="middle" font-size="10" fill="#1a1a1a">Nov</text><text x="206.5" y="282" text-anchor="middle" font-size="10" fill="#1a1a1a">11–20</text><rect x="279.6" y="47.8" width="59.7" height="63.5" fill="#c05621"/><line x1="309.5" x2="309.5" y1="61.5" y2="34.2" stroke="#333" stroke-width="1.1"/><line x1="306.0" x2="313.0" y1="61.5" y2="61.5" stroke="#333" stroke-width="1.1"/><line x1="306.0" x2="313.0" y1="34.2" y2="34.2" stroke="#333" stroke-width="1.1"/><text x="309.5" y="271" text-anchor="middle" font-size="10" fill="#1a1a1a">Nov</text><text x="309.5" y="282" text-anchor="middle" font-size="10" fill="#1a1a1a">21–30</text><rect x="382.6" y="47.8" width="59.7" height="63.5" fill="#c05621"/><line x1="412.5" x2="412.5" y1="59.5" y2="36.2" stroke="#333" stroke-width="1.1"/><line x1="409.0" x2="416.0" y1="59.5" y2="59.5" stroke="#333" stroke-width="1.1"/><line x1="409.0" x2="416.0" y1="36.2" y2="36.2" stroke="#333" stroke-width="1.1"/><text x="412.5" y="271" text-anchor="middle" font-size="10" fill="#1a1a1a">Dec</text><text x="412.5" y="282" text-anchor="middle" font-size="10" fill="#1a1a1a">1–10</text><rect x="485.6" y="73.2" width="59.7" height="38.2" fill="#2b6cb0"/><line x1="515.5" x2="515.5" y1="86.6" y2="59.8" stroke="#333" stroke-width="1.1"/><line x1="512.0" x2="519.0" y1="86.6" y2="86.6" stroke="#333" stroke-width="1.1"/><line x1="512.0" x2="519.0" y1="59.8" y2="59.8" stroke="#333" stroke-width="1.1"/><text x="515.5" y="271" text-anchor="middle" font-size="10" fill="#1a1a1a">Dec</text><text x="515.5" y="282" text-anchor="middle" font-size="10" fill="#1a1a1a">11–20</text><rect x="588.6" y="111.4" width="59.7" height="109.1" fill="#9a9a9a"/><line x1="618.5" x2="618.5" y1="235.8" y2="205.1" stroke="#333" stroke-width="1.1"/><line x1="615.0" x2="622.0" y1="235.8" y2="235.8" stroke="#333" stroke-width="1.1"/><line x1="615.0" x2="622.0" y1="205.1" y2="205.1" stroke="#333" stroke-width="1.1"/><text x="618.5" y="271" text-anchor="middle" font-size="10" fill="#1a1a1a">Dec</text><text x="618.5" y="282" text-anchor="middle" font-size="10" fill="#1a1a1a">21–30</text><text transform="translate(13,135.0) rotate(-90)" text-anchor="middle" font-size="10.5" fill="#5a5a5a">Night forecast error (MW)</text></svg>
+<svg viewBox="0 0 680 310" width="100%" role="img" style="max-width:680px;font-family:ui-sans-serif,system-ui,sans-serif"><line x1="52" x2="670" y1="111.4" y2="111.4" stroke="var(--rule)" stroke-width="1"/><text x="45" y="114.9" text-anchor="end" font-size="10" fill="var(--muted)">0</text><line x1="52" x2="670" y1="111.4" y2="111.4" stroke="var(--fg)" stroke-width="1.2"/><rect x="73.6" y="88.6" width="59.7" height="22.8" fill="var(--c-blue)"/><line x1="103.5" x2="103.5" y1="95.7" y2="81.5" stroke="var(--fg)" stroke-width="1.1"/><line x1="100.0" x2="107.0" y1="95.7" y2="95.7" stroke="var(--fg)" stroke-width="1.1"/><line x1="100.0" x2="107.0" y1="81.5" y2="81.5" stroke="var(--fg)" stroke-width="1.1"/><text x="103.5" y="271" text-anchor="middle" font-size="10" fill="var(--fg)">Nov</text><text x="103.5" y="282" text-anchor="middle" font-size="10" fill="var(--fg)">1–10</text><rect x="176.6" y="85.7" width="59.7" height="25.6" fill="var(--c-blue)"/><line x1="206.5" x2="206.5" y1="96.3" y2="75.2" stroke="var(--fg)" stroke-width="1.1"/><line x1="203.0" x2="210.0" y1="96.3" y2="96.3" stroke="var(--fg)" stroke-width="1.1"/><line x1="203.0" x2="210.0" y1="75.2" y2="75.2" stroke="var(--fg)" stroke-width="1.1"/><text x="206.5" y="271" text-anchor="middle" font-size="10" fill="var(--fg)">Nov</text><text x="206.5" y="282" text-anchor="middle" font-size="10" fill="var(--fg)">11–20</text><rect x="279.6" y="47.8" width="59.7" height="63.5" fill="var(--c-red)"/><line x1="309.5" x2="309.5" y1="61.5" y2="34.2" stroke="var(--fg)" stroke-width="1.1"/><line x1="306.0" x2="313.0" y1="61.5" y2="61.5" stroke="var(--fg)" stroke-width="1.1"/><line x1="306.0" x2="313.0" y1="34.2" y2="34.2" stroke="var(--fg)" stroke-width="1.1"/><text x="309.5" y="271" text-anchor="middle" font-size="10" fill="var(--fg)">Nov</text><text x="309.5" y="282" text-anchor="middle" font-size="10" fill="var(--fg)">21–30</text><rect x="382.6" y="47.8" width="59.7" height="63.5" fill="var(--c-red)"/><line x1="412.5" x2="412.5" y1="59.5" y2="36.2" stroke="var(--fg)" stroke-width="1.1"/><line x1="409.0" x2="416.0" y1="59.5" y2="59.5" stroke="var(--fg)" stroke-width="1.1"/><line x1="409.0" x2="416.0" y1="36.2" y2="36.2" stroke="var(--fg)" stroke-width="1.1"/><text x="412.5" y="271" text-anchor="middle" font-size="10" fill="var(--fg)">Dec</text><text x="412.5" y="282" text-anchor="middle" font-size="10" fill="var(--fg)">1–10</text><rect x="485.6" y="73.2" width="59.7" height="38.2" fill="var(--c-blue)"/><line x1="515.5" x2="515.5" y1="86.6" y2="59.8" stroke="var(--fg)" stroke-width="1.1"/><line x1="512.0" x2="519.0" y1="86.6" y2="86.6" stroke="var(--fg)" stroke-width="1.1"/><line x1="512.0" x2="519.0" y1="59.8" y2="59.8" stroke="var(--fg)" stroke-width="1.1"/><text x="515.5" y="271" text-anchor="middle" font-size="10" fill="var(--fg)">Dec</text><text x="515.5" y="282" text-anchor="middle" font-size="10" fill="var(--fg)">11–20</text><rect x="588.6" y="111.4" width="59.7" height="109.1" fill="var(--c-grey)"/><line x1="618.5" x2="618.5" y1="235.8" y2="205.1" stroke="var(--fg)" stroke-width="1.1"/><line x1="615.0" x2="622.0" y1="235.8" y2="235.8" stroke="var(--fg)" stroke-width="1.1"/><line x1="615.0" x2="622.0" y1="205.1" y2="205.1" stroke="var(--fg)" stroke-width="1.1"/><text x="618.5" y="271" text-anchor="middle" font-size="10" fill="var(--fg)">Dec</text><text x="618.5" y="282" text-anchor="middle" font-size="10" fill="var(--fg)">21–30</text><text transform="translate(13,135.0) rotate(-90)" text-anchor="middle" font-size="10.5" fill="var(--muted)">Night forecast error (MW)</text></svg>
 <figcaption><b>Figure 3.</b> The same error in 10-day bins across November and
 December. The bias climbs to +223 ± 41 MW in early December and then collapses at
 the Christmas industrial shutdown. This is the shape, magnitude and timing snowmaking
@@ -287,14 +417,14 @@ what a seasonal heating ramp produces.</p>
 <p>Conditional on weather, it vanishes.</p>
 
 <figure>
-<svg viewBox="0 0 680 250" width="100%" role="img" style="max-width:680px;font-family:ui-sans-serif,system-ui,sans-serif"><line x1="231.9" x2="231.9" y1="16" y2="210" stroke="#d8d4cc" stroke-width="1"/><text x="231.9" y="226" text-anchor="middle" font-size="10" fill="#5a5a5a">-400</text><line x1="305.7" x2="305.7" y1="16" y2="210" stroke="#d8d4cc" stroke-width="1"/><text x="305.7" y="226" text-anchor="middle" font-size="10" fill="#5a5a5a">-300</text><line x1="379.6" x2="379.6" y1="16" y2="210" stroke="#d8d4cc" stroke-width="1"/><text x="379.6" y="226" text-anchor="middle" font-size="10" fill="#5a5a5a">-200</text><line x1="453.4" x2="453.4" y1="16" y2="210" stroke="#d8d4cc" stroke-width="1"/><text x="453.4" y="226" text-anchor="middle" font-size="10" fill="#5a5a5a">-100</text><line x1="527.3" x2="527.3" y1="16" y2="210" stroke="#d8d4cc" stroke-width="1"/><text x="527.3" y="226" text-anchor="middle" font-size="10" fill="#5a5a5a">0</text><line x1="601.1" x2="601.1" y1="16" y2="210" stroke="#d8d4cc" stroke-width="1"/><text x="601.1" y="226" text-anchor="middle" font-size="10" fill="#5a5a5a">100</text><line x1="527.3" x2="527.3" y1="16" y2="210" stroke="#1a1a1a" stroke-width="1.2" stroke-dasharray="4 3"/><line x1="513.8" x2="548.3" y1="40.2" y2="40.2" stroke="#333" stroke-width="1.6"/><line x1="513.8" x2="513.8" y1="36.2" y2="44.2" stroke="#333" stroke-width="1.4"/><line x1="548.3" x2="548.3" y1="36.2" y2="44.2" stroke="#333" stroke-width="1.4"/><circle cx="531.0" cy="40.2" r="5" fill="#276749"/><text x="158" y="38.2" text-anchor="end" font-size="10.5" fill="#1a1a1a">below × cum100</text><text x="158" y="49.2" text-anchor="end" font-size="10.5" fill="#1a1a1a">(PRE-REGISTERED)</text><line x1="470.4" x2="624.3" y1="88.8" y2="88.8" stroke="#333" stroke-width="1.6"/><line x1="470.4" x2="470.4" y1="84.8" y2="92.8" stroke="#333" stroke-width="1.4"/><line x1="624.3" x2="624.3" y1="84.8" y2="92.8" stroke="#333" stroke-width="1.4"/><circle cx="547.3" cy="88.8" r="5" fill="#9a9a9a"/><text x="158" y="92.2" text-anchor="end" font-size="10.5" fill="#1a1a1a">below</text><line x1="447.1" x2="616.7" y1="137.2" y2="137.2" stroke="#333" stroke-width="1.6"/><line x1="447.1" x2="447.1" y1="133.2" y2="141.2" stroke="#333" stroke-width="1.4"/><line x1="616.7" x2="616.7" y1="133.2" y2="141.2" stroke="#333" stroke-width="1.4"/><circle cx="531.9" cy="137.2" r="5" fill="#9a9a9a"/><text x="158" y="140.8" text-anchor="end" font-size="10.5" fill="#1a1a1a">campaign start</text><line x1="203.7" x2="446.8" y1="185.8" y2="185.8" stroke="#333" stroke-width="1.6"/><line x1="203.7" x2="203.7" y1="181.8" y2="189.8" stroke="#333" stroke-width="1.4"/><line x1="446.8" x2="446.8" y1="181.8" y2="189.8" stroke="#333" stroke-width="1.4"/><circle cx="325.2" cy="185.8" r="5" fill="#c05621"/><text x="158" y="189.2" text-anchor="end" font-size="10.5" fill="#1a1a1a">holiday (Christmas)</text><text x="414.0" y="244" text-anchor="middle" font-size="10.5" fill="#5a5a5a">Coefficient (MW), 95% CI</text></svg>
+<svg viewBox="0 0 680 250" width="100%" role="img" style="max-width:680px;font-family:ui-sans-serif,system-ui,sans-serif"><line x1="231.9" x2="231.9" y1="16" y2="210" stroke="var(--rule)" stroke-width="1"/><text x="231.9" y="226" text-anchor="middle" font-size="10" fill="var(--muted)">-400</text><line x1="305.7" x2="305.7" y1="16" y2="210" stroke="var(--rule)" stroke-width="1"/><text x="305.7" y="226" text-anchor="middle" font-size="10" fill="var(--muted)">-300</text><line x1="379.6" x2="379.6" y1="16" y2="210" stroke="var(--rule)" stroke-width="1"/><text x="379.6" y="226" text-anchor="middle" font-size="10" fill="var(--muted)">-200</text><line x1="453.4" x2="453.4" y1="16" y2="210" stroke="var(--rule)" stroke-width="1"/><text x="453.4" y="226" text-anchor="middle" font-size="10" fill="var(--muted)">-100</text><line x1="527.3" x2="527.3" y1="16" y2="210" stroke="var(--rule)" stroke-width="1"/><text x="527.3" y="226" text-anchor="middle" font-size="10" fill="var(--muted)">0</text><line x1="601.1" x2="601.1" y1="16" y2="210" stroke="var(--rule)" stroke-width="1"/><text x="601.1" y="226" text-anchor="middle" font-size="10" fill="var(--muted)">100</text><line x1="527.3" x2="527.3" y1="16" y2="210" stroke="var(--fg)" stroke-width="1.2" stroke-dasharray="4 3"/><line x1="513.8" x2="548.3" y1="40.2" y2="40.2" stroke="var(--fg)" stroke-width="1.6"/><line x1="513.8" x2="513.8" y1="36.2" y2="44.2" stroke="var(--fg)" stroke-width="1.4"/><line x1="548.3" x2="548.3" y1="36.2" y2="44.2" stroke="var(--fg)" stroke-width="1.4"/><circle cx="531.0" cy="40.2" r="5" fill="var(--c-green)"/><text x="158" y="38.2" text-anchor="end" font-size="10.5" fill="var(--fg)">below × cum100</text><text x="158" y="49.2" text-anchor="end" font-size="10.5" fill="var(--fg)">(PRE-REGISTERED)</text><line x1="470.4" x2="624.3" y1="88.8" y2="88.8" stroke="var(--fg)" stroke-width="1.6"/><line x1="470.4" x2="470.4" y1="84.8" y2="92.8" stroke="var(--fg)" stroke-width="1.4"/><line x1="624.3" x2="624.3" y1="84.8" y2="92.8" stroke="var(--fg)" stroke-width="1.4"/><circle cx="547.3" cy="88.8" r="5" fill="var(--c-grey)"/><text x="158" y="92.2" text-anchor="end" font-size="10.5" fill="var(--fg)">below</text><line x1="447.1" x2="616.7" y1="137.2" y2="137.2" stroke="var(--fg)" stroke-width="1.6"/><line x1="447.1" x2="447.1" y1="133.2" y2="141.2" stroke="var(--fg)" stroke-width="1.4"/><line x1="616.7" x2="616.7" y1="133.2" y2="141.2" stroke="var(--fg)" stroke-width="1.4"/><circle cx="531.9" cy="137.2" r="5" fill="var(--c-grey)"/><text x="158" y="140.8" text-anchor="end" font-size="10.5" fill="var(--fg)">campaign start</text><line x1="203.7" x2="446.8" y1="185.8" y2="185.8" stroke="var(--fg)" stroke-width="1.6"/><line x1="203.7" x2="203.7" y1="181.8" y2="189.8" stroke="var(--fg)" stroke-width="1.4"/><line x1="446.8" x2="446.8" y1="181.8" y2="189.8" stroke="var(--fg)" stroke-width="1.4"/><circle cx="325.2" cy="185.8" r="5" fill="var(--c-red)"/><text x="158" y="189.2" text-anchor="end" font-size="10.5" fill="var(--fg)">holiday (Christmas)</text><text x="414.0" y="244" text-anchor="middle" font-size="10.5" fill="var(--muted)">Coefficient (MW), 95% CI</text></svg>
 <figcaption><b>Figure 4.</b> Coefficients from the primary specification with 95%
 intervals. The pre-registered interaction sits on zero. The same model, on the same
 nights, places the Christmas shutdown at −274 MW — so the design is not blind to
 effects of the size snowmaking would have to produce.</figcaption>
 </figure>
 
-<table>
+<div class="twrap"><table>
 <thead><tr>
   <th>Specification</th><th class="num">n</th>
   <th class="num">below × cum100</th><th class="num">below</th><th class="num">holiday</th>
@@ -308,17 +438,17 @@ effects of the size snowmaking would have to produce.</figcaption>
   <td class="num">+5.4 (12.0)</td><td class="num">+23.1 (55.1)</td><td class="num">−273.7 (84.0)</td></tr>
 <tr><td>Seasons 2016–2022 only</td><td class="num">420</td>
   <td class="num">−7.9 (11.5)</td><td class="num">−3.3 (49.5)</td><td class="num">−372.0 (92.7)</td></tr>
-</tbody></table>
+</tbody></table></div>
 <p class="tcap"><b>Table 2.</b> Coefficients in MW, HC1 standard errors in
 parentheses, night-level observations. The primary coefficient is zero in every
 specification. The holiday control is strongly significant in every specification.</p>
 
-<table>
+<div class="twrap"><table>
 <thead><tr><th>Campaign-start terms</th><th class="num">Coef.</th><th class="num">s.e.</th><th class="num">t</th></tr></thead>
 <tbody>
 <tr><td>First night of a cold snap</td><td class="num">+6.3</td><td class="num">58.6</td><td class="num">0.11</td></tr>
 <tr><td>Second night</td><td class="num">−91.7</td><td class="num">86.7</td><td class="num">−1.06</td></tr>
-</tbody></table>
+</tbody></table></div>
 <p class="tcap"><b>Table 3.</b> The scenario where α should be highest, because
 autoregressive terms have not yet caught up. Both dummies enter the same
 specification. Zero, and the first night carries the wrong sign.</p>
@@ -370,7 +500,7 @@ registered 20:00–06:59 one, which is where the earlier 6.50% MAE came from.</p
 <p>None of it changes the verdict. The pre-registration, the kill criteria and the
 power calculation are unchanged.</p>
 
-<h2 class="sec">8. Was Austria a badly chosen case?</h2>
+<span class="chapter-label">Section 08</span><h2 class="sec" id="sec-8">Was Austria a badly chosen case?</h2>
 <p>A null is only interesting if the test was fair. Ranking systems by snowmaking
 energy per gigawatt of winter overnight load puts Austria near the top of the world.</p>
 <div class="verdict" style="margin:0 0 1.4rem"><strong>Scope note:</strong> no country
@@ -379,7 +509,7 @@ snowmaking energy divided by published system load. No load series, forecast ser
 regression was run for any other system. These are targets for replication, not
 results.</div>
 
-<table>
+<div class="twrap"><table>
 <thead><tr><th>System</th><th class="num">GWh/season</th><th class="num">O/n load (GW)</th>
   <th class="num">Ratio</th><th>Free forecast?</th></tr></thead>
 <tbody>
@@ -399,7 +529,7 @@ results.</div>
   <td class="num">1.8</td><td>Yes, ODRÉ</td></tr>
 <tr><td>Germany</td><td class="num">≤43†</td><td class="num">~52</td>
   <td class="num">≤0.8</td><td>Yes, SMARD</td></tr>
-</tbody></table>
+</tbody></table></div>
 <p class="tcap"><b>Table 4.</b> Worldwide ranking. *Derived by scaling equipped
 hectares at the Austrian intensity of 22,449 kWh/ha; no published national total
 exists outside Austria, Switzerland and France. †Germany's figure covers lifts and
@@ -423,7 +553,7 @@ and Pal Arinsal against a 570 GWh national system is plausibly a several-percent
 of national load, but FEDA sits outside ENTSO-E and publishes no hourly series. The
 same holds for China's Chongli cluster.</p>
 
-<h2 class="sec">9. Limitations</h2>
+<span class="chapter-label">Section 09</span><h2 class="sec" id="sec-9">Limitations</h2>
 <ul>
 <li>Roughly 360 relevant hours per season, heavily autocorrelated. Effective sample
 size is nights, not hours, which is why estimation is at night level.</li>
@@ -439,7 +569,7 @@ threshold. It ignores melt and counts cold hours whether or not guns actually ra
 <li>The opening-date and placebo tests were not identified and not run respectively.</li>
 </ul>
 
-<h2 class="sec">10. Data and reproduction</h2>
+<span class="chapter-label">Section 10</span><h2 class="sec" id="sec-10">Data and reproduction</h2>
 <p>No API token is required. Austrian Power Grid publishes both load series back to
 2009 as nested per-year ZIP archives with no registration, and GeoSphere Austria's
 station API needs no key. A single script reproduces everything:</p>
@@ -452,7 +582,7 @@ token. Electricity <em>futures</em> settlement history is paywalled at EEX and I
 a futures-lag test is not feasible on free data; day-ahead spot is the honest
 substitute.</p>
 
-<h2 class="sec">References</h2>
+<h2 class="sec" id="sec-11">References</h2>
 <ol class="refs">
 <li>Aigner, Steiger &amp; Mayer (2026). Snowmaking in Austria: resource consumption and
 greenhouse gas emissions. <em>Journal of Sustainable Tourism</em>.
@@ -478,6 +608,37 @@ MIT-licensed.</p>
 <p><a href="https://github.com/baptistecristo/Electricity-demand-forecasting-in-Austria">github.com/baptistecristo/Electricity-demand-forecasting-in-Austria</a></p>
 </div>
 
+</div>
 </main>
+<script>
+(function () {
+  var root = document.documentElement, KEY = 'snowtheme';
+  function current() {
+    var set = root.getAttribute('data-theme');
+    if (set) return set;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  var themeBtn = document.getElementById('themebtn');
+  themeBtn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem(KEY, next); } catch (e) {}
+    themeBtn.setAttribute('aria-label',
+      next === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+  });
+
+  var navBtn = document.getElementById('navbtn');
+  navBtn.addEventListener('click', function () {
+    var open = document.body.classList.toggle('nav-open');
+    navBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.idx a'), function (a) {
+    a.addEventListener('click', function () {
+      document.body.classList.remove('nav-open');
+      navBtn.setAttribute('aria-expanded', 'false');
+    });
+  });
+})();
+</script>
 </body>
 </html>

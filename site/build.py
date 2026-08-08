@@ -13,6 +13,52 @@ FIG_BINS = charts.figure_bins()
 FIG_COEFS = charts.figure_coefs()
 FIG_MDE = charts.mde_chart()
 
+# Applied before first paint so a stored dark preference does not flash white.
+HEAD_SCRIPT = (
+    "<script>try{var s=localStorage.getItem('snowtheme');"
+    "if(s)document.documentElement.setAttribute('data-theme',s);}catch(e){}</script>"
+)
+
+# Kept out of the f-string below: JavaScript braces would all need doubling.
+SCRIPT = r"""<script>
+(function () {
+  var root = document.documentElement, KEY = 'snowtheme';
+  function current() {
+    var set = root.getAttribute('data-theme');
+    if (set) return set;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  var themeBtn = document.getElementById('themebtn');
+  themeBtn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem(KEY, next); } catch (e) {}
+    themeBtn.setAttribute('aria-label',
+      next === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+  });
+
+  var navBtn = document.getElementById('navbtn');
+  navBtn.addEventListener('click', function () {
+    var open = document.body.classList.toggle('nav-open');
+    navBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.idx a'), function (a) {
+    a.addEventListener('click', function () {
+      document.body.classList.remove('nav-open');
+      navBtn.setAttribute('aria-expanded', 'false');
+    });
+  });
+})();
+</script>"""
+
+MOON = ('<svg class="moon" viewBox="0 0 24 24" aria-hidden="true">'
+        '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>')
+SUN = ('<svg class="sun" viewBox="0 0 24 24" aria-hidden="true">'
+       '<circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2'
+       'M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg>')
+BARS = ('<svg viewBox="0 0 24 24" aria-hidden="true">'
+        '<path d="M4 7h16M4 12h16M4 17h16"/></svg>')
+
 HTML = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,116 +66,246 @@ HTML = f"""<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Snowmaking and the Austrian Day-Ahead Load Forecast: A Pre-Registered Null</title>
 <meta name="description" content="A pre-registered test of whether ski-resort snowmaking is a systematic blind spot in Austria's day-ahead electricity load forecast. 780 nights, 13 seasons. Null.">
+{HEAD_SCRIPT}
 <style>
 :root {{
-  --ink:#1a1a1a; --muted:#5a5a5a; --rule:#d8d4cc; --bg:#fdfdfb;
-  --accent:#7a2020; --link:#1a4c8b; --panel:#f5f3ee;
+  --bg:#ffffff; --fg:#0a0a0a; --muted:#737373; --rule:#e5e5e5;
+  --accent:#0079F2; --accent-line:rgba(0,121,242,.18);
+  --panel:rgba(0,121,242,.035); --code-bg:#f4f4f5; --hl:rgba(0,121,242,.05);
+  --c-blue:#2b6cb0; --c-red:#c05621; --c-green:#276749; --c-grey:#9a9a9a;
+  --c-plum:#702459;
+  --serif:'Crimson Pro',Georgia,'Times New Roman',serif;
+  --sans:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
 }}
-*{{box-sizing:border-box}}
-html{{-webkit-text-size-adjust:100%}}
+:root[data-theme="dark"]{{
+  --bg:#0a0a0a; --fg:#e5e5e5; --muted:#a3a3a3; --rule:#404040;
+  --accent:#3b9eff; --accent-line:rgba(59,158,255,.32);
+  --panel:rgba(59,158,255,.07); --code-bg:rgba(255,255,255,.07);
+  --hl:rgba(59,158,255,.09);
+  --c-blue:#5aa9f0; --c-red:#ee8a4d; --c-green:#4bb07a; --c-grey:#8a8a8a;
+  --c-plum:#d571a6;
+}}
+@media (prefers-color-scheme:dark){{
+  :root:not([data-theme="light"]){{
+    --bg:#0a0a0a; --fg:#e5e5e5; --muted:#a3a3a3; --rule:#404040;
+    --accent:#3b9eff; --accent-line:rgba(59,158,255,.32);
+    --panel:rgba(59,158,255,.07); --code-bg:rgba(255,255,255,.07);
+    --hl:rgba(59,158,255,.09);
+    --c-blue:#5aa9f0; --c-red:#ee8a4d; --c-green:#4bb07a; --c-grey:#8a8a8a;
+    --c-plum:#d571a6;
+  }}
+}}
+*{{box-sizing:border-box;margin:0;padding:0}}
+html{{-webkit-text-size-adjust:100%;scroll-behavior:smooth}}
 body{{
-  margin:0; background:var(--bg); color:var(--ink);
-  font-family:"Latin Modern Roman","Computer Modern Serif",Georgia,"Times New Roman",serif;
-  font-size:17px; line-height:1.62;
+  background:var(--bg); color:var(--fg); font-family:var(--serif);
+  font-size:1.1875rem; line-height:1.8;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
 }}
-.bar{{
-  border-bottom:1px solid var(--rule); background:#fff;
-  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:12px; letter-spacing:.04em; color:var(--muted);
+:focus-visible{{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}}
+
+/* ---- sidebar index ---- */
+aside{{
+  position:fixed; top:0; left:0; height:100vh; width:20rem; z-index:30;
+  padding:3rem 2rem; overflow-y:auto; border-right:1px solid var(--rule);
+  background:var(--bg);
 }}
-.bar .in{{max-width:52rem;margin:0 auto;padding:.6rem 1.5rem;display:flex;
-  justify-content:space-between;gap:1rem;flex-wrap:wrap}}
-.bar b{{color:var(--accent);font-weight:600}}
-main{{max-width:46rem;margin:0 auto;padding:3rem 1.5rem 6rem}}
-h1{{font-size:1.95rem;line-height:1.25;margin:0 0 1.1rem;font-weight:600;
-  letter-spacing:-.005em;text-wrap:balance}}
-.byline{{margin:0 0 .2rem;font-size:1.02rem}}
-.affil{{color:var(--muted);font-size:.9rem;margin:0 0 .3rem;font-style:italic}}
-.dateline{{color:var(--muted);font-size:.86rem;margin:0 0 2.2rem;
-  font-family:ui-sans-serif,system-ui,sans-serif}}
-.abstract{{
-  background:var(--panel); border:1px solid var(--rule); border-radius:2px;
-  padding:1.3rem 1.6rem; margin:0 0 1rem; font-size:.95rem; line-height:1.6;
+.idx-eyebrow{{
+  font-family:var(--sans); font-size:.72rem; font-weight:600;
+  letter-spacing:.18em; text-transform:uppercase; color:var(--muted);
+  margin-bottom:2rem;
 }}
+.idx{{list-style:none}}
+.idx li{{margin:0 0 .1rem}}
+.idx a{{
+  display:flex; gap:1rem; align-items:baseline; text-decoration:none;
+  color:var(--muted); font-size:.95rem; line-height:1.45; padding:.42rem 0;
+  border:0; transition:color .15s;
+}}
+.idx a:hover,.idx a:focus-visible{{color:var(--fg)}}
+.idx .n{{
+  font-family:var(--sans); font-size:.72rem; font-variant-numeric:tabular-nums;
+  color:var(--muted); opacity:.7; flex-shrink:0; letter-spacing:.04em;
+}}
+.idx .grp{{
+  font-family:var(--sans); font-size:.68rem; font-weight:600;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--muted);
+  margin:2rem 0 .8rem; opacity:.75;
+}}
+
+/* ---- theme toggle ---- */
+.toggle{{
+  position:fixed; top:1.6rem; right:2rem; z-index:40;
+  background:var(--bg); border:1px solid var(--rule); border-radius:999px;
+  width:2.5rem; height:2.5rem; display:grid; place-items:center;
+  cursor:pointer; color:var(--muted); transition:color .15s,border-color .15s;
+}}
+.toggle:hover{{color:var(--fg);border-color:var(--muted)}}
+.toggle svg{{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6}}
+.toggle .sun{{display:none}}
+:root[data-theme="dark"] .toggle .sun{{display:block}}
+:root[data-theme="dark"] .toggle .moon{{display:none}}
+@media (prefers-color-scheme:dark){{
+  :root:not([data-theme="light"]) .toggle .sun{{display:block}}
+  :root:not([data-theme="light"]) .toggle .moon{{display:none}}
+}}
+
+/* ---- layout ---- */
+main{{margin-left:20rem;padding-bottom:6rem}}
+.container{{max-width:48rem;margin:0 auto;padding:0 4rem}}
+
+/* ---- masthead ---- */
+.masthead{{padding:6rem 0 3rem}}
+.kicker{{
+  font-family:var(--sans); font-size:.8rem; font-weight:500;
+  letter-spacing:.15em; text-transform:uppercase; color:var(--accent);
+  margin-bottom:1.6rem;
+}}
+h1{{
+  font-size:3.4rem; line-height:1.1; font-weight:400; letter-spacing:-.01em;
+  text-wrap:balance; margin-bottom:1.4rem;
+}}
+.byline{{font-size:1.05rem;margin-bottom:.15rem}}
+.affil{{color:var(--muted);font-size:.95rem;font-style:italic;margin-bottom:.5rem}}
+.dateline{{
+  font-family:var(--sans); font-size:.85rem; color:var(--muted);
+  letter-spacing:.025em; padding-bottom:2.5rem; border-bottom:1px solid var(--rule);
+}}
+
+/* ---- abstract + verdict ---- */
+.abstract{{margin:2.5rem 0 1.5rem}}
 .abstract h2{{
-  font-size:.78rem;text-transform:uppercase;letter-spacing:.14em;
-  margin:0 0 .7rem;color:var(--muted);font-weight:600;
-  font-family:ui-sans-serif,system-ui,sans-serif;
+  font-family:var(--sans); font-size:.78rem; font-weight:600;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--muted);
+  margin-bottom:1rem;
 }}
-.abstract p{{margin:0 0 .7rem;text-align:justify;hyphens:auto}}
+.abstract p{{margin-bottom:1rem;opacity:.9}}
 .abstract p:last-child{{margin-bottom:0}}
 .verdict{{
-  border-left:3px solid var(--accent); background:#fff; padding:.9rem 1.2rem;
-  margin:0 0 2.4rem; font-size:.94rem;
+  background:var(--panel); border:1px solid var(--accent-line); border-radius:8px;
+  padding:1.6rem 1.8rem; margin:2rem 0 3rem;
+  font-family:var(--sans); font-size:.95rem; line-height:1.65;
 }}
-.verdict strong{{color:var(--accent)}}
-h2.sec{{
-  font-size:1.15rem;margin:2.6rem 0 .8rem;font-weight:600;
-  padding-bottom:.3rem;border-bottom:1px solid var(--rule);
+.verdict strong{{color:var(--accent);font-weight:600}}
+
+/* ---- sections ---- */
+article{{margin-bottom:5rem}}
+.chapter-label{{
+  font-family:var(--sans); font-size:.82rem; font-weight:500;
+  letter-spacing:.15em; text-transform:uppercase; color:var(--accent);
+  opacity:.85; display:block; margin-bottom:.9rem;
 }}
-h3{{font-size:1rem;margin:1.8rem 0 .5rem;font-weight:600}}
-p{{margin:0 0 1rem;text-align:justify;hyphens:auto}}
-ul,ol{{margin:0 0 1rem;padding-left:1.3rem}}
-li{{margin:.35rem 0}}
-a{{color:var(--link);text-decoration:none;border-bottom:1px solid #c5d4e6}}
-a:hover{{border-bottom-color:var(--link)}}
+h2.sec{{font-size:2.6rem;line-height:1.15;font-weight:400;margin-bottom:1.8rem;
+  letter-spacing:-.01em;text-wrap:balance}}
+h3{{font-size:1.4rem;line-height:1.3;font-weight:600;margin:2.8rem 0 1.1rem}}
+p{{margin-bottom:1.15rem}}
+ul,ol{{margin:0 0 1.2rem;padding-left:1.4rem}}
+li{{margin:.45rem 0}}
+a{{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-line)}}
+a:hover{{border-bottom-color:var(--accent)}}
 code,.mono{{
-  font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
-  font-size:.86em;background:#f0eee9;padding:.1em .35em;border-radius:2px;
+  font-family:var(--mono); font-size:.84em; background:var(--code-bg);
+  padding:.12em .38em; border-radius:4px;
 }}
-pre{{background:var(--panel);border:1px solid var(--rule);border-radius:2px;
-  padding:.9rem 1.1rem;overflow-x:auto;font-size:.8rem;line-height:1.5;margin:0 0 1.2rem}}
+pre{{background:var(--code-bg);border:1px solid var(--rule);border-radius:8px;
+  padding:1.1rem 1.3rem;overflow-x:auto;font-size:.82rem;line-height:1.6;
+  margin-bottom:1.4rem;font-family:var(--mono)}}
 pre code{{background:none;padding:0}}
-figure{{margin:1.8rem 0;text-align:center}}
-figure img{{max-width:100%;height:auto;border:1px solid var(--rule);background:#fff}}
+
+/* ---- figures ---- */
+figure{{margin:2.4rem 0}}
+figure svg{{display:block;margin:0 auto;max-width:100%;height:auto}}
+figure img{{max-width:100%;height:auto;border:1px solid var(--rule);border-radius:8px}}
 figcaption{{
-  font-size:.83rem;color:var(--muted);margin-top:.7rem;text-align:left;
-  line-height:1.5;
+  font-family:var(--sans); font-size:.82rem; color:var(--muted);
+  margin-top:1rem; line-height:1.6;
 }}
-figcaption b{{color:var(--ink)}}
-table{{border-collapse:collapse;width:100%;font-size:.85rem;margin:.4rem 0 .5rem}}
-th,td{{padding:.42rem .55rem;border-bottom:1px solid var(--rule);text-align:left;
-  vertical-align:top}}
-thead th{{border-bottom:1.5px solid #b8b2a8;font-weight:600;font-size:.8rem;
-  text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}}
-td.num,th.num{{text-align:right;font-variant-numeric:tabular-nums;
-  font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.82rem}}
-tbody tr.hl{{background:#fbf6f6}}
+figcaption b{{color:var(--fg);font-weight:600}}
+
+/* ---- tables ---- */
+.twrap{{overflow-x:auto;margin:1rem 0 .5rem}}
+table{{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:.86rem}}
+th,td{{padding:.6rem .7rem;border-bottom:1px solid var(--rule);text-align:left;
+  vertical-align:top;line-height:1.5}}
+thead th{{
+  border-bottom:1px solid var(--muted); font-weight:600; font-size:.72rem;
+  text-transform:uppercase; letter-spacing:.09em; color:var(--muted);
+}}
+td.num,th.num{{text-align:right;font-variant-numeric:tabular-nums}}
+tbody tr.hl{{background:var(--hl)}}
 tbody tr.hl td{{font-weight:600}}
-.tcap{{font-size:.83rem;color:var(--muted);margin:.9rem 0 .4rem;line-height:1.5}}
-.tcap b{{color:var(--ink)}}
+.tcap{{font-family:var(--sans);font-size:.82rem;color:var(--muted);
+  margin:1rem 0 .4rem;line-height:1.6}}
+.tcap b{{color:var(--fg);font-weight:600}}
+
+/* ---- kill criteria ---- */
 .kill{{list-style:none;padding:0}}
-.kill li{{padding:.65rem 0 .65rem 2.1rem;position:relative;border-bottom:1px solid var(--rule);
-  font-size:.93rem}}
-.kill li:before{{position:absolute;left:0;top:.6rem;font-size:1rem}}
+.kill li{{padding:.8rem 0 .8rem 2.2rem;position:relative;
+  border-bottom:1px solid var(--rule);font-size:1.02rem}}
+.kill li:before{{position:absolute;left:0;top:.85rem;font-size:1rem;
+  font-family:var(--sans)}}
 .kill li.fired:before{{content:"✕";color:var(--accent);font-weight:700}}
 .kill li.notrun:before{{content:"○";color:var(--muted)}}
 .kill li.fired em{{color:var(--accent);font-style:normal;font-weight:600}}
-.foot{{margin-top:3.5rem;padding-top:1.2rem;border-top:1px solid var(--rule);
-  font-size:.82rem;color:var(--muted)}}
-.refs{{font-size:.84rem;line-height:1.55}}
-.refs li{{margin:.5rem 0}}
+
+/* ---- footer ---- */
+.foot{{margin-top:4rem;padding-top:1.6rem;border-top:1px solid var(--rule);
+  font-family:var(--sans);font-size:.82rem;color:var(--muted);line-height:1.7}}
+.foot p{{margin-bottom:.7rem}}
+.refs{{font-size:.92rem;line-height:1.6}}
+.refs li{{margin:.6rem 0}}
+
+/* ---- mobile ---- */
+.navbtn{{display:none;position:fixed;top:1.6rem;left:1.25rem;z-index:40;
+  background:var(--bg);border:1px solid var(--rule);border-radius:999px;
+  width:2.5rem;height:2.5rem;place-items:center;cursor:pointer;color:var(--muted)}}
+.navbtn svg{{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7}}
+@media (max-width:1100px){{
+  aside{{transform:translateX(-100%);transition:transform .25s ease;
+    box-shadow:0 0 40px rgba(0,0,0,.18);
+    padding-top:5.6rem}}   /* clear the fixed menu button */
+  body.nav-open aside{{transform:none}}
+  .navbtn{{display:grid}}
+  main{{margin-left:0}}
+  .container{{padding:0 1.6rem}}
+  .masthead{{padding:5rem 0 2.5rem}}
+}}
 @media (max-width:640px){{
-  body{{font-size:16px}} main{{padding:2rem 1.1rem 4rem}} h1{{font-size:1.5rem}}
-  table{{font-size:.78rem}} th,td{{padding:.35rem .3rem}}
+  body{{font-size:1.06rem;line-height:1.75}}
+  h1{{font-size:2.2rem}} h2.sec{{font-size:1.75rem}} h3{{font-size:1.2rem}}
+  .container{{padding:0 1.15rem}}
+  .toggle{{right:1.25rem}}
+  .verdict{{padding:1.2rem 1.3rem}}
+}}
+@media (prefers-reduced-motion:reduce){{
+  html{{scroll-behavior:auto}}
+  *{{transition:none!important;animation:none!important}}
 }}
 </style>
 </head>
 <body>
 
-<div class="bar"><div class="in">
-  <span><b>preprint</b> &nbsp;·&nbsp; energy economics / load forecasting</span>
-  <span>Pre-registered · data and code open</span>
-</div></div>
+<button class="navbtn" id="navbtn" aria-label="Open contents" aria-expanded="false">{BARS}</button>
+<button class="toggle" id="themebtn" aria-label="Switch colour theme">{MOON}{SUN}</button>
+
+<aside id="sidebar">
+<div class="idx-eyebrow">Index</div>
+<!--NAV-->
+</aside>
 
 <main>
+<div class="container">
 
+<header class="masthead">
+<div class="kicker">Pre-registered · tested · null</div>
 <h1>Snowmaking is absorbed by the day-ahead load forecast, not missed by it</h1>
 <p class="byline">Baptiste Cristofari</p>
 <p class="affil">Independent</p>
-<p class="dateline">August 2026 &nbsp;·&nbsp;
+<p class="dateline">August 2026 &nbsp;·&nbsp; Energy economics / load forecasting &nbsp;·&nbsp;
   <a href="https://github.com/baptistecristo/Electricity-demand-forecasting-in-Austria">code and data</a>
 </p>
+</header>
 
 <div class="abstract">
 <h2>Abstract</h2>
@@ -493,10 +669,51 @@ MIT-licensed.</p>
 <p><a href="https://github.com/baptistecristo/Electricity-demand-forecasting-in-Austria">github.com/baptistecristo/Electricity-demand-forecasting-in-Austria</a></p>
 </div>
 
+</div>
 </main>
+{SCRIPT}
 </body>
 </html>
 """
 
-OUT.write_text(HTML, encoding="utf-8")
-print(f"wrote {OUT}  ({len(HTML)/1024:.0f} KB)")
+
+def build_index(html: str) -> str:
+    """Give every section an anchor, an eyebrow, and an entry in the sidebar.
+
+    The index is derived from the headings themselves rather than maintained by
+    hand, so it cannot drift out of step with the paper.
+    """
+    import re
+
+    seen = []
+
+    def tag(m):
+        title = m.group(1)
+        num = re.match(r"^(\d+)\.\s*(.*)$", title)
+        slug = f"sec-{len(seen) + 1}"
+        if num:
+            n, rest = num.group(1), num.group(2)
+            seen.append((f"{int(n):02d}", rest, slug))
+            eyebrow = f'<span class="chapter-label">Section {int(n):02d}</span>'
+            return f'{eyebrow}<h2 class="sec" id="{slug}">{rest}</h2>'
+        seen.append(("", title, slug))
+        return f'<h2 class="sec" id="{slug}">{title}</h2>'
+
+    html = re.sub(r'<h2 class="sec">(.*?)</h2>', tag, html)
+
+    rows = []
+    for n, title, slug in seen:
+        num = f'<span class="n">{n}</span>' if n else '<span class="n">&nbsp;</span>'
+        rows.append(f'<li><a href="#{slug}">{num}<span>{title}</span></a></li>')
+    return html.replace("<!--NAV-->", '<ul class="idx">' + "".join(rows) + "</ul>")
+
+
+def wrap_tables(html: str) -> str:
+    """Tables scroll inside their own box so the page never scrolls sideways."""
+    return (html.replace("<table>", '<div class="twrap"><table>')
+                .replace("</table>", "</table></div>"))
+
+
+PAGE = wrap_tables(build_index(HTML))
+OUT.write_text(PAGE, encoding="utf-8")
+print(f"wrote {OUT}  ({len(PAGE)/1024:.0f} KB)")
