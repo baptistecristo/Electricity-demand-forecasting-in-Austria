@@ -270,6 +270,8 @@ Raw data is not committed. `data/README.md` documents exactly how to fetch it.
 Everything above this line was written first. Nothing above it has been edited
 since the data was opened.
 
+![Results](figures/results.png)
+
 ### 8.1 Sample
 
 APG publishes both series back to 2009 with no registration, which turned out to
