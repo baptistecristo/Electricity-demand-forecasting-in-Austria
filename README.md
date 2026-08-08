@@ -1,8 +1,14 @@
 # Snowmaking as a hidden load in Austrian day-ahead electricity forecasts
 
-**Status: pre-registered, data collection in progress.** No results yet. The
-predictions and the kill criteria in §5 were published before any load data was
-examined — commit history is the proof.
+**Status: pre-registered, tested, null.** Two of the three kill criteria in §5
+fired. The predictions and the stopping rules were written before any load data
+was examined; commit history is the proof. Results in §8.
+
+**Headline:** on 780 November–December nights across 13 seasons, the pre-registered
+interaction is **+1.3 MW ± 11.8** — indistinguishable from zero. The identical
+specification, on the identical nights, recovers the Christmas industrial shutdown
+at **−277 MW (t = −3.3)**. The design can see effects of the size snowmaking would
+have to produce. It does not see snowmaking.
 
 ---
 
@@ -231,13 +237,21 @@ Reproduce with `python src/power.py`.
 |---|---|---|
 | AT day-ahead total load forecast (A65) | ENTSO-E Transparency | free token, ~3 working days |
 | AT actual total load (A16) | ENTSO-E Transparency | same token |
-| AT day-ahead forecast + actual, 15-min, 2024– | markt.apg.at ZIP downloads | no registration |
+| AT actual load, 15-min, **2009–2022** | markt.apg.at `Gesamtlast.zip` | no registration |
+| AT day-ahead forecast, 15-min, **2010–2022** | markt.apg.at `Prognose über die Gesamtlast.zip` | no registration |
 | Hourly temperature and humidity, alpine stations | GeoSphere Austria `klima-v2-1h` | no key |
 | Resort opening dates | resort sites and Wayback | manual, ~30 resorts |
 
-The ENTSO-E token is free: register at transparency.entsoe.eu, email
-transparency@entsoe.eu with subject "RESTful API access", approval within three
-working days, then generate the token under My Account.
+**The APG archives go back to 2009, not 2024 as the web view implies.** Each is a
+ZIP of per-year ZIPs, each holding one CSV. That is thirteen overlapping seasons
+with no token, no registration and no waiting — more history than the ENTSO-E
+route would have given for this test, since the load series is continuous across
+the 2018 bidding-zone split and only prices broke. The results in §8 use APG.
+
+The ENTSO-E token remains free and is still worth having for the NL/DK placebos
+and any move to price or imbalance outcomes: register at transparency.entsoe.eu,
+email transparency@entsoe.eu with subject "RESTful API access", approval within
+three working days, then generate the token under My Account.
 
 Raw data is not committed. `data/README.md` documents exactly how to fetch it.
 
@@ -253,8 +267,142 @@ Raw data is not committed. `data/README.md` documents exactly how to fetch it.
 
 ## 8. Results
 
-Pending. This section will be added, not substituted — the pre-registration above
-stays as written.
+Everything above this line was written first. Nothing above it has been edited
+since the data was opened.
+
+### 8.1 Sample
+
+APG publishes both series back to 2009 with no registration, which turned out to
+be more history than the ENTSO-E route would have given and removed the token from
+the critical path. Forecast coverage starts 2010, so:
+
+| | |
+|---|---|
+| Joined hourly observations | 113,952 (2010-01-01 to 2022-12-31) |
+| Seasons | 13 |
+| Nov–Dec nights, ≥8 hours in the 20:00–06:59 window | **780** |
+| Alpine stations in the wet-bulb index | 13, deduplicated, 1,221–2,327 m |
+| Index hours (Oct–Dec) | 28,704 |
+| Campaign starts identified | 49 |
+
+Stations include Ischgl-Idalpe (2,327 m), Rudolfshütte (2,317 m), Patscherkofel
+(2,251 m), Galzig (2,079 m), Villacher Alpe (2,140 m) and Schmittenhöhe (1,956 m) —
+the index sits where snow is actually made, not in the valleys.
+
+### 8.2 The gate: the Austrian forecast is much noisier than assumed
+
+| Nov–Dec night hours, 2010–2022 | |
+|---|---|
+| Mean load | 6,420 MW |
+| Bias (actual − forecast) | **+59.5 MW** |
+| MAE | 417 MW, **6.50% of load** |
+| sd, raw | 597 MW |
+| sd, after hour/dow/season fixed effects | **514 MW** |
+| Implied α pass mark, 13 seasons | **25.4%** |
+
+The DE-LU benchmark used in §6 was 3.14%. Austria is roughly twice as hard to
+forecast, worse than the most pessimistic of the three scenarios. The bar the
+hypothesis had to clear was therefore ~25% of the snowmaking load left
+unexplained, not the ~19% anticipated.
+
+### 8.3 What the raw seasonal profile looked like
+
+Before conditioning on weather, the descriptive pattern was encouraging.
+November is the most under-forecast month of the year:
+
+| Month | Night bias (MW) | | Month | Night bias (MW) |
+|---|---|---|---|---|
+| Oct | +70 ± 16 | | Apr | −30 ± 16 |
+| **Nov** | **+131 ± 22** | | Jun | +8 ± 14 |
+| Dec | −10 ± 30 | | Jul | −65 ± 13 |
+| Jan | +108 ± 24 | | Aug | +25 ± 16 |
+
+And within November–December, in 10-day bins, the bias rises to a peak in early
+December then collapses:
+
+| Nov 1–10 | Nov 11–20 | Nov 21–30 | Dec 1–10 | Dec 11–20 | Dec 21–30 |
+|---|---|---|---|---|---|
+| +78 ± 24 | +81 ± 37 | +222 ± 47 | **+228 ± 43** | +146 ± 46 | −383 ± 54 |
+
+That hump is the right shape and the right order of magnitude for snowmaking:
+too warm to make snow in early November, a ramp into the opening-day crunch, then
+decline as bases are built. The Dec 21–30 collapse is the Christmas industrial
+shutdown.
+
+It is also exactly what a seasonal heating ramp produces. Separating them is what
+the pre-registered specification is for.
+
+### 8.4 The pre-registered test
+
+`err ~ below × cum100 + dist + below:dist + holiday + doy + doy² + season FE + dow FE`,
+night-level observations, HC1 standard errors.
+
+| Specification | n | `below:cum100` **(primary)** | `below` | `holiday` |
+|---|---|---|---|---|
+| Nov–Dec, all nights | 780 | **+1.3** (11.8), t = 0.11 | +3.4 (52.6) | **−277.3** (84.1), t = −3.30 |
+| Bandwidth \|wb+2\| ≤ 3 °C | 412 | **+1.1** (15.2), t = 0.07 | −33.8 (96.1) | −190.4 (123.8) |
+| With campaign-start dummies | 780 | **+0.4** (12.0), t = 0.03 | +13.6 (52.3) | −273.0 (85.7), t = −3.19 |
+| Seasons 2016–2022 only | 420 | **−7.1** (11.4), t = −0.63 | +28.7 (49.2) | **−373.1** (92.2), t = −4.05 |
+
+Standard errors in parentheses.
+
+Campaign-start effects, testing the highest-α scenario where autoregressive terms
+have not yet caught up:
+
+| Term | Coefficient | SE | t |
+|---|---|---|---|
+| `campaign_start` (first night of a cold snap) | −19.5 | 70.2 | −0.28 |
+| `campaign_night2` | −78.5 | 104.8 | −0.75 |
+
+### 8.5 Verdict against the pre-registered kill criteria
+
+> *"The interaction coefficient is zero or positive with a tight confidence
+> interval → no memory effect. Stop."*
+
+**Fired.** +1.3 MW with a standard error of 11.8, stable across four
+specifications, and negative-signed only in the subsample where it is least
+precise. The 95% interval is roughly [−22, +25] MW per 100 accumulated cold hours.
+
+> *"The event-study profile is flat across campaign days → the forecast already
+> absorbs it. Stop."*
+
+**Fired.** Both campaign-start coefficients are indistinguishable from zero and
+carry the wrong sign.
+
+The NL/DK placebo was not run. With two of three criteria met it is moot: there
+is no effect for a placebo to discredit.
+
+### 8.6 Why this is a null and not merely an absence of evidence
+
+The specification is not underpowered for effects of the relevant size. On the
+same 780 nights, with the same fixed effects and the same standard errors, it
+recovers the Christmas industrial shutdown at −277 MW with t = −3.3, rising to
+−373 MW and t = −4.1 in recent seasons. A real night-level swing of a few hundred
+megawatts is visible to this design. The snowmaking interaction is 0 ± 12.
+
+The most likely explanation is the one anticipated in §3. Snowmaking is not
+invisible to the forecast; it is *absorbed* by it. A temperature coefficient
+estimated on thirteen years in which cold alpine nights are snowmaking nights
+prices in the average response without needing to know snowmaking exists, and
+APG's use of lagged actual load carries a running campaign into the next day's
+forecast. What remains for the residual is too small to find, and probably too
+small to matter.
+
+The +131 MW November bias in §8.3 survives as a real seasonal feature. It is not
+attributable to snowmaking by this design.
+
+### 8.7 What would still be worth doing
+
+- **Opening dates.** The one pre-registered supporting test not run, and the only
+  remaining source of variation orthogonal to temperature.
+- **Price and imbalance as outcomes.** §9 already notes the load forecast error is
+  the TSO's error, not the market's. A null here does not rule out a price effect.
+- **Larger, less well-forecast markets.** The binding constraint was α, not sample
+  size. Systems where the load is a larger share of demand, or where the operator
+  forecasts less well, face a lower bar. Spanish irrigation pumping is the obvious
+  next case, with one caveat: irrigation *responds to price*, which makes the load
+  endogenous to the thing being explained and requires an instrument. Snowmaking
+  was the clean case precisely because its constraint is physical.
 
 ## 9. Limitations
 
@@ -264,19 +412,52 @@ stays as written.
   consensus. A systematic bias in it demonstrates a blind spot in APG's forecast,
   **not** a market mispricing. Establishing the latter requires day-ahead price or
   imbalance as the outcome and is a separate study.
-- Part of Vorarlberg is outside the published load series (§2).
-- Opening dates are collected manually for the ~30 resorts covering most capacity,
-  so the opening-date test is coarser than the others.
+- Part of Vorarlberg is outside the published load series (§2). Vorarlberg carries
+  weight 0.10 in the wet-bulb index while some of its load is absent from the
+  dependent variable, which adds noise at exactly the threshold.
+- **Opening dates were not collected.** This is the one pre-registered supporting
+  test that was not run, and the only remaining identifying variation orthogonal
+  to temperature.
+- **The NL/DK placebo was not run.** With the primary coefficient at zero there is
+  no effect for it to discredit, but the pipeline supports it (`snowload.py`) and
+  it would tighten the write-up.
+- The wet-bulb index uses 13 stations weighted by state share of skier visits, not
+  by equipped hectares. A capacity-weighted index would be better and is unlikely
+  to move a coefficient this close to zero.
+- `cum_cold_h` proxies the snow stock with accumulated hours below threshold. It
+  ignores melt, and it counts cold hours whether or not guns actually ran. A true
+  stock variable would need production data no resort publishes.
 
 ## 10. Reproduce
 
+**To reproduce §8 from scratch, no token and no registration required:**
+
 ```bash
 pip install -r requirements.txt
-export ENTSOE_TOKEN=...           # see §7
+python src/apg_pipeline.py
+```
+
+That downloads both APG archives, unpacks the nested per-year ZIPs, joins the
+15-minute actual load to the 15-minute day-ahead forecast at hourly resolution,
+selects the alpine stations, solves the psychrometric wet bulb with the station
+pressure correction, builds the region-weighted index and the season-to-date cold
+accumulator, detects campaign starts, writes `data/night_panel.csv`, and prints
+the gate statistics followed by all four specifications. Runtime is a few minutes,
+most of it the two ~6 MB downloads.
+
+The other scripts stand alone:
+
+```bash
 python src/magnitude.py           # load magnitude arithmetic, no data needed
 python src/power.py               # detectability calculation, no data needed
+
+export ENTSOE_TOKEN=...           # see §7 — only needed for the ENTSO-E route
 python src/snowload.py --seasons 2018 2019 2021 2022 2023 2024
 ```
+
+`snowload.py` is the ENTSO-E path, kept because it also handles the NL/DK
+placebos and multi-country comparison that APG cannot serve. `apg_pipeline.py` is
+what produced the reported results.
 
 `snowload.py` selects alpine stations by altitude and state, solves the
 psychrometric wet bulb with a station-pressure correction, builds the
