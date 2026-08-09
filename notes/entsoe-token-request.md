@@ -22,10 +22,17 @@ I would like to request RESTful API access for the Transparency Platform.
 Registered email address: baptistecristofari@gmail.com
 
 I am carrying out academic research on the accuracy of day-ahead total load
-forecasts in the Austrian bidding zone, specifically whether large
-weather-triggered industrial loads are systematically under-predicted. The series
-I need are Actual Total Load [6.1.A] and Day-Ahead Total Load Forecast [6.1.B] for
-the AT bidding zone, with NL and DK as controls.
+forecasts, specifically whether large weather-triggered industrial loads are
+systematically under-predicted and whether that shows up in imbalance. The series
+I need are:
+
+  - Actual Total Load [6.1.A]
+  - Day-Ahead Total Load Forecast [6.1.B]
+  - Day-Ahead Prices [12.1.D]
+  - Imbalance Prices [17.1.F]
+  - Total Imbalance Volumes [17.1.G]
+
+for the AT bidding zone, with CH, IT-North, NL and DK as controls.
 
 Thank you,
 Baptiste Cristofari
@@ -42,6 +49,15 @@ Then:
 ```bash
 export ENTSOE_TOKEN=<paste>
 ```
+
+## Why the imbalance series were added to the request
+
+The load test and the day-ahead price test both close at the same moment: APG
+publishes its forecast at 08:00 on D-1 and the day-ahead auction clears around
+noon. A weather-forecast revision arriving *after* noon is information a resort
+acts on and neither the forecast nor the day-ahead price can contain. Whatever
+that produces has nowhere to go but imbalance. §9 of the root README lists
+imbalance as the untried instrument, and these two series are what it needs.
 
 ## Optional — worth asking APG at the same time
 
