@@ -612,6 +612,13 @@ substantially noisier than the German-Luxembourg benchmark of 3.14% used to
 calibrate this: <b>6.48% MAE</b> on November–December night hours, standard deviation
 608 MW raw and 554 MW after fixed effects. That raised the pass mark to
 <b>α ≥ 27.4%</b> at thirteen seasons.</p>
+<div class="verdict" style="margin:1.2rem 0"><strong>What this section turned out
+to be worth.</strong> Both figures above are ex-ante: they assume a forecast error
+standard deviation rather than using a fitted one. Once the models were actually
+estimated, the fitted standard errors put the real Austrian bar at <b>47%</b>, not
+27.4%. The α column was the right thing to worry about and the arithmetic under it
+was too kind. Section 8.1 redoes it on fitted standard errors for all four
+markets, and that is the version that counts.</div>
 
 <h2 class="sec">7. Results</h2>
 <figure>

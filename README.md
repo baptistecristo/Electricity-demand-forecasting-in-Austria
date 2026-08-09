@@ -2,9 +2,10 @@
 
 ### 📄 [Read the paper →](https://snowmaking-load-austria.vercel.app)
 
-**Status: pre-registered, tested, null.** Two of the three kill criteria in §5
-fired. The predictions and the stopping rules were written before any load data
-was examined; commit history is the proof. Results in §8.
+**Status: pre-registered, tested in four markets, null in Austria.** Two of the
+three kill criteria in §5 fired on the Austrian data. The predictions and the
+stopping rules were written before any load data was examined; commit history is
+the proof. Results in §8, replications in §8.8b, price in §8.8c.
 
 **Headline:** on 780 November–December nights across 13 seasons, the pre-registered
 interaction is **+5.1 MW ± 11.9** — indistinguishable from zero. The identical
@@ -257,6 +258,14 @@ Austrian forecast error standard deviation, which collapses this table to one
 row. `src/snowload.py` prints it before running anything else.
 
 Reproduce with `python src/power.py`.
+
+> **What this table turned out to be worth.** The measured Austrian error was
+> 6.48%, worse than every scenario above, and §8.2 collapses the table to a 27.4%
+> pass mark. Then the models were fitted, and the fitted standard errors put the
+> real Austrian bar at **47%** (§8.8b). Both numbers on this page are ex-ante and
+> both are optimistic. The α column was the right thing to worry about and the
+> arithmetic under it was too kind. §8.8b's version uses fitted standard errors
+> and covers all four markets; that is the one that counts.
 
 ## 7. Data
 
