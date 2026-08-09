@@ -664,6 +664,13 @@ resorts. Switzerland's 200 MW comes from a published national total. Vermont's
 total behind it, so its 27% is the least trustworthy number in the column and the
 gap between it and Vermont is inside the uncertainty of its own numerator.
 
+They also do not share a coincidence factor. Austria's 900 MW is about 59% of its
+1.52 GW fleet ceiling, and Italy's 1,500 MW is 50% of its 3.0 GW one. Putting both
+on 50% would move Austria to 760 MW and its α to 56%; putting both on 59% would
+move Italy to 1,790 MW and its α to 23%. The ordering does not change under either
+harmonisation, but a 5-point difference in this column is not a real difference
+between markets.
+
 Read the column with that caveat and the programme is visible in one place.
 **No test here could see a forecaster missing less than about a quarter of the
 snowmaking load, and Austria, on the best-grounded fleet estimate of the four,

@@ -880,7 +880,11 @@ Italian snowmaking total behind it, so its 27% is the least trustworthy number i
 the column and its gap to Vermont sits inside its own uncertainty. Austria's
 900 MW comes from a published survey of 141 resorts; Switzerland's 200 MW from a
 published national total; Vermont's 30&ndash;110 MW range puts its own figure
-anywhere from 22% to 79%.</em></p>
+anywhere from 22% to 79%. The denominators do not share a coincidence factor
+either &mdash; Austria's 900 MW is 59% of its fleet ceiling, Italy's 1,500 MW is
+50% of its own &mdash; and harmonising them moves Austria to 56% or Italy to 23%
+without changing the ordering. A five-point gap in this column is not a real
+difference between markets.</em></p>
 <p><b>No test here could see a forecaster missing less than about a quarter of the
 snowmaking load, and Austria &mdash; on the best-grounded fleet estimate of the
 four &mdash; could not see one missing less than half.</b> That is the finding
