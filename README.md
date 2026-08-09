@@ -458,16 +458,16 @@ A null is only interesting if the test was fair. Ranking candidate systems by
 snowmaking energy per gigawatt of winter overnight load — Austria's 281 GWh ÷ ~7 GW
 = **43 GWh/GW** — puts Austria near the top of the world, not the middle.
 
-> **No country other than Austria was analysed.** Everything in this section is
-> desk scoping: published or derived snowmaking energy divided by published system
-> load. No load series, forecast series or regression was run for any other system.
-> These are targets for replication, not results.
+> **The table below is desk scoping, not results:** published or derived
+> snowmaking energy divided by published system load. Two of its rows have since
+> been tested for real, and §8.8b reports what came back. Everything still in the
+> table is a target for replication.
 
 | System | Snowmaking (GWh/season) | Winter overnight load (GW) | Ratio | Free day-ahead forecast? |
 |---|---|---|---|---|
 | **ISO-NE Vermont region** | 40–90 *(derived)* | ~0.62–0.70 | **62–140** | Yes, hourly, per region, ~9 yr |
-| Italy-North | ~560 *(derived)* | ~12–13 | ~45 | Yes, Terna, per bidding zone |
-| **Austria (this study)** | **281 (published)** | **~7** | **43** | Yes |
+| **Austria (this study)** | **281 (published)** | **6.6 (measured)** | **43** | Yes |
+| Italy-North *(tested, §8.8b)* | ~560 *(derived)* | **16.2 (measured)** | **~35** | Yes, Terna, per bidding zone |
 | ISO-NE New Hampshire | 22–54 *(derived)* | ~1.25 | 18–43 | Yes |
 | PSCO (Xcel Colorado) | 45–70 *(derived)* | ~3.5–4.5 | 11–18 | Yes, EIA-930 |
 | Switzerland | 60–65 (published) | ~8.4 | 7.1–7.7 | Yes, Swissgrid |
@@ -481,6 +481,12 @@ and France, so everything else in that column is an estimate.
 **Austria was a fair test.** Only two systems plausibly beat it, and one is a
 sub-region rather than a country. Switzerland is six times worse, France
 twenty-four, Germany fifty. This is not the null of a badly chosen case.
+
+One row moved after it was measured rather than scoped. Italy-North's winter
+overnight load is **16.2 GW**, not the 12–13 GW estimated here, so its ratio falls
+from ~45 to about 35 and it no longer clears Austria. The numerator is still a
+desk estimate, and at 700 GWh the two would be level, so the honest statement is
+that Italy-North is *comparable* to Austria rather than clearly above or below it.
 
 **The best remaining test is Vermont, not a country.** ISO-NE publishes an hourly
 demand forecast *per reliability region*. Vermont's ~0.65 GW zonal load sits under a
@@ -502,6 +508,62 @@ Pal Arinsal against a 570 GWh national system is plausibly a several-percent sha
 national load, but FEDA sits outside ENTSO-E and publishes no hourly series. Same for
 China's Chongli cluster, built in a very dry climate for the 2022 Olympics.
 
+### 8.8b Two of those rows were then tested
+
+Same specification, same wet-bulb solver with the station-pressure correction,
+same 20:00–06:59 night, same fixed effects, same night-level estimation. Only the
+load and weather sources change. Code in `src/it_north/` and `src/swiss/`.
+
+| | Seasons | Nights | `below:cum100` | Verdict |
+|---|---|---|---|---|
+| **Austria** | 13 | 780 | **+5.1** (11.9) | Null, and the design is certified sensitive |
+| **Italy-North** (Terna, North zone) | 7 | 420 | **+4.3** (10.2) | Null, but uncertified — see below |
+| **Switzerland** (energy-charts) | 9 | 540 | −42.5 (14.3) | Not interpretable; see below |
+
+**Italy-North replicates the null.** Terna publishes actual and day-ahead
+forecast for the North bidding zone in one file, with no login, back to 2019.
+The pre-registered interaction lands at +4.3 ± 10.2 against Austria's +5.1 ± 11.9:
+two different TSOs, two different weather networks, and the coefficient sits in
+the same place with the predicted negative sign absent in both.
+
+**The Christmas sanity gate is an Austrian regularity, not a universal check.**
+This is the most useful thing the replications produced, and it was not
+anticipated. §8.6 leans on recovering the Christmas shutdown at −274 MW to prove
+the design can see a real effect. That works in Austria because APG's night MAE is
+6.48%. It fails elsewhere for the opposite of a worrying reason:
+
+| | Shutdown in the load | Predicted by the forecaster | Left in the error |
+|---|---|---|---|
+| Austria | large | no | **−274 MW** (t = −3.3) |
+| Switzerland | −207 MW | −202 MW | ≈ 0 |
+| Italy-North | −4,482 MW | −4,461 MW | −20 MW (0.4%) |
+
+Terna's night MAE is **2.17%**, three times better than APG's. A competent
+calendar model absorbs Christmas completely, which removes the reference effect
+the gate depends on. So the Italian null carries no *empirical* sensitivity
+warranty, only a paper-power bound; and any future replication against a good
+forecaster will have the same problem. A system-specific reference effect is
+needed, not this one.
+
+**Switzerland could never have detected the effect.** Standard deviation after
+fixed effects is 587 MW on 9 usable seasons, giving a minimum detectable effect of
+**314 MW** against a plausible Swiss coincident snowmaking load of about 200 MW.
+The required α is 157%, above the 100% ceiling: a forecaster modelling *none* of
+Swiss snowmaking would still be invisible. The primary coefficient does come back
+significant and correctly signed (−42.5, z = −2.97), and it is reported as a
+confound rather than a finding, because it implies a swing in the load level
+larger than the entire Swiss snowmaking fleet, and because the Swiss night-level
+calibration slope is 0.71 with corr(err, load) = +0.58, which passes load–weather
+structure straight into the residual.
+
+**Vermont is designed but not run.** The ISO-NE regional forecast turned out to be
+neither independent per region nor a fixed load-share allocation: the zonal totals
+are exact multiples of 10 MW, and two publications eleven minutes apart revised the
+total while leaving the regional shares byte-identical, yet those shares move by
+hour and season and are revised each cycle. Vermont MW error is therefore mostly
+system error rescaled by ~4.7%, so the test has to target the *share*, not the MW.
+That redesign is written; the data collection was not finished.
+
 ### 8.9 The ENTSO-E token was never necessary
 
 Two data findings, either of which would have saved days of assumed waiting.
@@ -517,6 +579,16 @@ https://api.energy-charts.info/public_power_forecast?country=XX&production_type=
 https://api.energy-charts.info/public_power?country=XX          # series "Load"
 https://api.energy-charts.info/price?bzn=XX                     # day-ahead spot
 ```
+
+**One trap in that forecast series, found the hard way.** For Switzerland in the
+2021 and 2022 winters, the published day-ahead "forecast" is the realised load
+multiplied by a near-constant. The standard deviation of actual ÷ forecast is
+0.0005 and 0.0010 in those two seasons against 0.056–0.125 in every neighbouring
+season. Nothing in the summary statistics flags it: the MAPE still reads a
+plausible ~5%, so a forecast error computed from it looks entirely normal while
+containing no forecasting at all. Both seasons were dropped, which is why §8.8b
+reports 9 Swiss seasons and not 11. Check the ratio's variance before trusting
+this series for any zone.
 
 On futures: EEX and ICE historical settlement data is paywalled (EEX Group
 DataSource, roughly €45–80/month, redistribution prohibited), so a futures-lag test

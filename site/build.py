@@ -1,17 +1,58 @@
 #!/usr/bin/env python3
 """Build the single-file arXiv-style preprint page. Images are inlined as data
 URLs so the deployed page has no external dependencies."""
+import re
 from pathlib import Path
 import charts
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = Path(__file__).resolve().parent / "index.html"
+HERE = Path(__file__).resolve().parent
+OUT = HERE / "index.html"
+FIG = HERE / "fig"
 
 
-FIG_MONTH = charts.figure_month()
-FIG_BINS = charts.figure_bins()
-FIG_COEFS = charts.figure_coefs()
-FIG_MDE = charts.mde_chart()
+def _widget(name: str) -> str:
+    """The figure body from one `Rscript site/charts.R` output.
+
+    saveWidget writes a whole HTML document per figure, each pointing at its own
+    copy of the ggiraph runtime. Only the widget div and its JSON payload are
+    kept here; the runtime is inlined once for the page by _viz_assets(), so
+    four figures cost one library rather than four.
+    """
+    html = (FIG / f"{name}.html").read_text(encoding="utf-8")
+    body = re.search(r"<body[^>]*>(.*)</body>", html, re.S).group(1)
+    return re.sub(r'<script src="[^"]*"></script>', "", body).strip()
+
+
+def _viz_assets() -> tuple[str, str]:
+    """ggiraph's CSS and JS, inlined so the page still makes no request.
+
+    Read from site/fig/lib, which holds the four files this page actually needs,
+    copied once. The rest of what saveWidget emits is not kept: ggiraph bundles
+    ~19 MB of Liberation fonts per figure, and ships girafe.js twice under two
+    names (the two copies are byte-identical). The SVG falls back to the page's
+    own font stack, which is what it should be using anyway.
+
+    Refresh site/fig/lib by hand if ggiraph is ever upgraded.
+    """
+    css = "\n".join((FIG / "lib" / p).read_text(encoding="utf-8")
+                    for p in ("fill.css", "girafe.css"))
+    js = ";\n".join((FIG / "lib" / p).read_text(encoding="utf-8",
+                                                errors="replace")
+                    for p in ("htmlwidgets.js", "girafe.js"))
+    return css, js
+
+
+VIZ_CSS, VIZ_JS = _viz_assets()
+FIG_MONTH = _widget("month")
+FIG_BINS = _widget("bins")
+FIG_COEFS = _widget("coefs")
+FIG_MDE = _widget("mde")
+
+# Every figure ships a table view, so nothing has to be read off colour alone.
+TABLE_MONTH = charts.table_month()
+TABLE_BINS = charts.table_bins()
+TABLE_COEFS = charts.table_coefs()
 
 # Applied before first paint so a stored dark preference does not flash white.
 HEAD_SCRIPT = (
@@ -173,6 +214,33 @@ h1{{
   letter-spacing:.025em; padding-bottom:2.5rem; border-bottom:1px solid var(--rule);
 }}
 
+/* ---- the one-minute read ---- */
+.tldr{{margin:2.5rem 0 1rem;padding-bottom:2.5rem;
+  border-bottom:1px solid var(--rule)}}
+.tldr-label{{font-family:var(--sans);font-size:.78rem;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--accent);
+  margin-bottom:1.4rem}}
+.tldr p{{font-size:1.22rem;line-height:1.72;margin-bottom:1.05rem}}
+.tldr p b{{font-weight:600}}
+.tldr .lead{{font-family:var(--sans);font-size:.82rem;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  display:block;margin-bottom:.2rem}}
+.stats{{display:grid;grid-template-columns:repeat(4,1fr);gap:1.6rem;
+  margin:2.2rem 0 1.6rem;padding:1.5rem 0;
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}}
+.stat .v{{font-size:1.85rem;line-height:1.1;font-weight:400;
+  font-variant-numeric:tabular-nums;display:block}}
+.stat .k{{font-family:var(--sans);font-size:.74rem;line-height:1.45;
+  color:var(--muted);display:block;margin-top:.5rem}}
+.stat.key .v{{color:var(--accent)}}
+.more{{font-family:var(--sans);font-size:.85rem;color:var(--muted);
+  margin-top:1.6rem}}
+@media (max-width:640px){{
+  .stats{{grid-template-columns:repeat(2,1fr);gap:1.3rem}}
+  .tldr p{{font-size:1.1rem}}
+  .stat .v{{font-size:1.5rem}}
+}}
+
 /* ---- abstract + verdict ---- */
 .abstract{{margin:2.5rem 0 1.5rem}}
 .abstract h2{{
@@ -282,7 +350,17 @@ tbody tr.hl td{{font-weight:600}}
   html{{scroll-behavior:auto}}
   *{{transition:none!important;animation:none!important}}
 }}
+
+/* ---- R / ggiraph figures ---- */
+.girafe_container_std{{width:100%!important;margin:0 auto}}
+.girafe_container_std svg{{width:100%!important;height:auto!important}}
+.dtable{{margin:.6rem 0 0}}
+.dtable summary{{font-family:var(--sans);font-size:.8rem;color:var(--muted);
+  cursor:pointer;padding:.35rem 0}}
+.dtable summary:hover{{color:var(--fg)}}
+.dtable[open] summary{{margin-bottom:.5rem}}
 </style>
+<style>{VIZ_CSS}</style>
 </head>
 <body>
 
@@ -306,6 +384,54 @@ tbody tr.hl td{{font-weight:600}}
   <a href="https://github.com/baptistecristo/Electricity-demand-forecasting-in-Austria">code and data</a>
 </p>
 </header>
+
+<section class="tldr">
+<div class="tldr-label">In one minute</div>
+
+<p><span class="lead">The question</span>
+Austrian ski resorts burn about <b>281 GWh</b> a season making artificial snow,
+almost all of it on cold November and December nights — <b>8–15% of the country's
+overnight demand</b>. Snowmaking is a task, not a weather response. It runs only
+below a wet-bulb temperature near −2 °C, and it stops once the base layer is
+built. Two identical cold nights can therefore draw very different amounts of
+power. A forecast that does not know this should be visibly wrong on exactly
+those nights.</p>
+
+<p><span class="lead">What was done</span>
+The prediction and the conditions for abandoning it were written down and
+committed to the repository <b>before any load data was opened</b>. Then thirteen
+seasons of Austrian grid data, 780 November–December nights, tested against a
+wet-bulb index built from thirteen alpine weather stations between 1,221 and
+2,327 m.</p>
+
+<p><span class="lead">The answer</span>
+<b>No.</b> The effect is <b>+5.1 MW, give or take 11.9</b> — indistinguishable
+from zero, and pointing the opposite way to the prediction. Two of the three
+pre-registered stopping rules fired.</p>
+
+<p><span class="lead">Why that is believable</span>
+The same model, on the same nights, finds the Christmas industrial shutdown at
+<b>−274 MW</b>. It can see effects of the size snowmaking would have to produce.
+It simply does not see snowmaking. The load is real; it is <b>absorbed</b> by
+the forecast rather than missed by it, because thirteen years of cold alpine
+nights <em>are</em> snowmaking nights, so the forecast's temperature response
+already prices it in.</p>
+
+<div class="stats">
+  <div class="stat"><span class="v">281</span>
+    <span class="k">GWh per season of Austrian snowmaking</span></div>
+  <div class="stat"><span class="v">8–15%</span>
+    <span class="k">of overnight demand, at realistic coincidence</span></div>
+  <div class="stat key"><span class="v">+5.1</span>
+    <span class="k">MW ± 11.9 — the effect looked for, and not found</span></div>
+  <div class="stat"><span class="v">−274</span>
+    <span class="k">MW — Christmas, which the same model does find</span></div>
+</div>
+
+<p class="more">Everything below is the long version: how the load was sized, how
+the test was designed to separate snowmaking from heating, what was committed in
+advance, the result, a correction, and a replication in Italy.</p>
+</section>
 
 <div class="abstract">
 <h2>Abstract</h2>
@@ -458,6 +584,7 @@ calibrate this: <b>6.48% MAE</b> on November–December night hours, standard de
 <figcaption><b>Figure 2.</b> Night forecast error by month, 2010–2022, night-level
 observations. November is the most under-forecast month of the year at
 +131 ± 22 MW. Bars are ±1 s.e.</figcaption>
+{TABLE_MONTH}
 </figure>
 
 <figure>
@@ -466,6 +593,7 @@ observations. November is the most under-forecast month of the year at
 December. The bias climbs to +223 ± 41 MW in early December and then collapses at
 the Christmas industrial shutdown. This is the shape, magnitude and timing snowmaking
 would produce — and also what a seasonal heating ramp produces.</figcaption>
+{TABLE_BINS}
 </figure>
 
 <p>The unconditional seasonal profile was encouraging. November is the most
@@ -483,6 +611,7 @@ what a seasonal heating ramp produces.</p>
 intervals. The pre-registered interaction sits on zero. The same model, on the same
 nights, places the Christmas shutdown at −274 MW — so the design is not blind to
 effects of the size snowmaking would have to produce.</figcaption>
+{TABLE_COEFS}
 </figure>
 
 <table>
@@ -564,11 +693,10 @@ power calculation are unchanged.</p>
 <h2 class="sec">8. Was Austria a badly chosen case?</h2>
 <p>A null is only interesting if the test was fair. Ranking systems by snowmaking
 energy per gigawatt of winter overnight load puts Austria near the top of the world.</p>
-<div class="verdict" style="margin:0 0 1.4rem"><strong>Scope note:</strong> no country
-other than Austria was analysed. This section is desk scoping — published or derived
-snowmaking energy divided by published system load. No load series, forecast series or
-regression was run for any other system. These are targets for replication, not
-results.</div>
+<div class="verdict" style="margin:0 0 1.4rem"><strong>Scope note:</strong> the table
+below is desk scoping — published or derived snowmaking energy divided by published
+system load. Two of its rows have since been tested for real, in section 8.1.
+Everything still in the table is a target for replication, not a result.</div>
 
 <table>
 <thead><tr><th>System</th><th class="num">GWh/season</th><th class="num">O/n load (GW)</th>
@@ -576,10 +704,10 @@ results.</div>
 <tbody>
 <tr><td>ISO-NE Vermont region</td><td class="num">40–90*</td><td class="num">~0.65</td>
   <td class="num">62–140</td><td>Yes, per region</td></tr>
-<tr><td>Italy-North</td><td class="num">~560*</td><td class="num">~12–13</td>
-  <td class="num">~45</td><td>Yes, Terna</td></tr>
-<tr class="hl"><td>Austria (this study)</td><td class="num">281</td><td class="num">~7</td>
-  <td class="num">43</td><td>Yes</td></tr>
+<tr class="hl"><td>Austria (this study)</td><td class="num">281</td>
+  <td class="num">6.6</td><td class="num">43</td><td>Yes</td></tr>
+<tr><td>Italy-North <em>(tested)</em></td><td class="num">~560*</td>
+  <td class="num">16.2</td><td class="num">~35</td><td>Yes, Terna</td></tr>
 <tr><td>ISO-NE New Hampshire</td><td class="num">22–54*</td><td class="num">~1.25</td>
   <td class="num">18–43</td><td>Yes</td></tr>
 <tr><td>PSCO (Colorado)</td><td class="num">45–70*</td><td class="num">~4</td>
@@ -613,6 +741,51 @@ than "snowmaking is missed."</p>
 and Pal Arinsal against a 570 GWh national system is plausibly a several-percent share
 of national load, but FEDA sits outside ENTSO-E and publishes no hourly series. The
 same holds for China's Chongli cluster.</p>
+
+<h3>8.1 Two of those rows were then tested</h3>
+<p>Same specification, same wet-bulb solver with the station-pressure correction,
+same 20:00&ndash;06:59 night, same fixed effects. Only the load and weather sources
+change.</p>
+
+<table>
+<thead><tr><th>System</th><th class="num">Seasons</th><th class="num">Nights</th>
+  <th class="num">below &times; cum100</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr class="hl"><td>Austria</td><td class="num">13</td><td class="num">780</td>
+  <td class="num">+5.1 (11.9)</td><td>Null, design certified sensitive</td></tr>
+<tr><td>Italy-North (Terna)</td><td class="num">7</td><td class="num">420</td>
+  <td class="num">+4.3 (10.2)</td><td>Null, but uncertified</td></tr>
+<tr><td>Switzerland</td><td class="num">9</td><td class="num">540</td>
+  <td class="num">&minus;42.5 (14.3)</td><td>Not interpretable</td></tr>
+</tbody></table>
+<p class="tcap"><b>Table 5.</b> Replications. Coefficients in MW, HC1 standard
+errors in parentheses.</p>
+
+<p><b>Italy-North replicates the null.</b> Two different TSOs, two different
+weather networks, and the pre-registered interaction sits in the same place, with
+the predicted negative sign absent in both.</p>
+
+<p><b>The Christmas sanity gate turns out to be an Austrian regularity.</b> Section
+7.1 leans on recovering the shutdown at &minus;274 MW to show the design can see a
+real effect. That works because APG's night MAE is 6.48%. Terna's is 2.17%, and its
+forecast predicts &minus;4,461 MW of a &minus;4,482 MW shutdown, leaving 0.4% in the
+error. Switzerland is the same story at &minus;202 against &minus;207. A competent
+calendar model absorbs Christmas entirely and removes the reference effect the gate
+depends on, so the Italian null carries only a paper-power bound. Any future
+replication against a good forecaster needs a different reference effect.</p>
+
+<p><b>Switzerland could never have detected the effect.</b> The minimum detectable
+effect is 314 MW against a plausible Swiss coincident snowmaking load near 200 MW,
+so the required &alpha; is 157% &mdash; above the ceiling. Its primary coefficient
+is significant and correctly signed, and is reported as a confound rather than a
+finding: it implies a swing in the load level larger than the entire Swiss fleet,
+and the Swiss night-level calibration slope of 0.71 passes load&ndash;weather
+structure straight into the residual.</p>
+
+<p><b>Vermont is designed but not run.</b> ISO-NE's regional forecast is neither
+independent per region nor a fixed load-share split, so Vermont MW error is mostly
+system error rescaled by about 4.7%. The test has to target the regional
+<em>share</em>. That redesign exists; the data collection does not.</p>
 
 <h2 class="sec">9. Limitations</h2>
 <ul>
@@ -671,6 +844,7 @@ MIT-licensed.</p>
 
 </div>
 </main>
+<script>{VIZ_JS}</script>
 {SCRIPT}
 </body>
 </html>

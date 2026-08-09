@@ -30,3 +30,6 @@ site/index.min.html
 site/shot_*.png
 site/chk*.png
 site/fig1.png
+
+# ggiraph ships ~19MB of Liberation fonts per figure; only site/fig/lib is kept
+site/fig/*_files/
