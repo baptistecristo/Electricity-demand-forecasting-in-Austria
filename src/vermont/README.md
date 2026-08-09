@@ -505,6 +505,12 @@ forecaster at a different scale.
    error is measured against seven other zones that must absorb the mirror image.
    The latitude result in 6.3 is a consequence of taking that seriously rather
    than a separate finding.
-6. **Nothing here tests price.** Whether the day-ahead auction prices Vermont
-   snowmaking is a different question, pre-registered separately in
-   `src/price/README.md`.
+6. **The price test on the same two zones has since run, and it belongs next to
+   section 6.4 point 2.** `src/price/README.md` §10.3 puts this exact right-hand
+   side against the Vermont day-ahead LMP spread and gets −1.47 (0.54),
+   p = 0.007 — and Rhode Island returns −1.33 (0.52). There the placebo
+   discriminates outright, because price carries no compositional constraint:
+   both zones clear near the same system price, so a New England–wide driver
+   shows up identically in both. The load placebo cannot do that, because its
+   eight shares must sum to zero. That contrast is the clearest available
+   statement of what this replication's placebo can and cannot rule out.
