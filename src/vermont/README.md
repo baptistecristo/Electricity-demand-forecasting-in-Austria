@@ -14,8 +14,11 @@
 > is the direction section 5 of the root README committed to before any load data
 > was opened, and Vermont is the only one of the four markets tested where a
 > coefficient of the predicted sign cleared its own detection threshold. Sections
-> 6.4 and 6.5 give the reasons to hold it loosely anyway: it does not survive a
-> change of weather index, and it clears that threshold by almost nothing.
+> 6.4 and 6.5 give the reasons to hold it loosely, and by the end of the file
+> there are three: it does not survive a change of weather index, it clears its
+> own detection threshold by almost nothing, and the same-publisher robustness
+> arm in section 7 nearly halves it while making the placebo significant.
+> **Suggestive, and weakening.**
 >
 > **Correction, same day.** The first version of sections 6.2 to 6.5 described
 > this coefficient as *rejecting* the prediction with the sign reversed. That was
@@ -437,8 +440,12 @@ interval comfortably contains the night estimate. **This placebo does not
 discriminate and is not offered as if it did.** It neither establishes
 night-specificity nor rules it out.
 
-**4. The same-publisher arm is missing and the gap it would close moves with
-temperature.** See section 7, item 1. This is the loosest thread in the replication.
+**4. The same-publisher arm has since run and does not support it.** On the one
+season ISO-NE's own zonal report covers, Vermont's coefficient nearly halves and
+loses significance, and the Rhode Island placebo turns significant and negative.
+Sixty nights in a single season, so this is weak evidence either way — but it is
+weak evidence pointing away, and it is the second post-hoc check to do so. See
+section 7, item 1.
 
 ### 6.5 Power, and the effect sitting on its own threshold
 
@@ -473,25 +480,50 @@ pre-registered prediction met at p = 0.004 with a clean placebo is still what it
 is, but an effect this close to the floor is precisely the kind that moves when
 an input changes, which is what 6.4 point 1 reports happening.
 
-The verdict this section supports is **predicted sign, significant, in the
-second-best-powered of four markets, at the edge of what it could resolve, and
-not robust to the weather index**. That is suggestive. It is not confirmation,
-and it does not overturn the Austrian null, which was measured on a different
-forecaster at a different scale.
+The verdict this section supports is **predicted sign, significant, at the edge
+of what this market could resolve, and not surviving three separate checks**: the
+weather index (6.4 point 1), the same-publisher actuals (section 7, item 1), and
+the price placebo on the same two zones (`src/price/README.md` §10.3). Each is
+individually weak — a different thermometer, sixty nights, a different outcome —
+and none of them refutes the coefficient. But they were run to find support and
+none of them found any, and an effect sitting on its own noise floor is the kind
+that should not survive that.
+
+**Reported as suggestive, and weakening.** It is not confirmation, it does not
+overturn the Austrian null, and on the evidence assembled after the fact the more
+likely reading is a New England–wide response to accumulated cold that Vermont
+happens to sit at the north end of.
 
 ## 7. Honest limitations
 
-1. **The same-publisher robustness arm did not run.** ISO-NE's own five-minute
-   zonal load report would let the forecast and the outcome share a publisher, so
-   that no cross-source definitional gap could be doing the work. Its archive
-   reaches back only to about mid-2025, so it can cover one season, and that
-   season's collection is not in cache. The gap between EIA-930 and ISO-NE shares
-   is measured instead, on two sampled days: for Vermont the mean gap is
-   +0.035 pp with sd 0.067 pp, a third of the sd of the share error itself, and
-   it correlates −0.475 with wet bulb over 22 night hours. **A cross-source gap
-   that moves with temperature is exactly the confound this arm exists to rule
-   out**, and it has not been ruled out. It is a small n and it is the weakest
-   point in this replication.
+1. **The same-publisher arm has now run, and it does not support the result.**
+   ISO-NE's own five-minute zonal load report lets the forecast and the outcome
+   share a publisher, so no cross-source definitional gap can be doing the work.
+   Its archive covers one season, Nov–Dec 2025, which is 60 of the 297 nights.
+   On those 60 nights:
+
+   | | ISO-NE's own actuals | EIA-930, same nights |
+   | --- | --- | --- |
+   | **Vermont** `below:cum100` | −0.0281 (0.0188), p = 0.14 | −0.0492 (0.0200), **p = 0.014** |
+   | **Rhode Island** `below:cum100` | −0.0215 (0.0101), **p = 0.033** | −0.0069 (0.0097), p = 0.47 |
+   | mean share error | +0.0042 pp | +0.1199 pp |
+
+   Two things go the wrong way at once. Vermont's coefficient nearly halves and
+   loses significance when the actuals come from the same publisher as the
+   forecast. And **the placebo fires**: Rhode Island, which makes no snow, turns
+   significant and negative on that same data. The definitional level gap between
+   the two sources is 0.116 pp of share, about 14 MW, which is over half the
+   standard deviation of the night share error the whole test is measured in.
+
+   **How much weight this carries.** Not much on its own: 60 nights in a single
+   season, so the season fixed effects carry no variation and every estimate here
+   is noisy. Neither Vermont pair nor Rhode Island pair is separated by much more
+   than one standard error, and a 60-night panel would struggle to replicate a
+   true effect of this size either. What it does do is fail to rule out the
+   confound it was built to rule out, in the direction that matters. Read it with
+   §10.3 of `src/price/README.md`, where the same two zones on a price outcome
+   gave Rhode Island a coefficient indistinguishable from Vermont's: two
+   independent post-hoc checks now point the same way.
 2. **Two of seven seasons are lost**, one to a hole in the RWIS archive and one
    to structured missingness. Five seasons of 297 nights is a thin panel for a
    design with season fixed effects.

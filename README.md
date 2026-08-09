@@ -22,7 +22,8 @@ pre-registered prediction**: −2.5 MW per 100 accumulated cold hours, p = 0.004
 with a clean placebo and the predicted decaying campaign-start profile. It also
 clears its own detection threshold by almost nothing (−25 MW found against 24 MW
 detectable) and does not survive a change of weather index, so it is reported as
-suggestive rather than as confirmation. The Austrian null stands on its own data;
+suggestive rather than as confirmation — and three later checks, none decisive on
+its own, all point away from it. The Austrian null stands on its own data;
 Vermont is a different forecaster at a tenth of the scale.
 
 **The bound behind all four results:** no test in this project could see a
@@ -747,6 +748,17 @@ the Austrian design specified, but it sits 100 km away in another state and 70.6
 of its hours are below threshold against the road network's 40.9%, which
 saturates `cum_cold_h` and leaves little variation in `below`. Neither reading is
 established here.
+
+**The same-publisher arm, which was the loosest thread in the replication, has
+since run and does not support it either.** ISO-NE's own zonal load report covers
+one season, 60 of the 297 nights. On those nights Vermont's coefficient goes from
+−0.0492 (0.0200) on EIA-930 actuals to **−0.0281 (0.0188)**, losing significance,
+while Rhode Island goes the other way, from −0.0069 (0.0097) to **−0.0215
+(0.0101), p = 0.033** — the placebo fires. The definitional level gap between the
+two sources is 0.116 pp of share, about 14 MW, over half the standard deviation of
+the outcome. Sixty nights in a single season is weak evidence either way, but it
+is the second post-hoc check to point away, and §8.8c's price placebo on the same
+two zones is the third.
 
 Two further post-hoc checks, both run after seeing the coefficient and labelled
 as such in the pipeline, fail to discriminate rather than cutting either way.
