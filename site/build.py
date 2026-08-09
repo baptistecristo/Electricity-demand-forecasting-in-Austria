@@ -417,6 +417,15 @@ the forecast rather than missed by it, because thirteen years of cold alpine
 nights <em>are</em> snowmaking nights, so the forecast's temperature response
 already prices it in.</p>
 
+<p><span class="lead">Then the same test, run elsewhere</span>
+Italy-North gives the same answer: <b>+4.3 ± 10.2</b>. Switzerland is reported as
+unreadable, because the arithmetic says it could never have found the effect even
+if it were there. And Vermont — the one market with real room to spare, able to
+detect <b>10.9 MW</b> against a fleet drawing thirty to a hundred and ten —
+finds a significant effect <b>pointing the wrong way</b>. Three follow-up tests
+trace it to how ISO-NE splits New England's demand between north and south, not
+to snow guns.</p>
+
 <div class="stats">
   <div class="stat"><span class="v">281</span>
     <span class="k">GWh per season of Austrian snowmaking</span></div>
@@ -424,13 +433,13 @@ already prices it in.</p>
     <span class="k">of overnight demand, at realistic coincidence</span></div>
   <div class="stat key"><span class="v">+5.1</span>
     <span class="k">MW ± 11.9 — the effect looked for, and not found</span></div>
-  <div class="stat"><span class="v">−274</span>
-    <span class="k">MW — Christmas, which the same model does find</span></div>
+  <div class="stat"><span class="v">4</span>
+    <span class="k">markets tested; none supports the prediction</span></div>
 </div>
 
 <p class="more">Everything below is the long version: how the load was sized, how
 the test was designed to separate snowmaking from heating, what was committed in
-advance, the result, a correction, and a replication in Italy.</p>
+advance, the result, a correction, and three replications.</p>
 </section>
 
 <div class="abstract">
@@ -695,15 +704,15 @@ power calculation are unchanged.</p>
 energy per gigawatt of winter overnight load puts Austria near the top of the world.</p>
 <div class="verdict" style="margin:0 0 1.4rem"><strong>Scope note:</strong> the table
 below is desk scoping — published or derived snowmaking energy divided by published
-system load. Two of its rows have since been tested for real, in section 8.1.
+system load. Three of its rows have since been tested for real, in section 8.1.
 Everything still in the table is a target for replication, not a result.</div>
 
 <table>
 <thead><tr><th>System</th><th class="num">GWh/season</th><th class="num">O/n load (GW)</th>
   <th class="num">Ratio</th><th>Free forecast?</th></tr></thead>
 <tbody>
-<tr><td>ISO-NE Vermont region</td><td class="num">40–90*</td><td class="num">~0.65</td>
-  <td class="num">62–140</td><td>Yes, per region</td></tr>
+<tr><td>ISO-NE Vermont region <em>(tested)</em></td><td class="num">40–90*</td>
+  <td class="num">0.59</td><td class="num">68–153</td><td>Yes, per region</td></tr>
 <tr class="hl"><td>Austria (this study)</td><td class="num">281</td>
   <td class="num">6.6</td><td class="num">43</td><td>Yes</td></tr>
 <tr><td>Italy-North <em>(tested)</em></td><td class="num">~560*</td>
@@ -727,39 +736,50 @@ snowmaking together.</p>
 <p>Only two systems plausibly beat Austria, and one is a sub-region rather than a
 country. Switzerland is six times worse, France twenty-four, Germany fifty. This is
 not the null of a badly chosen case.</p>
-<p><b>The best remaining test is Vermont.</b> ISO-NE publishes an hourly demand
-forecast per reliability region, and Vermont's ~0.65 GW zonal load sits under a
-snowmaking fleet covering close to 100% of trail acreage, because Northeast resorts
-snowmake far harder than the Alps where natural snowfall is unreliable. Resort-level
-derivations put Northeast intensity at 3–7× the Austrian figure. Rhode Island gives a
-same-forecaster, same-weather, zero-snowmaking placebo inside the same feed. One
-caveat has to be resolved first: ISO-NE's regional report may allocate a system
-forecast to regions by load-share factors rather than forecasting each region
-independently, in which case a positive result would mean "no regional model" rather
-than "snowmaking is missed."</p>
+<p><b>The best test was Vermont, and it has now been run.</b> ISO-NE publishes an
+hourly demand forecast per reliability region, and Vermont's 0.59 GW measured
+zonal night load sits under a snowmaking fleet covering close to 100% of trail
+acreage, because Northeast resorts snowmake far harder than the Alps where natural
+snowfall is unreliable. Resort-level derivations put Northeast intensity at 3–7×
+the Austrian figure. Rhode Island gives a same-forecaster, same-weather,
+zero-snowmaking placebo inside the same feed. The caveat this row carried has been
+resolved rather than assumed away: ISO-NE's regional report might have allocated a
+system forecast by fixed load-share factors, which would leave it structurally
+blind to anything Vermont-specific. It does not. The shares move by hour and
+season and are revised on their own cycle, so the share is the thing being
+modelled, and the share is what the test targets.</p>
 <p><b>Andorra has the best physics on earth and no data.</b> Snowmaking at Grandvalira
 and Pal Arinsal against a 570 GWh national system is plausibly a several-percent share
 of national load, but FEDA sits outside ENTSO-E and publishes no hourly series. The
 same holds for China's Chongli cluster.</p>
 
-<h3>8.1 Two of those rows were then tested</h3>
+<h3>8.1 Three of those rows were then tested</h3>
 <p>Same specification, same wet-bulb solver with the station-pressure correction,
 same 20:00&ndash;06:59 night, same fixed effects. Only the load and weather sources
 change.</p>
 
 <table>
 <thead><tr><th>System</th><th class="num">Seasons</th><th class="num">Nights</th>
-  <th class="num">below &times; cum100</th><th>Verdict</th></tr></thead>
+  <th class="num">below &times; cum100</th><th class="num">Detectable vs fleet</th>
+  <th>Verdict</th></tr></thead>
 <tbody>
 <tr class="hl"><td>Austria</td><td class="num">13</td><td class="num">780</td>
-  <td class="num">+5.1 (11.9)</td><td>Null, design certified sensitive</td></tr>
+  <td class="num">+5.1 (11.9)</td><td class="num">427 vs 427 MW</td>
+  <td>Null, at the edge of what it could see</td></tr>
 <tr><td>Italy-North (Terna)</td><td class="num">7</td><td class="num">420</td>
-  <td class="num">+4.3 (10.2)</td><td>Null, but uncertified</td></tr>
+  <td class="num">+4.3 (10.2)</td><td class="num">&mdash;</td>
+  <td>Null, but uncertified</td></tr>
+<tr><td>Vermont (ISO-NE)</td><td class="num">5</td><td class="num">297</td>
+  <td class="num">&minus;2.5 (0.9)</td><td class="num">10.9 vs 30&ndash;110 MW</td>
+  <td>Rejected, wrong sign</td></tr>
 <tr><td>Switzerland</td><td class="num">9</td><td class="num">540</td>
-  <td class="num">&minus;42.5 (14.3)</td><td>Not interpretable</td></tr>
+  <td class="num">&minus;42.5 (14.3)</td><td class="num">314 vs ~200 MW</td>
+  <td>Not interpretable</td></tr>
 </tbody></table>
 <p class="tcap"><b>Table 5.</b> Replications. Coefficients in MW, HC1 standard
-errors in parentheses.</p>
+errors in parentheses. Vermont's outcome is the regional <em>share</em>; its native
+coefficient is &minus;0.0211 percentage points per 100 cold hours, converted here
+at the 120 MW one point of share is worth.</p>
 
 <p><b>Italy-North replicates the null.</b> Two different TSOs, two different
 weather networks, and the pre-registered interaction sits in the same place, with
@@ -782,10 +802,38 @@ finding: it implies a swing in the load level larger than the entire Swiss fleet
 and the Swiss night-level calibration slope of 0.71 passes load&ndash;weather
 structure straight into the residual.</p>
 
-<p><b>Vermont is designed but not run.</b> ISO-NE's regional forecast is neither
-independent per region nor a fixed load-share split, so Vermont MW error is mostly
-system error rescaled by about 4.7%. The test has to target the regional
-<em>share</em>. That redesign exists; the data collection does not.</p>
+<p><b>Vermont rejects the prediction, with the sign reversed.</b> On five usable
+seasons and 297 nights the interaction is &minus;0.0211 percentage points of system
+share per 100 cold hours (HC1 0.0073, p = 0.004), about &minus;16 &plusmn; 11 MW at
+the coldest point of a season. Positive was predicted. Rhode Island, the
+no-snowmaking placebo in the same feed, stays null.</p>
+
+<p>Three follow-ups, all run after seeing that coefficient and all labelled
+post-hoc where they print, say this is ISO-NE's regional temperature response
+rather than snow guns. Swapping the eight Vermont road stations for the Mount
+Washington summit at 1,910 m &mdash; colder, purer, and the index a physical
+reading of the hypothesis would prefer &mdash; collapses it to &minus;0.0057
+(0.0056). Across all eight reliability regions the coefficients line up almost
+monotonically with latitude, Spearman &minus;0.886: every northern zone negative,
+every southern zone but Rhode Island positive, with Vermont the most negative of
+eight rather than different in kind from Maine or New Hampshire. And moving only
+the outcome window from the night to the following afternoon drops the estimate
+sixfold, but the afternoon is 2.3&times; noisier and its interval still contains the
+night estimate, so that placebo is reported as inconclusive rather than as
+support.</p>
+
+<p>One Vermont result points the other way and is reported without being leaned on:
+the campaign-start dummy, the first night of a cold snap, is +0.076 pp
+(s.e. 0.031), about +9 &plusmn; 7 MW, with a null placebo. It rests on 27 campaign
+starts, carries no multiplicity correction, and is a tenth of the fleet's plausible
+draw.</p>
+
+<p><b>Why Vermont's answer weighs more than the other three.</b> Its minimum
+detectable effect is 10.9 MW against a fleet drawing an estimated 30&ndash;110 MW:
+powered by a factor of three to ten. Austria sits exactly at its own limit,
+Switzerland is five times short. Vermont is the one place in this project where the
+instrument was sharp enough that the answer is about the world rather than about
+the instrument.</p>
 
 <h2 class="sec">9. Limitations</h2>
 <ul>
@@ -794,7 +842,8 @@ size is nights, not hours, which is why estimation is at night level.</li>
 <li>The published forecast is the operator's transparency artefact, not the trading
 consensus. A bias in it demonstrates a blind spot in APG's forecast, <b>not</b> a
 market mispricing. Establishing the latter needs day-ahead price or imbalance as the
-outcome.</li>
+outcome, which is pre-registered separately in <code>src/price/</code> and run on the
+day-ahead spot auction in all four markets.</li>
 <li>APG's published load excludes a corridor in Vorarlberg, which carries weight 0.10
 in the wet-bulb index while some of its load is absent from the dependent variable.</li>
 <li>The index is weighted by state share of skier visits, not equipped hectares.</li>
