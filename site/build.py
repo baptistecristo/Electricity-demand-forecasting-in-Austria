@@ -21,7 +21,30 @@ def _widget(name: str) -> str:
     """
     html = (FIG / f"{name}.html").read_text(encoding="utf-8")
     body = re.search(r"<body[^>]*>(.*)</body>", html, re.S).group(1)
-    return re.sub(r'<script src="[^"]*"></script>', "", body).strip()
+    body = re.sub(r'<script src="[^"]*"></script>', "", body).strip()
+    return _theme_svg(body)
+
+
+# ggiraph bakes colour into the SVG as uppercase hex presentation attributes.
+# Left alone that makes the figures theme-blind, and theme-blind here means
+# broken rather than merely inconsistent: the ink is #0A0A0A, so in dark mode
+# every error bar, zero line and direct label is near-black on a near-black
+# page and simply disappears. Swapping the four non-series colours for CSS
+# custom properties makes the figures follow the toggle. var() is legal in an
+# SVG presentation attribute, and the series hues are deliberately not touched
+# so a bar keeps its identity in both modes.
+_SVG_TOKENS = {
+    "#0A0A0A": "var(--fig-ink)",     # labels, error bars, zero lines
+    "#5A5A5A": "var(--fig-mut)",     # axis text and titles
+    "#E5E5E5": "var(--fig-rule)",    # grid
+    "#FFFFFF": "var(--fig-bg)",      # the surface ring around overlapping marks
+}
+
+
+def _theme_svg(body: str) -> str:
+    for hex_, token in _SVG_TOKENS.items():
+        body = body.replace(f"'{hex_}'", f"'{token}'")
+    return body
 
 
 def _viz_assets() -> tuple[str, str]:
@@ -115,6 +138,7 @@ HTML = f"""<!DOCTYPE html>
   --panel:rgba(0,121,242,.035); --code-bg:#f4f4f5; --hl:rgba(0,121,242,.05);
   --c-blue:#2b6cb0; --c-red:#c05621; --c-green:#276749; --c-grey:#9a9a9a;
   --c-plum:#702459;
+  --fig-ink:#0a0a0a; --fig-mut:#5a5a5a; --fig-rule:#e5e5e5; --fig-bg:#ffffff;
   --serif:'Crimson Pro',Georgia,'Times New Roman',serif;
   --sans:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
@@ -126,6 +150,7 @@ HTML = f"""<!DOCTYPE html>
   --hl:rgba(59,158,255,.09);
   --c-blue:#5aa9f0; --c-red:#ee8a4d; --c-green:#4bb07a; --c-grey:#8a8a8a;
   --c-plum:#d571a6;
+  --fig-ink:#e5e5e5; --fig-mut:#a3a3a3; --fig-rule:#404040; --fig-bg:#0a0a0a;
 }}
 @media (prefers-color-scheme:dark){{
   :root:not([data-theme="light"]){{
@@ -135,6 +160,7 @@ HTML = f"""<!DOCTYPE html>
     --hl:rgba(59,158,255,.09);
     --c-blue:#5aa9f0; --c-red:#ee8a4d; --c-green:#4bb07a; --c-grey:#8a8a8a;
     --c-plum:#d571a6;
+    --fig-ink:#e5e5e5; --fig-mut:#a3a3a3; --fig-rule:#404040; --fig-bg:#0a0a0a;
   }}
 }}
 *{{box-sizing:border-box;margin:0;padding:0}}

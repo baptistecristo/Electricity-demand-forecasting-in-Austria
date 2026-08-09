@@ -13,9 +13,16 @@
 #
 # Colours are the categorical slots checked with the dataviz palette validator
 # against this page's surfaces; they pass the lightness band, chroma floor and
-# colour-vision separation in both modes. Because ggiraph bakes colour into the
-# SVG, the figures do not follow the page's light/dark toggle — a deliberate
-# trade accepted when R was chosen for the graphics.
+# colour-vision separation in both modes.
+#
+# INK, MUT and RULE below are the LIGHT-mode values, and they are placeholders.
+# ggiraph writes them into the SVG as hex presentation attributes, so site/
+# build.py substitutes each one for a CSS custom property when it inlines the
+# figure, and the figures then follow the page's light/dark toggle. Keep these
+# three values in sync with the _SVG_TOKENS table in build.py: they are matched
+# by exact uppercase hex, so changing one here without changing it there leaves
+# that element stuck in light mode. The series hues are deliberately not
+# substituted, so a bar keeps its identity in both themes.
 
 suppressPackageStartupMessages({
   library(ggplot2)
