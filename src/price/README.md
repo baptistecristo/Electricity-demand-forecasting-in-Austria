@@ -192,7 +192,7 @@ Reported first, in the order the Austrian gate in section 8.2 was:
 | series | source | zones |
 | --- | --- | --- |
 | day-ahead spot price, hourly | energy-charts.info `/price` | AT, CH, IT-North |
-| day-ahead LMP, hourly | ISO-NE day-ahead hourly LMP by load zone | .Z.VERMONT, .Z.RHODEISLAND |
+| day-ahead LMP, hourly | ISO-NE *Day-Ahead Energy Market Hourly LMP Report*, `WW_DALMP_ISO_YYYYMMDD.csv`; session cookie plus matching `Referer`, rate-limited; archive reaches 2015-12-03 | .Z.VERMONT, .Z.RHODEISLAND |
 | load and residual load, hourly | energy-charts.info `/public_power` | AT, CH, IT-North |
 | system load, hourly | EIA-930 ISNE, already cached by the Vermont pipeline | ISO-NE |
 | wet-bulb index, cold hours, all controls | the four existing night panels | all |
@@ -410,9 +410,20 @@ independent publishers on a known hour.
 ## 11. Run it
 
 ```
-python src/price/price_pipeline.py
+python src/price/fetch_prices.py        # AT / CH / IT-North day-ahead spot
+python src/price/fetch_lmp.py           # ISO-NE day-ahead hourly zonal LMP
+python src/price/price_pipeline.py      # gates first, then the coefficients
 ```
 
-Everything the script prints is computed from data it fetches or from the four
-committed night panels. No number in the results write-up will be carried over
-from a prior pass.
+Both fetchers cache every response and skip what is already on disk;
+`fetch_lmp.py --no-fetch` rebuilds its CSVs from cache without making a single
+request. Neither is fast on a cold cache. energy-charts rate-limits bursts even
+at 3.5 s spacing, and ISO-NE needs about 9 s between per-day requests, so its
+427 days take roughly 75 minutes.
+
+`price_pipeline.py` rebuilds nothing on the right-hand side: it reads the night
+panel each load pipeline wrote and joins one column onto it. Run the load
+pipelines first, or there is nothing for it to join to.
+
+Every number in section 10 is printed by these three scripts. None was carried
+over from a prior pass or filled in by hand.
