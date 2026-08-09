@@ -844,6 +844,83 @@ def estimate(p: pd.DataFrame, label: str, extra: str = "", quiet: bool = False):
     return m
 
 
+# -------------------------------------------------------------- post hoc -----
+# EVERYTHING BELOW THIS LINE WAS ADDED AFTER SEEING THE PRIMARY RESULT.
+# It is not pre-registered and is labelled POST-HOC wherever it prints. It
+# exists because the primary coefficient came back significant with the wrong
+# sign, and a wrong-signed significant coefficient needs an explanation that is
+# tested rather than asserted. The design commit for this pipeline predates
+# these functions in the history, which is the only reason the distinction is
+# checkable at all.
+
+DAY_HOURS = set(range(10, 17))       # 10:00-16:59 local
+
+# Approximate load-weighted latitude of each reliability region, used only to
+# describe the ordering of the eight coefficients. Nothing is estimated from it.
+ZONE_LAT = {".Z.MAINE": 44.8, ".Z.VERMONT": 44.1, ".Z.NEWHAMPSHIRE": 43.3,
+            ".Z.WCMASS": 42.4, ".Z.NEMASSBOST": 42.4, ".Z.SEMASS": 41.8,
+            ".Z.RHODEISLAND": 41.7, ".Z.CONNECTICUT": 41.5}
+
+
+def afternoon_error(h: pd.DataFrame, zone: str) -> pd.Series:
+    """Mean share error over the afternoon that FOLLOWS each night, keyed by the
+    same night_date the night panel uses, so the two outcomes are directly
+    swappable under an otherwise identical right-hand side."""
+    z = h[(h.region == zone) & h.hb.isin(DAY_HOURS)].copy()
+    z["night_date"] = z.date - pd.Timedelta(days=1)
+    g = z.groupby("night_date")["err_share"]
+    return g.mean()[g.size() >= 5]
+
+
+def posthoc_afternoon(h: pd.DataFrame, wb: pd.Series, good_seasons) -> None:
+    """Hold the right-hand side fixed and move only the outcome window.
+
+    Snow is made at night. If the night wet-bulb history predicts the share
+    error just as well in the following afternoon -- when the guns are largely
+    off -- then whatever the coefficient is picking up is not snowmaking, it is
+    a regional temperature response that happens to run all day.
+    """
+    print("\n" + "=" * 72)
+    print("POST-HOC PLACEBO -- same regressors, afternoon outcome (10:00-16:59)")
+    print("=" * 72)
+    print("  NOT PRE-REGISTERED. Added after the primary result came back")
+    print("  significant with the sign reversed.")
+    for zone in (VT, RI):
+        p = night_panel(screen_outliers(h, zone), wb)
+        p = p[p.season.isin(good_seasons)]
+        aft = afternoon_error(h, zone)
+        q = p.assign(err=p.night_date.map(aft)).dropna(subset=["err"])
+        mn = estimate(p, f"POST-HOC {zone}: NIGHT outcome (reference)",
+                      quiet=True)
+        md = estimate(q, f"POST-HOC {zone}: AFTERNOON outcome, same regressors")
+        if mn is not None and md is not None:
+            k = "below:cum100"
+            print(f"  {zone}: night {mn.params[k]:+.4f} ({mn.bse[k]:.4f}) "
+                  f"vs afternoon {md.params[k]:+.4f} ({md.bse[k]:.4f}) "
+                  f"on n={int(md.nobs)} of the same nights")
+
+
+def posthoc_latitude(rows) -> None:
+    """Describe the ordering of the eight zone coefficients against latitude."""
+    if not rows:
+        return
+    from scipy import stats
+    t = pd.DataFrame(rows, columns=["zone", "coef", "se", "p", "share"])
+    t["lat"] = t.zone.map(ZONE_LAT)
+    rho, pv = stats.spearmanr(t.lat, t.coef)
+    print("\n" + "=" * 72)
+    print("POST-HOC DESCRIPTIVE -- the eight coefficients against latitude")
+    print("=" * 72)
+    print("  NOT PRE-REGISTERED, and n=8 zones. Descriptive only.")
+    print(t.sort_values("lat", ascending=False)
+          [["zone", "lat", "coef", "se", "p"]].round(4).to_string(index=False))
+    print(f"  Spearman(latitude, below:cum100) = {rho:+.3f}  (p = {pv:.3f})")
+    print("  Maine and New Hampshire are large snowmaking states too, so in")
+    print("  this cross-section 'northern' and 'has ski resorts' are the same")
+    print("  grouping. The eight-zone table cannot separate them; only the")
+    print("  afternoon placebo above holds geography fixed.")
+
+
 # ------------------------------------------------------------------ main -----
 def main() -> None:
     print("ISO-NE VERMONT snowmaking test -- outcome variable is the SHARE")
@@ -953,6 +1030,9 @@ def main() -> None:
         print(f"  sum of the eight coefficients: "
               f"{t['below:cum100'].sum():+.4f} pp "
               f"(compositional constraint puts this near zero)")
+
+    posthoc_afternoon(h, wb, good_seasons)
+    posthoc_latitude(rows)
 
     # robustness: swap the actual series for ISO-NE's own zonal load on the one
     # season its report still archives, so forecast and outcome share a

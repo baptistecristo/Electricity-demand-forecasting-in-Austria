@@ -1,18 +1,20 @@
 # Snowmaking in ISO-NE's Vermont day-ahead forecast
 
-> **STATUS: DESIGNED AND WRITTEN, NOT RUN. There are no results here.**
+> **STATUS: RUN END TO END, 9 August 2026. Sections 5 to 7 are results.**
 >
-> The identification argument in §1 is settled and is the substantive
-> contribution: ISO-NE's regional forecast is a system total times a separately
-> published regional share, so Vermont MW error is mostly system error rescaled
-> by about 4.7% and the test must target the *share*. The pipeline implements
-> that and was exercised end to end against a two-season cached subset only.
-> The full collection did not finish, because ISO-NE rate-limits the per-day CSV
-> hard enough that seven seasons take hours.
+> An earlier version of this file carried a banner saying the pipeline had been
+> designed but never run, because ISO-NE rate-limits the per-day CSV hard enough
+> that collecting seven seasons takes hours and the first attempt did not
+> finish. It has now finished: 427 target dates, five usable seasons, and the
+> `night_panel_*.csv` files in this directory are the real panels rather than the
+> two-season smoke test that was deliberately withheld.
 >
-> Any coefficient printed below this line came from that two-season subset. It
-> is a smoke test, not a finding, and it must not be read as one. The partial
-> night panels were deliberately not committed for the same reason.
+> **Read section 6 before anything else. The pre-registered prediction is
+> rejected here, and it is rejected with a significant coefficient of the wrong
+> sign rather than with a null.** Vermont is also the only test in this project
+> with the statistical power to have found the effect it was looking for, which
+> makes it the one place where a null would have meant something and the
+> rejection means more.
 
 A replication of the Austrian test in `src/apg_pipeline.py` on the system with
 the best snowmaking-to-winter-overnight-load ratio anywhere. Austria returned a
@@ -212,12 +214,217 @@ conditions, and each resort makes snow off its own hill.
 
 ## 5. Sample obtained
 
-*(results in section 6)*
+| step | result |
+| --- | --- |
+| forecast CSVs fetched | 427 target dates, 1 Nov – 31 Dec 2019 … 2025, 554,880 zone-hour publications |
+| day-ahead vintage kept | 427 of 427 dates; the chosen publication falls at 09:24–09:29 in every season |
+| EIA-930 ISNE actuals | 531,256 zone-hours, 1 Jan 2019 – 29 Jul 2026 |
+| matched hourly panel | 82,040 zone-hours over 427 dates |
+| RWIS wet-bulb index | 12,151 hours from 8 stations; 40.9 % below −2.0 °C |
+
+Season coverage of the complete 1 Oct – 31 Dec hourly clock, which is what
+decides the primary sample:
+
+| season | observed h | coverage | % below −2 °C | cold hours by 31 Dec |
+| --- | --- | --- | --- | --- |
+| 2019 | 2,206 | 99.9 % | 43.6 | 962 |
+| 2020 | 0 | **0.0 %** | – | – |
+| 2021 | 2,208 | 100.0 % | 36.1 | 797 |
+| 2022 | 1,191 | **53.9 %** | 35.3 | 779 |
+| 2023 | 2,206 | 99.9 % | 31.0 | 684 |
+| 2024 | 2,170 | 98.3 % | 33.6 | 742 |
+| 2025 | 2,170 | 98.3 % | 45.3 | 999 |
+
+The primary sample keeps 2019, 2021, 2023, 2024 and 2025 and drops the two
+seasons flagged in section 4.3, for the two different reasons given there. Both
+are put back in a reported sensitivity.
+
+**Vermont, primary sample.** 297 nights, of which 183 are below threshold and 27
+are campaign starts. 344 nights before the weather restriction. The outlier
+screen removed 75 of 4,704 night-hours (1.59 %).
+
+Mean share error **+0.0020 pp** (sd 0.1842), mean realised share **4.880 %**.
+Mean night system load is 12,003 MW, so **1 pp of share is 120 MW** and the
+standard deviation of the night share error is **22.1 MW**. Every coefficient
+below can be read in megawatts by multiplying by 120.
 
 ## 6. Results
 
-*(to be filled from the run)*
+### 6.1 The gates
+
+**GATE 0.** The eight EIA-930 subregion codes match ISO-NE's own zone names
+one for one. The mapping was checked, not assumed.
+
+**GATE 1: the forecast is a hybrid, as section 1 argued.** The eight regional MW
+figures sit within 0.003 MW of an exact multiple of 10 for 100.00 % of hours,
+and `|MW − pct × total|` never exceeds 0.095 MW across 554,880 zone-hours. So MW
+is derived from a rounded system total and a published percentage. Yet the
+percentages are not fixed load-share factors: 24.7 % of consecutive revisions of
+the same Vermont target hour leave the share byte-identical to three decimals,
+and 11 % of *those* nonetheless revise the MW by more than 0.5 MW. Totals and
+shares refresh on separate cycles. The Vermont day-ahead share ranges 1.65 % to
+6.03 % with a mean of 4.71 %, so it is modelled, not frozen.
+
+**GATE 2: the variance split runs the opposite way to the prior expectation,
+exactly as section 1 pre-committed to reporting.** Over 4,704 night hours the
+identity closes to 0.085 MW, and:
+
+| | system component | share component |
+| --- | --- | --- |
+| raw variance | 18.1 % | **88.8 %** |
+| de-meaned by season × hour | 17.0 % | **82.7 %** |
+| correlation with VT MW error | 0.345 | **0.906** |
+
+The expectation written down before any actuals were in hand was that Vermont MW
+error would be dominated by New England system error rescaled to Vermont's ~4.7 %.
+It is not. Four fifths of the variance is Vermont's own share error. The
+structural claim survives and the variance claim does not, and the design choice
+survives either way: the share is a *better* outcome for being where the error
+actually lives.
+
+**Baseline skill.** Against raw lag-1 persistence the Vermont day-ahead share
+forecast has −5.7 % skill, which is an artifact of the constant definitional gap
+between EIA-930 and ISO-NE. After each series is de-meaned by season and
+hour-of-day the skill is +1.1 %, and against the *feasible* persistence benchmark
+that uses only information available at 09:30 on D-1 it is +9.5 %. The forecast
+is barely better than assuming yesterday. Its correlation with the same-day
+realised share is 0.398. Off the Friday-to-Saturday transition it moves 62 % of
+the true change and its skill goes negative. This is a weak regional model, which
+is a favourable condition for the test: a weak forecaster is an easy one to catch
+out.
+
+### 6.2 The pre-registered test
+
+    below:cum100  =  -0.0211 pp per 100 cold hours
+                     (HC1 s.e. 0.0073, z = -2.89, p = 0.004, n = 297)
+
+**Significant at the 1 % level, and the sign is the opposite of the prediction.**
+
+The prediction in section 3 was positive. Snowmaking is unforecast load; adding
+unforecast load to Vermont pushes the realised share *above* the day-ahead share;
+the gap should widen as the season's cold accumulates and the fleet comes on.
+What the data shows is that as cumulative cold accumulates, Vermont's realised
+share comes in progressively *below* what ISO-NE forecast. At the maximum
+observed `cum_cold_h` that is **−16.1 ± 10.9 MW**.
+
+It is stable across the specification variants: −0.0208 with the campaign-start
+dummy, −0.0210 with campaign start plus second night, −0.0232 with the
+low-coverage seasons put back. The bandwidth restriction to |wb + 2| ≤ 3 °C
+halves it and loses significance (−0.0139, s.e. 0.0104), which is what a
+139-night subsample would do to any of these.
+
+**The placebo is clean.** Rhode Island, which makes no snow, returns
++0.0019 (0.0037), p = 0.61, and stays null in every variant.
+
+### 6.3 Why this is not evidence of snowmaking, in three steps
+
+A wrong-signed significant coefficient needs an explanation that is tested rather
+than asserted. Everything in this subsection was written **after** seeing 6.2 and
+is labelled POST-HOC in the pipeline output. The design commit for this pipeline
+predates it in the git history, which is the only reason the distinction is
+checkable.
+
+**Step 1. It is not robust to the weather index.** Swapping the eight road
+stations for the Mount Washington summit ASOS at 1,910 m — a colder, purer,
+more snowmaking-relevant index, and the one a physical reading of the hypothesis
+would prefer — gives **−0.0057 (0.0056), p = 0.31**. The result depends on which
+thermometers you pick.
+
+**Step 2. It is one end of a north–south gradient across all eight zones.** The
+eight share errors sum to zero by construction, so the eight coefficients do too
+(they sum to +0.0005). Ranked by latitude:
+
+| zone | lat | `below:cum100` | s.e. | p |
+| --- | --- | --- | --- | --- |
+| Maine | 44.8 | −0.0208 | 0.0160 | 0.19 |
+| **Vermont** | 44.1 | **−0.0211** | 0.0073 | **0.004** |
+| New Hampshire | 43.3 | −0.0118 | 0.0074 | 0.11 |
+| NEMA / Boston | 42.4 | −0.0064 | 0.0097 | 0.51 |
+| WC Mass | 42.4 | +0.0138 | 0.0068 | 0.04 |
+| SE Mass | 41.8 | +0.0199 | 0.0069 | 0.004 |
+| Rhode Island | 41.7 | +0.0019 | 0.0037 | 0.61 |
+| Connecticut | 41.5 | +0.0252 | 0.0134 | 0.06 |
+
+Spearman(latitude, coefficient) = **−0.886**, p = 0.003. Every northern zone is
+negative and every southern zone except Rhode Island is positive. Vermont is the
+most negative, but it is not doing anything the rest of northern New England is
+not also doing. This is the signature of ISO-NE's regional model over-responding
+to accumulated cold in the north, and the compositional constraint then forces
+the mirror image onto the south.
+
+Maine and New Hampshire are large snowmaking states too, so in this
+cross-section "northern" and "has ski resorts" are the same eight-way split. The
+zone table cannot separate them.
+
+**Step 3. The one test that could separate them is inconclusive.** Holding the
+right-hand side fixed and moving only the outcome window from the night to the
+following afternoon (10:00–16:59), when the guns are largely off, gives
+**−0.0037 (0.0169)** against the night's −0.0211 (0.0073) on the same 297 nights.
+The point estimate is a sixth of the night's, which looks like night-specificity,
+but the afternoon share error is 2.3 times noisier and the interval comfortably
+contains the night estimate. **This placebo does not discriminate and is not
+offered as if it did.** It fails to establish night-specificity and equally
+fails to rule it out.
+
+Steps 1 and 2 are enough on their own. A coefficient that reverses when you
+change thermometers, and that sits on a monotone latitude gradient shared by
+seven other zones, is a property of the forecaster's regional temperature
+response, not of snow guns.
+
+### 6.4 The one result that points the other way
+
+The campaign-start dummy — the first night of a cold snap after two mild ones,
+which is when a resort with no base has the strongest reason to run everything it
+owns — comes back **+0.0757 pp (HC1 s.e. 0.0313, p = 0.016)**, or **+9.1 ± 7.4 MW**.
+Correctly signed, and the Rhode Island placebo is null at −0.0125 (0.0161).
+
+It is reported because it is the only Vermont result consistent with the
+hypothesis, and it is not leaned on, for three reasons. It rests on 27 campaign
+starts. It is one coefficient among the several specifications run here, with no
+multiplicity correction. And 9 MW is a tenth of the Vermont fleet's plausible
+coincident draw, so even taken at face value it describes a forecaster that
+misses a small fraction of one night rather than a systematic blind spot.
+
+### 6.5 Power: this is the one test that could have found the effect
+
+At the maximum observed `cum_cold_h` the standard error corresponds to a
+**minimum detectable effect of 10.9 MW**. Vermont's snowmaking energy is
+40–90 GWh a season (section 8.8 of the root README), which spread over a
+campaign implies a coincident draw somewhere between 30 and 110 MW.
+
+The test is powered by a factor of three to ten. Compare the rest of the project:
+Austria's minimum detectable effect is 427 MW against a 427 MW fleet, right at
+the edge; Switzerland's is 314 MW against ~200 MW, hopeless. Vermont is the only
+one of the four with real headroom, which is why its answer carries weight —
+and why the answer being a *reversed sign* rather than a null is the more
+interesting outcome.
 
 ## 7. Honest limitations
 
-*(to be filled from the run)*
+1. **The same-publisher robustness arm did not run.** ISO-NE's own five-minute
+   zonal load report would let the forecast and the outcome share a publisher, so
+   that no cross-source definitional gap could be doing the work. Its archive
+   reaches back only to about mid-2025, so it can cover one season, and that
+   season's collection is not in cache. The gap between EIA-930 and ISO-NE shares
+   is measured instead, on two sampled days: for Vermont the mean gap is
+   +0.035 pp with sd 0.067 pp, a third of the sd of the share error itself, and
+   it correlates −0.475 with wet bulb over 22 night hours. **A cross-source gap
+   that moves with temperature is exactly the confound this arm exists to rule
+   out**, and it has not been ruled out. It is a small n and it is the weakest
+   point in this replication.
+2. **Two of seven seasons are lost**, one to a hole in the RWIS archive and one
+   to structured missingness. Five seasons of 297 nights is a thin panel for a
+   design with season fixed effects.
+3. **The weather stations are road-level, 462–721 m**, not the 900–2,600 m band
+   the Austrian design specified, because Vermont has no high-elevation hourly
+   temperature-and-humidity station. The Mount Washington arm is 1,910 m but sits
+   in New Hampshire, 100 km from the nearest Vermont resort.
+4. **Nov–Dec only**, matching Austria. Vermont snowmaking runs hard into January
+   and February and that extension is untested here.
+5. **The outcome is compositional.** Vermont is 4.9 % of the system, so its share
+   error is measured against seven other zones that must absorb the mirror image.
+   The latitude result in 6.3 is a consequence of taking that seriously rather
+   than a separate finding.
+6. **Nothing here tests price.** Whether the day-ahead auction prices Vermont
+   snowmaking is a different question, pre-registered separately in
+   `src/price/README.md`.

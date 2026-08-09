@@ -12,6 +12,13 @@ specification, on the identical nights, recovers the Christmas industrial shutdo
 at **−274 MW (t = −3.3)**. The design can see effects of the size snowmaking would
 have to produce. It does not see snowmaking.
 
+**Then it was run in three more markets (§8.8b).** Italy-North reproduces the
+Austrian null at **+4.3 ± 10.2**. Switzerland is reported as not interpretable
+because it could never have detected the effect. Vermont, the only one of the four
+with real statistical headroom — 10.9 MW detectable against a 30–110 MW fleet —
+**rejects the prediction with the sign reversed**, and three follow-up tests point
+at ISO-NE's north–south temperature response rather than at snow guns.
+
 ---
 
 ## Abstract
@@ -443,14 +450,41 @@ small to matter.
 The +131 MW November bias in §8.3 survives as a real seasonal feature. It is not
 attributable to snowmaking by this design.
 
+> **Two limits on the paragraph above, both established after it was written.**
+>
+> **The Christmas argument is about Austria and does not travel.** It works here
+> because APG leaves the shutdown sitting in its residual, and APG leaves it
+> there because its night MAE is 6.48%. Terna and Swissgrid both forecast their
+> own Christmas almost perfectly, so the same control returns approximately zero
+> in Italy and Switzerland without saying anything about their sensitivity.
+> §8.8b sets out the numbers. Read §8.6 as a claim about the Austrian panel only.
+>
+> **"Not underpowered for effects of the relevant size" is a statement about
+> 274 MW, not about the snowmaking effect.** Austria's minimum detectable effect
+> is 427 MW against a fleet whose coincident draw is estimated at 427 MW, which
+> is the edge of the envelope rather than headroom. The one test in this project
+> with genuine power is Vermont, at 10.9 MW against a 30–110 MW fleet, and §8.8b
+> reports what it found.
+
 ### 8.7 What would still be worth doing
 
-- **Opening dates.** The one pre-registered supporting test not run, and the only
-  remaining source of variation orthogonal to temperature.
-- **Price and imbalance as outcomes.** §9 already notes the load forecast error is
-  the TSO's error, not the market's. A null here does not rule out a price effect.
-- **Systems where the load is a larger share of demand.** The binding constraint was
-  α, not sample size. See §8.8 for the worldwide ranking.
+- **Opening dates.** The one pre-registered supporting test still not run, and the
+  only remaining source of variation orthogonal to temperature. §8.5b explains
+  why calendar opening dates cannot identify it and what would.
+- **A system-specific sensitivity gate.** Christmas works only against a weak
+  forecaster. Any replication against a good one needs a reference effect of its
+  own, chosen before estimation. This is now the binding methodological problem
+  for the whole programme, not a detail.
+- **Vermont's same-publisher arm.** ISO-NE's own zonal load report would close the
+  one cross-source gap left open in that replication. Its archive covers a single
+  season. See `src/vermont/README.md` §7.1.
+- **Systems where the load is a larger share of demand.** The binding constraint
+  was α, not sample size. §8.8 ranks the candidates; §8.8b reports the three that
+  have since been tested.
+- **Price as an outcome.** §9 notes that a load forecast error is the TSO's error,
+  not the market's, and that a null here does not rule out a price effect. That
+  test is now pre-registered in `src/price/README.md` for all four markets, on
+  the day-ahead spot auction rather than on futures, and §8.8c reports it.
 
 ### 8.8 Was Austria a badly chosen case? Mostly not
 
@@ -465,7 +499,7 @@ snowmaking energy per gigawatt of winter overnight load — Austria's 281 GWh ÷
 
 | System | Snowmaking (GWh/season) | Winter overnight load (GW) | Ratio | Free day-ahead forecast? |
 |---|---|---|---|---|
-| **ISO-NE Vermont region** | 40–90 *(derived)* | ~0.62–0.70 | **62–140** | Yes, hourly, per region, ~9 yr |
+| **ISO-NE Vermont region** *(tested, §8.8b)* | 40–90 *(derived)* | **0.59 (measured)** | **68–153** | Yes, hourly, per region, 7 yr |
 | **Austria (this study)** | **281 (published)** | **6.6 (measured)** | **43** | Yes |
 | Italy-North *(tested, §8.8b)* | ~560 *(derived)* | **16.2 (measured)** | **~35** | Yes, Terna, per bidding zone |
 | ISO-NE New Hampshire | 22–54 *(derived)* | ~1.25 | 18–43 | Yes |
@@ -488,37 +522,46 @@ from ~45 to about 35 and it no longer clears Austria. The numerator is still a
 desk estimate, and at 700 GWh the two would be level, so the honest statement is
 that Italy-North is *comparable* to Austria rather than clearly above or below it.
 
-**The best remaining test is Vermont, not a country.** ISO-NE publishes an hourly
-demand forecast *per reliability region*. Vermont's ~0.65 GW zonal load sits under a
-snowmaking fleet covering close to 100% of trail acreage, because US Northeast
-resorts snowmake far harder than the Alps where natural snowfall is unreliable.
-Resort-level derivations (Jiminy Peak, Sugarbush) put Northeast intensity at
-**3–7× the Austrian 22.4 MWh/ha**. Rhode Island provides a same-forecaster,
-same-weather, zero-snowmaking placebo inside the same data feed.
+**The best test was Vermont, not a country, and it has now been run.** ISO-NE
+publishes an hourly demand forecast *per reliability region*. Vermont's 0.59 GW
+measured zonal night load sits under a snowmaking fleet covering close to 100% of
+trail acreage, because US Northeast resorts snowmake far harder than the Alps
+where natural snowfall is unreliable. Resort-level derivations (Jiminy Peak,
+Sugarbush) put Northeast intensity at **3–7× the Austrian 22.4 MWh/ha**. Rhode
+Island provides a same-forecaster, same-weather, zero-snowmaking placebo inside
+the same data feed.
 
-One caveat must be resolved first: ISO-NE's regional report expresses each region as
-a percentage of the zonal total, which suggests the system forecast may be allocated
-to regions by load-share factors rather than each region being forecast
-independently. If so the forecast is structurally incapable of seeing a
-Vermont-specific anomaly, and a positive result would mean "no regional model"
-rather than "snowmaking is missed."
+The caveat this row carried has been resolved rather than assumed away. ISO-NE's
+regional report expresses each region as a percentage of the zonal total, which
+raised the possibility that the system forecast is allocated to regions by fixed
+load-share factors and is therefore structurally incapable of seeing a
+Vermont-specific anomaly. It is not fixed: the shares move by hour and season and
+are revised on their own cycle, independently of the total. The forecast is a
+hybrid, the regional share is the thing being modelled, and the share is what the
+test targets. §8.8b has the result.
 
 **Andorra has the best physics on earth and no data.** Snowmaking at Grandvalira and
 Pal Arinsal against a 570 GWh national system is plausibly a several-percent share of
 national load, but FEDA sits outside ENTSO-E and publishes no hourly series. Same for
 China's Chongli cluster, built in a very dry climate for the 2022 Olympics.
 
-### 8.8b Two of those rows were then tested
+### 8.8b Three of those rows were then tested
 
 Same specification, same wet-bulb solver with the station-pressure correction,
 same 20:00–06:59 night, same fixed effects, same night-level estimation. Only the
 load and weather sources change. Code in `src/it_north/` and `src/swiss/`.
 
-| | Seasons | Nights | `below:cum100` | Verdict |
-|---|---|---|---|---|
-| **Austria** | 13 | 780 | **+5.1** (11.9) | Null, and the design is certified sensitive |
-| **Italy-North** (Terna, North zone) | 7 | 420 | **+4.3** (10.2) | Null, but uncertified — see below |
-| **Switzerland** (energy-charts) | 9 | 540 | −42.5 (14.3) | Not interpretable; see below |
+| | Seasons | Nights | `below:cum100` | MDE vs fleet | Verdict |
+|---|---|---|---|---|---|
+| **Austria** | 13 | 780 | **+5.1** (11.9) MW | 427 vs 427 MW | Null, at the edge of what it could see |
+| **Italy-North** (Terna, North zone) | 7 | 420 | **+4.3** (10.2) MW | — | Null, but uncertified — see below |
+| **Vermont** (ISO-NE, share outcome) | 5 | 297 | **−2.5** (0.9) MW | **10.9 vs 30–110 MW** | Prediction rejected, wrong sign — see below |
+| **Switzerland** (energy-charts) | 9 | 540 | −42.5 (14.3) MW | 314 vs ~200 MW | Not interpretable; see below |
+
+Vermont's coefficient is natively −0.0211 pp of system share per 100 cold hours;
+the megawatt figure above is that times the 120 MW that one point of share is
+worth. Its outcome variable is the regional *share*, not megawatts, for the
+reason set out in `src/vermont/README.md` §1.
 
 **Italy-North replicates the null.** Terna publishes actual and day-ahead
 forecast for the North bidding zone in one file, with no login, back to 2019.
@@ -556,13 +599,47 @@ larger than the entire Swiss snowmaking fleet, and because the Swiss night-level
 calibration slope is 0.71 with corr(err, load) = +0.58, which passes load–weather
 structure straight into the residual.
 
-**Vermont is designed but not run.** The ISO-NE regional forecast turned out to be
-neither independent per region nor a fixed load-share allocation: the zonal totals
-are exact multiples of 10 MW, and two publications eleven minutes apart revised the
-total while leaving the regional shares byte-identical, yet those shares move by
-hour and season and are revised each cycle. Vermont MW error is therefore mostly
-system error rescaled by ~4.7%, so the test has to target the *share*, not the MW.
-That redesign is written; the data collection was not finished.
+**Vermont rejects the prediction with the sign reversed, and Vermont is the only
+test here with the power to have found it.** The ISO-NE regional forecast turned
+out to be neither independent per region nor a fixed load-share allocation: the
+zonal totals are exact multiples of 10 MW, and two publications eleven minutes
+apart revised the total while leaving the regional shares byte-identical, yet
+those shares move by hour and season and are revised each cycle. So the outcome
+had to be the regional *share*, not the MW.
+
+On five usable seasons and 297 nights the pre-registered interaction is
+**−0.0211 pp per 100 cold hours (HC1 s.e. 0.0073, p = 0.004)**, or −16 ± 11 MW at
+the coldest point of a season. Positive was predicted. Rhode Island, the
+no-snowmaking placebo in the same data feed, is null at +0.0019 (0.0037).
+
+Three things say this is the forecaster's regional temperature response rather
+than snow guns, and all three were run after seeing the coefficient and are
+labelled as such in the pipeline:
+
+- Swapping the eight Vermont road stations for the Mount Washington summit at
+  1,910 m — colder, purer, and the index a physical reading of the hypothesis
+  would prefer — collapses it to −0.0057 (0.0056), p = 0.31.
+- Across all eight reliability regions the coefficients line up almost
+  monotonically with latitude, Spearman −0.886, p = 0.003. Every northern zone is
+  negative, every southern zone but Rhode Island positive. Vermont is the most
+  negative of eight, not different in kind from Maine or New Hampshire.
+- Moving only the outcome window from night to the following afternoon gives
+  −0.0037 (0.0169). The point estimate drops sixfold but the afternoon is 2.3×
+  noisier and the interval contains the night estimate, so this placebo does not
+  discriminate either way. It is reported as inconclusive rather than as support.
+
+One Vermont result does point the hypothesis's way: the campaign-start dummy, the
+first night of a cold snap, is **+0.076 pp (s.e. 0.031, p = 0.016)**, or
++9.1 ± 7.4 MW, with a null placebo. It rests on 27 campaign starts, carries no
+multiplicity correction, and is a tenth of the fleet's plausible draw. It is
+reported and not leaned on.
+
+**Why Vermont's answer weighs more than the other three.** Its minimum detectable
+effect is 10.9 MW against a fleet drawing an estimated 30–110 MW: powered by a
+factor of three to ten. Austria sits exactly at its own limit and Switzerland is
+five times short of hers. Vermont is the one place in this project where the
+instrument was sharp enough that the answer is about the world rather than about
+the instrument. Full write-up and every gate in `src/vermont/README.md`.
 
 ### 8.9 The ENTSO-E token was never necessary
 
