@@ -188,8 +188,17 @@ interaction exploits.
 
 ## 5. Pre-registered predictions and kill criteria
 
-**Primary prediction.** The `below × cum_cold_hours` coefficient is negative and
-significant at 5% with date-clustered standard errors.
+**Primary prediction.** The `below × cum_cold_hours` coefficient is **negative**
+and significant at 5% with date-clustered standard errors.
+
+*Negative, not positive, and the direction is the whole test.* Snowmaking adds
+load, so a cold night on its own should push the forecast error up. What
+identifies snowmaking rather than heating is that the push **fades**: by late
+December the base is built and the guns are off, so identical weather draws far
+less power than it did in November. The interaction measures that fade, and a
+fade is a negative number. A positive interaction is not a larger effect, it is
+the wrong shape, and it fires the first kill criterion below. Every replication
+in §8.8b is scored against this same sign.
 
 **Supporting predictions.**
 

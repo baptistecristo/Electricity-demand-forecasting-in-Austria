@@ -576,7 +576,14 @@ Schmittenhöhe (1,956 m), among thirteen stations in total.</p>
 
 <h2 class="sec">5. Pre-registration</h2>
 <p><b>Primary prediction.</b> The <code>below × cum_cold_hours</code> coefficient is
-negative and significant at 5%.</p>
+<b>negative</b> and significant at 5%.</p>
+<p><b>Negative, not positive, and the direction is the whole test.</b> Snowmaking
+adds load, so a cold night on its own should push the forecast error up. What
+identifies snowmaking rather than heating is that the push <em>fades</em>: by late
+December the base is built and the guns are off, so the same weather draws far less
+power than it did in November. The interaction measures that fade, and a fade is a
+negative number. A positive interaction is not a bigger effect, it is the wrong
+shape, and it fires the first kill criterion below.</p>
 <p><b>Supporting predictions.</b> The error spikes on the first night of a cold snap
 and decays over 24–48 hours as autoregressive terms catch up; the effect is smaller
 after resorts open, conditional on wet bulb and day of season; and the Netherlands and
