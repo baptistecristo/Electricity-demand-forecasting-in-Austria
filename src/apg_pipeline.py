@@ -243,6 +243,62 @@ def night_panel(load: pd.DataFrame, wb: pd.Series) -> pd.DataFrame:
     return p[p.month.isin([11, 12])].reset_index(drop=True)
 
 
+def as_registered(load: pd.DataFrame, wb: pd.Series) -> None:
+    """Run the estimating equation exactly as it was committed, before results.
+
+    The pre-registration commit (56688a6) contains `src/snowload.py`, not this
+    file. This file arrived with the results commit, and its equation is not the
+    one snowload.py carried. The primary coefficient, its definition and its
+    predicted sign are identical and were registered verbatim -- snowload.py
+    says "Prediction: below:cum100 coefficient is NEGATIVE and significant" in a
+    comment -- but the equation around it was rewritten, and a rewrite that
+    lands in the same commit as the results is not itself pre-registered.
+
+    Rather than argue about whether the rewrite mattered, run both. This
+    function reproduces snowload.py's estimation exactly: hourly observations,
+    night = 21:00-05:59, primary sample restricted to |dist| <= 3 C, hour, dow
+    and season fixed effects, standard errors clustered by date.
+    """
+    import statsmodels.formula.api as smf
+    print("\n" + "=" * 72)
+    print("AS REGISTERED -- snowload.py's equation, from commit 56688a6")
+    print("=" * 72)
+    full = load.join(wb, how="inner")
+    full = full[full.M.isin([10, 11, 12])].copy().sort_index()
+    full["season"] = full["Y"]
+    below_h = (full["wb"] < WB_THRESHOLD).astype(int)
+    full["cum_cold_h"] = (below_h.groupby(full["season"])
+                          .transform(lambda s: s.shift(1).fillna(0).cumsum()))
+
+    # snowload.py's night: hours 21,22,23,0,1,2,3,4,5.
+    reg_night = set(range(21, 24)) | set(range(0, 6))
+    d = full[full.H.isin(reg_night) & full.M.isin([11, 12])].copy()
+    ts = pd.to_datetime(d.index, format="%Y-%m-%d %H")
+    d["date"] = ts.date
+    d["hour"], d["dow"] = d.H, ts.dayofweek
+    d["below"] = (d.wb < WB_THRESHOLD).astype(int)
+    d["dist"] = d.wb - WB_THRESHOLD
+    rd = d[d.dist.abs() <= 3.0].copy()
+    rd["cum100"] = (rd.cum_cold_h - rd.cum_cold_h.median()) / 100.0
+    print(f"  night hours Nov-Dec {len(d):,}; within +/-3 C {len(rd):,}; "
+          f"distinct nights {rd.date.nunique():,}")
+
+    f = ("err ~ below * cum100 + dist + below:dist "
+         "+ C(hour) + C(dow) + C(season)")
+    m = smf.ols(f, data=rd).fit(cov_type="cluster",
+                                cov_kwds={"groups": rd.date.astype(str)})
+    keep = [t for t in m.params.index
+            if any(k in t for k in ("below", "cum100", "dist"))]
+    print(pd.DataFrame({"Coef.": m.params, "Std.Err.": m.bse,
+                        "z": m.tvalues, "P>|z|": m.pvalues})
+          .loc[keep].round(4).to_string())
+    k = "below:cum100"
+    print(f"  AS REGISTERED {k} = {m.params[k]:+.1f} MW per 100 h "
+          f"(clustered s.e. {m.bse[k]:.1f}, z {m.tvalues[k]:+.2f}, "
+          f"p = {m.pvalues[k]:.3f})")
+    print("  Registered prediction: NEGATIVE and significant at 5%.")
+
+
 # ------------------------------------------------------------- estimation ----
 def estimate(p: pd.DataFrame, label: str, extra: str = "") -> None:
     import statsmodels.formula.api as smf
@@ -333,6 +389,8 @@ def main() -> None:
     print(f"\nnight panel: {len(p)} nights across {p.season.nunique()} seasons, "
           f"{int(p.campaign_start.sum())} campaign starts")
     p.to_csv("data/night_panel.csv", index=False)
+
+    as_registered(load, wb)
 
     estimate(p, "PRIMARY — Nov-Dec, all nights")
     estimate(p[p.dist.abs() <= 3], "Bandwidth |wb+2| <= 3 C")

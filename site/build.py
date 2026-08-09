@@ -645,6 +645,20 @@ effects of the size snowmaking would have to produce.</figcaption>
 parentheses, night-level observations. The primary coefficient is zero in every
 specification. The holiday control is strongly significant in every specification.</p>
 
+<div class="verdict" style="margin:1.4rem 0"><strong>This is not the equation that
+was registered, and both were run.</strong> The pre-registration commit contains
+<code>src/snowload.py</code>; <code>src/apg_pipeline.py</code>, which produced
+everything above, arrived with the results commit. The registered version used
+hourly rows with hour fixed effects and standard errors clustered by date, a
+21:00&ndash;05:59 night, a &plusmn;3 °C bandwidth as its primary sample, and no
+holiday or day-of-season controls. What did not change is the coefficient the
+paper turns on: <code>snowload.py</code> carries the line "Prediction:
+below:cum100 coefficient is NEGATIVE and significant" in the pre-registration
+commit itself. Running the registered equation unchanged on the same data gives
+<b>&minus;1.3 (12.3), p = 0.91</b> against the <b>+5.1 (11.9)</b> above &mdash;
+the same null at the same precision. The rewrite neither manufactured the null
+nor hid an effect.</div>
+
 <table>
 <thead><tr><th>Campaign-start terms</th><th class="num">Coef.</th><th class="num">s.e.</th><th class="num">t</th></tr></thead>
 <tbody>
@@ -708,8 +722,9 @@ wrong-signed against the prediction. The season-to-date cold accumulator had als
 built after the night filter, halving it and inflating every coefficient attached to it
 by a factor near 2.05. Austria's daylight-saving hour, which APG writes as
 <code>2A</code> and <code>2B</code>, crashed the parser outright. And the gate
-statistics in section 6 had been measured on a 21:00–05:59 night rather than the
-registered 20:00–06:59 one, which is where the earlier 6.50% MAE came from.</p>
+statistics in section 6 had been measured on a 21:00–05:59 night while every sample
+count beside them used the 20:00–06:59 night the estimation runs on, which is where
+the earlier 6.50% MAE came from.</p>
 <p>None of it changes the verdict. The pre-registration, the kill criteria and the
 power calculation are unchanged.</p>
 

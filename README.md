@@ -360,6 +360,48 @@ the pre-registered specification is for.
 `err ~ below × cum100 + dist + below:dist + holiday + doy + doy² + season FE + dow FE`,
 night-level observations, HC1 standard errors.
 
+**That is not the equation §4 and §5 committed to, and the difference is worth
+being explicit about.** The pre-registration commit `56688a6` contains
+`src/snowload.py`. `src/apg_pipeline.py`, which produced every number below,
+arrived with the results commit `ec016fc`. What was registered and what was
+estimated therefore differ, as follows:
+
+| registered (`snowload.py`, 56688a6) | estimated (`apg_pipeline.py`, ec016fc) |
+|---|---|
+| hourly rows, `C(hour)` fixed effects, standard errors clustered by date | one row per night, HC1 |
+| night = 21:00–05:59 | night = 20:00–06:59, ≥8 valid hours |
+| primary sample restricted to \|dist\| ≤ 3 °C | full Nov–Dec sample; ±3 °C reported as a sensitivity |
+| controls: `dist`, `below:dist`, hour, dow, season | the same, plus `holiday`, `doy`, `doy²` |
+| campaign start = first hour below threshold after ≥48 h above | first *night* below threshold after two mild nights |
+
+**What did not change is the thing the paper turns on.** The primary coefficient,
+its construction and its predicted sign were registered verbatim. `snowload.py`
+carries the line *"Prediction: below:cum100 coefficient is NEGATIVE and
+significant"* in the pre-registration commit itself, which is what §8.5 tests
+against.
+
+The changes are individually defensible — night-level rows stop 9 to 11
+autocorrelated hours from being counted as 9 to 11 observations, and `holiday`
+and the day-of-season polynomial keep the Christmas collapse and the seasonal
+ramp in §8.3 off `cum100`, which rises monotonically through the season. But a
+rewrite that lands in the same commit as the results is not pre-registered, and
+saying otherwise would be exactly the kind of claim this repository exists to
+make checkable.
+
+**So both were run.** `as_registered()` in `src/apg_pipeline.py` reproduces
+`snowload.py`'s equation exactly — hourly, 21:00–05:59, ±3 °C, hour and dow and
+season fixed effects, clustered by date:
+
+| equation | n | `below:cum100` |
+|---|---|---|
+| **as registered**, snowload.py's, unchanged | 3,795 hours / 546 nights | **−1.3** (12.3), z = −0.11, p = 0.914 |
+| as estimated, the table below | 780 nights | **+5.1** (11.9), z = 0.43, p = 0.67 |
+
+Same answer, and the same precision to within 4%. The rewrite did not
+manufacture the null and it did not hide an effect. Under the original equation
+the coefficient even carries the predicted negative sign, and is a ninth of its
+own standard error.
+
 | Specification | n | `below:cum100` **(primary)** | `below` | `holiday` |
 |---|---|---|---|---|
 | Nov–Dec, all nights | 780 | **+5.1** (11.9), t = 0.43 | +27.2 (53.2) | **−273.6** (84.0), t = −3.26 |
@@ -726,8 +768,15 @@ hours and leaves 113,939.
 
 **4. The gate table measured a different night than the sample it described.** The
 original 6,420 MW, 417 MW and 597 MW in §8.2 reproduce to the decimal on a
-21:00–05:59 night rather than the registered 20:00–06:59 one. §8.2 now uses the
-registered window. The MAE ratio the argument rests on moves from 6.50% to 6.48%.
+21:00–05:59 night, while every sample count beside them was built on the
+20:00–06:59 night the estimation uses. §8.2 now uses the estimation window
+throughout. The MAE ratio the argument rests on moves from 6.50% to 6.48%.
+
+An earlier version of this note called 20:00–06:59 "the registered" window. It is
+not: `snowload.py` in the pre-registration commit uses 21:00–05:59, and the wider
+window arrived with `apg_pipeline.py` in the results commit. §8.4 now sets out
+that difference and every other one between the registered and the estimated
+equation, and reports the coefficient under both.
 
 One number resisted every specification tried: the 514 MW standard deviation after
 hour, day-of-week and season fixed effects. The registered window gives 554 MW,
