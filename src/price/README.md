@@ -243,7 +243,7 @@ Four other things this cannot settle:
 
 ## 10. Results: the day-ahead spot price cannot answer this question
 
-Outcome 3 of section 5 fired in all three European markets. The power gate,
+Outcome 3 of section 5 fired in all four markets. The power gate,
 printed before any coefficient as designed, says the test could not have detected
 the effect it was looking for. The coefficients are reported below and no claim
 is made from them.

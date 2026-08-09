@@ -508,20 +508,25 @@ reproduces the null at <b>+4.3 (10.2)</b>. Switzerland is reported as
 uninterpretable because it would need its forecaster to be missing 201% of Swiss
 snowmaking before the test could see anything. Vermont, at 34%, returns <b>−0.0211 percentage points of system share per 100
 accumulated cold hours (s.e. 0.0073)</b> with a clean placebo — the predicted
-sign, sitting on its own detection threshold, and not robust to a change of
-weather index. A
-separate pre-registered test on the day-ahead spot price is underpowered in all
-three European markets by a factor of three to nine, because overnight the whole
-Austrian fleet is worth about €14/MWh at the margin.</p>
+sign, sitting on its own detection threshold, and not surviving a change of
+weather index, a same-publisher actuals series, or a placebo on the price
+outcome.</p>
+<p>A separate pre-registered test puts the same specification on the day-ahead
+spot price in all four markets. It is underpowered in each, by 1.3× in Austria to
+4.0× in Vermont, because overnight the supply stack is flat enough that Austria's
+whole snowmaking fleet is worth about €14/MWh at the margin. Vermont is the
+exception worth reading: its price does move with accumulated cold, at
+<b>−1.47 (0.54)</b>, and it moves as much in Rhode Island, which makes no
+snow.</p>
 </div>
 
 <div class="verdict">
 <strong>Result in Austria:</strong> null, pre-registered, and close to the best
 test case in the world by snowmaking-to-system-load ratio, so the null is not a
 consequence of a poor choice of market. <strong>Result across four markets:</strong>
-Italy-North agrees; Switzerland could never have seen the effect; Vermont, the only
-one of the four with real power headroom, meets the prediction instead. Sections 8.1
-and 8.2 are where the argument stops being one-sided, and they are the part worth
+Italy-North agrees; Switzerland could never have seen the effect; Vermont meets the
+prediction instead, and three later checks all point away from it. Sections 8.1 and
+8.2 are where the argument stops being one-sided, and they are the part worth
 reading if you read nothing else past the summary.
 </div>
 

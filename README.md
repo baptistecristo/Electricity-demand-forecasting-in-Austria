@@ -809,7 +809,7 @@ The outcome is the night-minus-midday spread, which differences out the fuel cos
 that dominates the level through the crisis winters. The right-hand side is the
 load test's, unchanged, joined onto the same night panels.
 
-**All three European markets come back underpowered**, and the power gate says so
+**All four markets come back underpowered**, and the power gate says so
 before any coefficient is printed:
 
 | | seasons | nights | supply slope | fleet | fleet is worth | detectable swing | short by |
