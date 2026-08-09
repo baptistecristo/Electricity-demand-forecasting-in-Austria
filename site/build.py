@@ -1102,7 +1102,35 @@ day-ahead spot auction in all four markets.</li>
 in the wet-bulb index while some of its load is absent from the dependent variable.</li>
 <li>The index is weighted by state share of skier visits, not equipped hectares.</li>
 <li><code>cum_cold_hours</code> proxies snow stock by accumulated hours below
-threshold. It ignores melt and counts cold hours whether or not guns actually ran.</li>
+threshold. It ignores melt and counts cold hours whether or not guns actually ran.
+It is also not a proxy for water <em>remaining</em>: a resort with an empty
+reservoir cannot run on the next cold night whatever the wet bulb says, and the two
+come apart after a warm spell.</li>
+<li><b>The treatment is a switch and the physics is a staircase.</b> Olefs et al.
+(2010), the source of the &minus;2 °C threshold, defines a <em>relationship between
+wet-bulb temperature and snowmaking capacity</em> alongside it, and the hardware is
+built the same way: SUFAG's Taurus 2.0 auto-selects among eight temperature-indexed
+production thresholds, DemacLenko's EOS 8 has eight water-flow steps, HKD's Impulse
+R5 spans 8 to 48 cfm of compressed air &mdash; and in the US Northeast compressed
+air is the dominant electrical load. A binary treatment discards the intensity
+margin, and much of the megawattage lives there.</li>
+<li><b>Crossing the threshold is documented as not sufficient.</b> Startup has a
+fixed cost and operators wait for better nights &mdash; <em>"Many times it's best to
+wait for ideal temperatures rather than take advantage of barely freezing"</em>. The
+nights they skip are the marginal ones just below threshold, which is exactly the
+window the &plusmn;3 °C bandwidth was built around.</li>
+<li><b>Water temperature is an omitted state variable that mimics the predicted
+effect.</b> Production at the margin needs water below about +2 °C, and reservoir
+water cools through the season, so an identical wet bulb is more productive in late
+December than in early November. That trend runs in the same direction as the
+base-building fade this design looks for, and would produce the predicted negative
+coefficient with no path dependence involved at all. It is an alternative
+explanation for the Vermont result that nothing here can rule out.</li>
+<li><b>Electricity price already enters the decision in documented cases</b>, which
+makes the load partly endogenous to the outcome the price test uses: one US area
+defers snowmaking past the monthly meter read to dodge a demand charge, another
+makes snow "at night when rates are down", and SMI's control software supports
+explicit electrical-load constraints.</li>
 <li>The opening-date and placebo tests were not identified and not run respectively.</li>
 </ul>
 
