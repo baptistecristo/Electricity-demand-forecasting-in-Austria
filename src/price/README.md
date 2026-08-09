@@ -9,13 +9,15 @@
 > 10 came later. `git log --oneline -- src/price/` shows all three in order, and
 > that ordering is the only thing that makes the answer worth reading.
 >
-> **The answer is that the day-ahead spot price cannot settle this in any of the
-> three European markets, though Austria comes close.** The power gate, which
-> prints before every coefficient by design, puts Austria 1.3× short of being
-> able to detect the effect, Italy-North 2.7× and Switzerland 3.8×. Section 5
-> named that outcome in advance and said what to do about it, which is to report
-> the coefficients and make no claim from them. Austria is near enough that three
-> or four more winters would change the answer; section 10 says why.
+> **The answer is no, and in Vermont a placebo settles it outright.** The power
+> gate, which prints before every coefficient by design, puts Austria 1.3× short
+> of being able to detect the effect, Italy-North 2.7×, Switzerland 3.8× and
+> Vermont 4.0×. Section 5 named that outcome in advance and said what to do about
+> it, which is to report the coefficients and make no claim from them.
+>
+> Vermont is the exception worth reading. Its price interaction *is* negative and
+> significant at p = 0.007 — and Rhode Island, which makes no snow, returns the
+> same coefficient to within a quarter of a standard error. Section 10.4.
 
 The load test asks whether the grid operator's day-ahead forecast misses
 snowmaking. This asks a different question about the same load: whether the
@@ -251,6 +253,7 @@ is made from them.
 | **Austria** | 5 (2018–22) | 300 | +15.6 €/MWh per GW | 900 MW | +14.02 €/MWh | 18.0 €/MWh | **1.3×** |
 | **Italy-North** | 7 | 420 | +3.5 | 1,500 MW | +5.29 | 14.4 | 2.7× |
 | **Switzerland** | 9 | 540 | +7.7 | 200 MW | +1.55 | 5.9 | 3.8× |
+| **Vermont** (ISO-NE, USD) | 6 | 344 | +23.9 $/MWh per GW | 70 MW | +1.67 $/MWh | 6.7 $/MWh | 4.0× |
 
 The reason is physical rather than statistical. The overnight merit order is
 close to flat: Austria's own night data puts the supply slope at 15.6 €/MWh per
@@ -324,7 +327,64 @@ Austria shows a weaker version of the same thing on the level sensitivity,
 +4.86 (1.99), p = 0.015, also wrong-signed, also inside a market the power gate
 has already declared unable to see the effect.
 
-### 10.3 Two data facts worth recording
+### 10.3 Vermont: the one place a placebo settled it
+
+The ISO-NE arm is the only part of this project where a placebo discriminated
+outright rather than failing to.
+
+**First, the local-content gate that section 9 asked for.** ISO-NE is usually
+unconstrained overnight, so the worry was that the Vermont LMP is the system
+price under another name, in which case a Vermont price test says nothing about
+Vermont whatever its coefficient does. Measured over 10,269 shared hours: Vermont
+and Rhode Island clear at the same cent in **0.4%** of them (0.4% on night hours
+alone), correlation 0.9956, and Vermont's own congestion component is nonzero in
+**45.3%** of hours with a mean absolute value of 0.50 USD/MWh. The zones are
+tightly coupled but genuinely distinct. The gate passes.
+
+**Then the coefficient, which looks like a finding until you read the next line.**
+
+| | `below:cum100` on the spread | s.e. | p |
+| --- | --- | --- | --- |
+| **Vermont** | **−1.469** | 0.541 | **0.007** |
+| **Rhode Island**, no snowmaking | **−1.328** | 0.523 | **0.011** |
+| Vermont, load test's 5 seasons | −1.373 | 0.540 | 0.011 |
+| Rhode Island, load test's 5 seasons | −1.175 | 0.519 | 0.024 |
+
+Negative, significant, the predicted sign — and reproduced almost exactly in the
+zone with no snow guns in it. The Vermont-minus-Rhode-Island difference is 0.14,
+about a quarter of either standard error, and it is 0.20 on the load test's own
+five-season sample. **What the coefficient measures is a New England–wide
+relationship between accumulated cold and the night-day price spread. It is not a
+Vermont snowmaking signal.**
+
+The bottom two rows exist because the price panel has no weather-coverage filter
+of its own and silently readmits the 2022 season, which the load test drops for
+covering only 54% of the October–December clock. Restricting to the load test's
+five seasons changes nothing.
+
+**Why this placebo works when the load test's did not.** In the load test the
+outcome is a regional *share*, and the eight shares sum to zero by construction,
+so a genuine Vermont effect is forced to push Rhode Island the other way and the
+placebo cannot cleanly separate signal from mirror image. Price has no such
+constraint: both zones clear near the same system price, so a system-wide driver
+appears identically in both while a Vermont-specific driver would appear in
+Vermont alone. The compositional outcome that made the load test possible is
+exactly what blunted its placebo, and the price outcome, useless for power, is
+where the placebo becomes sharp.
+
+**It was underpowered regardless.** ISO-NE's overnight supply slope is
++23.9 USD/MWh per GW, steeper than any European market here, but a 70 MW Vermont
+fleet is still worth only 1.67 USD/MWh against a smallest detectable swing of
+6.71. Even without the placebo the pre-registered rule would have declared it
+uninformative. The sanity gate also failed the same way it did in Europe:
+`holiday` = +1.56 (4.30) on the spread, +4.84 (7.14) on the level.
+
+One deviation to note: the supply slope is estimated against **total** system
+load rather than residual load, because EIA-930's ISNE subregion files carry no
+wind or solar split. That biases the slope toward zero if anything, so the
+implied impact is if anything overstated and the underpowered verdict is safe.
+
+### 10.4 Two data facts worth recording
 
 **The Austrian price panel is five seasons, not thirteen.** The AT bidding zone
 did not exist before 1 October 2018, and this was established from the data

@@ -94,6 +94,12 @@ MARKETS = [
      "src/swiss/ch_night_panel.csv",            200),
 ]
 
+# The seasons src/vermont/vt_pipeline.py keeps in its primary sample: 2020 has
+# no VTrans RWIS data at all and 2022 covers only 53.9% of the Oct-Dec hourly
+# clock, structurally (the missing hours are October and November). See
+# src/vermont/README.md section 4, item 3.
+VT_PRIMARY_SEASONS = (2019, 2021, 2023, 2024, 2025)
+
 # ISO-NE is handled separately: its price is an LMP in USD, its hours arrive as
 # published ordinals rather than timestamps, and its panel is a share panel.
 ISONE = [
@@ -506,6 +512,14 @@ def run_isone() -> None:
                       f"implied impact of {abs(impact):.3f}")
         estimate(p, "spread", f"{label}: PRIMARY, night-minus-midday spread")
         estimate(p, "p_night", f"{label}: SENSITIVITY, night level")
+        # The load test drops 2020 outright and 2022 for weather coverage below
+        # 90% of the Oct-Dec clock, and estimates on five seasons. The price
+        # panel has no such filter of its own, so it silently readmits 2022,
+        # whose cum_cold_h is built on a half-observed clock. Report the load
+        # test's own sample too, so the two coefficients are on one footing.
+        q = p[p.season.isin(VT_PRIMARY_SEASONS)]
+        estimate(q, "spread",
+                 f"{label}: spread on the load test's primary seasons")
 
 
 def main() -> None:

@@ -805,6 +805,7 @@ before any coefficient is printed:
 | **Austria** | 5 (2018–22) | 300 | +15.6 €/MWh per GW | 900 MW | +14.02 €/MWh | 18.0 €/MWh | **1.3×** |
 | **Italy-North** | 7 | 420 | +3.5 | 1,500 MW | +5.29 | 14.4 | 2.7× |
 | **Switzerland** | 9 | 540 | +7.7 | 200 MW | +1.55 | 5.9 | 3.8× |
+| **Vermont** (ISO-NE, USD) | 6 | 344 | +23.9 | 70 MW | +1.67 | 6.7 | 4.0× |
 
 The reason is physical. The overnight merit order is nearly flat, so Austria's
 own night data prices a 900 MW snowmaking fleet at about **14 €/MWh** at the
@@ -841,6 +842,29 @@ Three things came out of it that are worth more than the coefficients:
   Italy-North are also equal to the cent in 16.0% of shared hours, which is
   Brenner market coupling working normally and means those two are close to one
   observation rather than two.
+
+**And in Vermont a placebo settled it outright, which nothing else in this
+project managed.** Vermont's price interaction is **−1.47 (0.54), p = 0.007**:
+negative, significant, the predicted sign. Rhode Island, which makes no snow,
+returns **−1.33 (0.52), p = 0.011**. The difference is 0.14, about a quarter of
+either standard error, and restricting to the load test's own five seasons leaves
+it at 0.20. The coefficient is a New England–wide relationship between
+accumulated cold and the night-day spread, not a Vermont snowmaking signal.
+
+The local-content gate §9 asked for passes first, so this is not an artifact of
+Vermont's LMP being the system price under another name: the two zones clear at
+the same cent in only 0.4% of 10,269 hours and Vermont's congestion component is
+nonzero in 45.3% of them.
+
+**Why this placebo bites when the load test's could not.** The load outcome is a
+regional share and the eight shares sum to zero by construction, so a genuine
+Vermont effect is *forced* to push Rhode Island the other way and the placebo
+cannot separate signal from mirror image. Price carries no such constraint: both
+zones clear near the same system price, so a system-wide driver shows up
+identically in both while a Vermont-specific one would show up in Vermont alone.
+The compositional outcome that made the load test possible is exactly what
+blunted its placebo; the price outcome, useless for power, is where the placebo
+becomes sharp.
 
 Full write-up, every gate and the two data traps in `src/price/README.md`.
 

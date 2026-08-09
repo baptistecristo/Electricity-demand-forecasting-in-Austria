@@ -1004,6 +1004,9 @@ unchanged.</p>
 <tr><td>Switzerland</td><td class="num">9</td><td class="num">540</td>
   <td class="num">+7.7</td><td class="num">200 MW</td><td class="num">+1.55</td>
   <td class="num">5.9</td><td class="num">3.8×</td></tr>
+<tr><td>Vermont (ISO-NE, USD)</td><td class="num">6</td><td class="num">344</td>
+  <td class="num">+23.9</td><td class="num">70 MW</td><td class="num">+1.67</td>
+  <td class="num">6.7</td><td class="num">4.0×</td></tr>
 </tbody></table>
 <p class="tcap"><b>Table 6.</b> The price power gate, which prints before any
 coefficient by design. Supply slope in €/MWh per GW, estimated from each market's
@@ -1039,6 +1042,28 @@ estimated, and Switzerland is the most hydro-dominated of the three. And
 <b>Austria's price panel is five seasons, not thirteen</b>, because the Austrian
 bidding zone did not exist before 1 October 2018, so only 300 of the load test's
 780 nights carry a price at all.</p>
+
+<p><b>And in Vermont a placebo settled it outright, which nothing else in this
+project managed.</b> Vermont's price interaction is <b>&minus;1.47 (0.54),
+p = 0.007</b>: negative, significant, the predicted sign. Rhode Island, which makes
+no snow, returns <b>&minus;1.33 (0.52), p = 0.011</b>. The difference is 0.14,
+about a quarter of either standard error, and restricting to the load test's own
+five seasons leaves it at 0.20. What the coefficient measures is a New
+England&ndash;wide relationship between accumulated cold and the night-day spread,
+not a Vermont snowmaking signal. The local-content check runs first, so this is not
+an artifact of Vermont's price being the system price under another name: the two
+zones clear at the same cent in only 0.4% of 10,269 hours and Vermont's congestion
+component is nonzero in 45.3% of them.</p>
+
+<p><b>Why this placebo bites where the load test's could not.</b> The load outcome
+is a regional share and the eight shares sum to zero by construction, so a genuine
+Vermont effect is <em>forced</em> to push Rhode Island the other way and the placebo
+cannot separate signal from mirror image. Price carries no such constraint: both
+zones clear near the same system price, so a system-wide driver appears identically
+in both while a Vermont-specific one would appear in Vermont alone. The
+compositional outcome that made the load test possible is exactly what blunted its
+placebo; the price outcome, useless for power, is where the placebo becomes
+sharp.</p>
 
 <h2 class="sec">9. Limitations</h2>
 <ul>
