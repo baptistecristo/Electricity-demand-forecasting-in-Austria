@@ -118,11 +118,18 @@ pipeline does not assume the mapping: `GATE 0` reads ISO-NE's own zonal report,
 which prints load-zone ID and load-zone name side by side, and checks the eight
 pairs against the table it uses.
 
-**Weather.** NOAA's own hosts are unreachable from this machine — `ncei.noaa.gov`
-and `www1.ncdc.noaa.gov` reset the TLS connection on every attempt, with and
-without a browser user agent, for `isd-history.csv` and the v3 services path
-alike. The Iowa Environmental Mesonet archives the same NWS/FAA/state
-observations and is reachable, so it is the carrier for both ASOS and RWIS.
+**Weather.** The Iowa Environmental Mesonet is the carrier for both ASOS and
+RWIS. It was chosen because NOAA's own hosts were unreachable from this machine
+when the pipeline was written: `ncei.noaa.gov` and `www1.ncdc.noaa.gov` reset the
+TLS connection on every attempt, with and without a browser user agent, for
+`isd-history.csv` and the v3 services path alike.
+
+> **That no longer reproduces.** Re-tested 9 August 2026: `ncei.noaa.gov` answers
+> 200 with a full page body. It is slow — over a minute to first byte, slow enough
+> that a 60-second timeout reports it as dead — which may be what the original
+> failure was. Nothing here was rebuilt on NOAA, because IEM archives the same
+> NWS/FAA/state observations and the panel is already built on it, but a future
+> replication should not treat NOAA as blocked on this evidence.
 
 Vermont has no high-elevation ASOS: the highest station in the `VT_ASOS` network
 is Lyndonville at 362 m, and snow is not made at 362 m. The **VTrans RWIS**
