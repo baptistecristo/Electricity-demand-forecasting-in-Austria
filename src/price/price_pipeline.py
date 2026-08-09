@@ -363,13 +363,139 @@ def run_market(key, label, bzn, tz, unit, panel, increment) -> None:
     estimate(p, "p_night", f"{label}: SENSITIVITY, night level")
 
 
+def isone_spread(d: pd.DataFrame) -> pd.DataFrame:
+    """Night and midday mean LMP per night, from the day-ahead hourly LMP file.
+
+    Hours arrive as ISO-NE publication ordinals, already converted to a local
+    hour-beginning by `hour_begin()` in src/vermont/vt_pipeline.py, which is
+    what makes the November fall-back Sunday land correctly. The night label
+    follows that pipeline: hours 00:00-06:59 belong to the previous evening.
+    """
+    z = d.copy()
+    z["night_date"] = np.where(z.hb <= 6, z.date - pd.Timedelta(days=1), z.date)
+    n = z[z.hb.isin(NIGHT_HOURS)].groupby("night_date")["lmp_usd_mwh"]
+    night = pd.DataFrame({"p_night": n.mean(), "n_night": n.size()})
+    night = night[night.n_night >= MIN_NIGHT_HOURS]
+    m = z[z.hb.isin(MIDDAY_HOURS)].groupby("date")["lmp_usd_mwh"]
+    mid = pd.DataFrame({"p_mid": m.mean(), "n_mid": m.size()})
+    mid = mid[mid.n_mid >= MIN_MIDDAY_HOURS]
+    mid.index.name = "night_date"
+    out = night.join(mid, how="inner")
+    out["spread"] = out.p_night - out.p_mid
+    return out.reset_index()
+
+
+def isone_gate_local_content(lmps: dict) -> None:
+    """Registered in README section 9: ISO-NE is usually unconstrained overnight,
+    so the Vermont LMP may be the system price under another name. If it is, a
+    Vermont price test has no Vermont-specific content and says nothing about
+    Vermont whatever its coefficient does. Measured, not assumed."""
+    print("\n  GATE -- does the Vermont LMP carry any local content?")
+    vt, ri = lmps["VT"], lmps["RI"]
+    j = vt.merge(ri, on=["date", "hb"], suffixes=("_vt", "_ri"))
+    eq = (j.lmp_usd_mwh_vt.round(2) == j.lmp_usd_mwh_ri.round(2))
+    print(f"    Vermont == Rhode Island to the cent in {100*eq.mean():.1f}% "
+          f"of {len(j):,} shared hours; corr {j.lmp_usd_mwh_vt.corr(j.lmp_usd_mwh_ri):.4f}")
+    night = j[j.hb.isin(NIGHT_HOURS)]
+    print(f"    night hours only: {100*(night.lmp_usd_mwh_vt.round(2) == night.lmp_usd_mwh_ri.round(2)).mean():.1f}% "
+          f"equal, of {len(night):,}")
+    if "congestion_usd_mwh_vt" in j.columns:
+        c = j.congestion_usd_mwh_vt
+        print(f"    Vermont congestion component: {100*(c.abs() > 0.005).mean():.1f}% "
+              f"of hours nonzero, mean |congestion| {c.abs().mean():.3f} USD/MWh")
+
+
+def run_isone() -> None:
+    """The Vermont price arm. Same outcome, same right-hand side, same gate
+    order as the three European markets; the deviations are that the price is an
+    LMP in USD, and that the supply slope is estimated against total system load
+    rather than residual load, because EIA-930's ISNE subregion files carry no
+    wind or solar split."""
+    d = CACHE / "isone"
+    lmps = {}
+    for key, label, panel, fname, increment in ISONE:
+        f = d / fname
+        if not f.exists():
+            print(f"\nISO New England: {f} missing, price arm skipped.")
+            return
+        lmps[key] = pd.read_csv(f, parse_dates=["date"])
+
+    print("\n" + "=" * 74)
+    print("ISO New England  (day-ahead SPOT LMP, USD/MWh)")
+    print("=" * 74)
+    isone_gate_local_content(lmps)
+
+    try:
+        sys.path.insert(0, str(ROOT / "src" / "vermont"))
+        import vt_pipeline as vt
+        act = vt.load_actual()
+        tot = (act.groupby(["date", "ord_h"])["mw"].sum().rename("sys_mw")
+               .reset_index())
+        n_ord = tot.groupby("date")["ord_h"].transform("max")
+        tot["hb"] = vt.hour_begin(tot.ord_h, n_ord)
+        tot["night_date"] = np.where(tot.hb <= 6,
+                                     tot.date - pd.Timedelta(days=1), tot.date)
+        sysload = (tot[tot.hb.isin(NIGHT_HOURS)]
+                   .groupby("night_date")["sys_mw"].mean() / 1000.0)
+        sysload = sysload.rename("rl_gw").reset_index()
+    except Exception as e:                      # noqa: BLE001
+        print(f"  system load unavailable for the supply slope: {e}")
+        sysload = pd.DataFrame(columns=["night_date", "rl_gw"])
+
+    import statsmodels.formula.api as smf
+    for key, label, panel, fname, increment in ISONE:
+        print("\n" + "-" * 74)
+        print(f"{label}")
+        out = isone_spread(lmps[key])
+        p = join_panel(panel, out)
+        if len(p) < 40:
+            print(f"  only {len(p)} matched nights, skipped"); continue
+        print(f"  matched {len(p)} nights, seasons {sorted(p.season.unique())}")
+        print(f"  night mean {p.p_night.mean():.2f}, midday mean "
+              f"{p.p_mid.mean():.2f}, spread mean {p.spread.mean():+.2f} "
+              f"(sd {p.spread.std():.2f}) USD/MWh")
+        if not sanity_gate(p, "spread", f"{label} gate"):
+            print("  SANITY GATE FAILED on the primary outcome")
+        print("  POST-HOC, same gate on the night LEVEL rather than the spread:")
+        sanity_gate(p, "p_night", f"{label} gate, level")
+
+        print("\n  POWER GATE (printed before the coefficient, by design)")
+        q = p.merge(sysload, on="night_date", how="inner")
+        slope = np.nan
+        if len(q) >= 40:
+            ms = smf.ols("p_night ~ rl_gw + C(season)", data=q).fit(cov_type="HC1")
+            slope = ms.params["rl_gw"]
+            print(f"    supply slope dP/dQ = {slope:+.2f} USD/MWh per GW "
+                  f"(HC1 s.e. {ms.bse['rl_gw']:.2f}, n={int(ms.nobs)} nights)")
+            print("    NOTE: total system load, not residual load. EIA-930's "
+                  "ISNE subregion files carry no wind or solar split.")
+        impact = slope * increment / 1000.0
+        print(f"    snowmaking increment {increment:,} MW -> implied price "
+              f"impact {impact:+.3f} USD/MWh")
+        m = estimate(p, "spread", "power", quiet=True)
+        if m is not None and "below:cum100" in m.params.index:
+            se = m.bse["below:cum100"]
+            half = (p.cum_cold_h.max() - p.cum_cold_h.median()) / 100.0
+            full = (p.cum_cold_h.max() - p.cum_cold_h.min()) / 100.0
+            print(f"    s.e. {se:.4f} USD/MWh per 100 h")
+            print(f"    minimum detectable seasonal swing: "
+                  f"{1.96*se*half:.3f} USD/MWh over the median-to-max range, "
+                  f"{1.96*se*full:.3f} over the full range")
+            if not np.isnan(impact):
+                v = ("UNDERPOWERED" if 1.96*se*half > abs(impact) else "POWERED")
+                print(f"    VERDICT: {v} -- MDE {1.96*se*half:.3f} against an "
+                      f"implied impact of {abs(impact):.3f}")
+        estimate(p, "spread", f"{label}: PRIMARY, night-minus-midday spread")
+        estimate(p, "p_night", f"{label}: SENSITIVITY, night level")
+
+
 def main() -> None:
     print("DAY-AHEAD SPOT PRICE vs SNOWMAKING WEATHER")
     print("Pre-registered in src/price/README.md. Spot, not futures.")
     print("Gates print before coefficients, by design.")
     for m in MARKETS:
         run_market(*m)
-    print("\nISO New England: see run_isone() once the LMP archive is in cache.")
+    run_isone()
 
 
 if __name__ == "__main__":
