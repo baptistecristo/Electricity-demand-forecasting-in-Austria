@@ -528,7 +528,7 @@ attributable to snowmaking by this design.
   for the whole programme, not a detail.
 - **Vermont's same-publisher arm.** ISO-NE's own zonal load report would close the
   one cross-source gap left open in that replication. Its archive covers a single
-  season. See `src/vermont/README.md` §7.1.
+  season. See `src/vermont/README.md`, section 7, item 1.
 - **Systems where the load is a larger share of demand.** The binding constraint
   was α, not sample size. §8.8 ranks the candidates; §8.8b reports the three that
   have since been tested.
@@ -847,8 +847,18 @@ calculation stand as committed.
   size is episodes, not hours.
 - The published forecast is the TSO's transparency artefact, not the trading
   consensus. A systematic bias in it demonstrates a blind spot in APG's forecast,
-  **not** a market mispricing. Establishing the latter requires day-ahead price or
-  imbalance as the outcome and is a separate study.
+  **not** a market mispricing. The day-ahead spot price was tested separately as
+  the outcome (§8.8c) and cannot settle it either: overnight the whole Austrian
+  fleet is worth about 6.65 €/MWh against a spread whose standard deviation is 43.
+  Imbalance volumes and prices remain untried and are the better instrument.
+- **This design no longer has a working sensitivity check outside Austria.** The
+  Christmas control certifies the Austrian load test and nothing else. It returns
+  approximately zero against forecasters good enough to predict the shutdown
+  (§8.8b) and it returns approximately zero on a night-minus-midday price spread
+  built to be insensitive to common demand shocks (§8.8c). Every replication after
+  the first therefore carries a paper power calculation and no empirical proof
+  that its instrument can see anything at all. Finding a system-specific reference
+  effect is now the binding methodological problem for this line of work.
 - Part of Vorarlberg is outside the published load series (§2). Vorarlberg carries
   weight 0.10 in the wet-bulb index while some of its load is absent from the
   dependent variable, which adds noise at exactly the threshold.
@@ -893,8 +903,35 @@ python src/snowload.py --seasons 2018 2019 2021 2022 2023 2024
 ```
 
 `snowload.py` is the ENTSO-E path, kept because it also handles the NL/DK
-placebos and multi-country comparison that APG cannot serve. `apg_pipeline.py` is
-what produced the reported results.
+placebos and multi-country comparison that APG cannot serve. It is also the file
+the pre-registration commit carried, so its estimating equation is the registered
+one; §8.4 sets out how it differs from what `apg_pipeline.py` estimates and
+reports the coefficient under both. `apg_pipeline.py` is what produced the
+reported results.
+
+**The replications**, each self-contained with its own README, its own data
+sources and its own list of deviations from the Austrian specification:
+
+```bash
+python src/it_north/it_pipeline.py    # Terna, Italy-North bidding zone
+python src/swiss/ch_pipeline.py       # Swissgrid via energy-charts
+python src/vermont/vt_pipeline.py     # ISO-NE, regional share outcome
+```
+
+Vermont is slow on a cold cache: ISO-NE rate-limits its per-day CSV hard enough
+that 427 dates take about 75 minutes, and the script paces itself accordingly and
+caches everything it fetches.
+
+**The price test**, pre-registered separately in `src/price/README.md`:
+
+```bash
+python src/price/fetch_prices.py      # day-ahead spot, AT / CH / IT-North
+python src/price/price_pipeline.py    # gates first, then the coefficients
+```
+
+`price_pipeline.py` rebuilds nothing on the right-hand side. It reads the night
+panel each load pipeline wrote and joins one column onto it, so run the load
+pipelines first.
 
 `snowload.py` selects alpine stations by altitude and state, solves the
 psychrometric wet bulb with a station-pressure correction, builds the

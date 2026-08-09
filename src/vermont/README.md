@@ -438,7 +438,7 @@ discriminate and is not offered as if it did.** It neither establishes
 night-specificity nor rules it out.
 
 **4. The same-publisher arm is missing and the gap it would close moves with
-temperature.** See section 7.1. This is the loosest thread in the replication.
+temperature.** See section 7, item 1. This is the loosest thread in the replication.
 
 ### 6.5 Power: this is the one test that could have found the effect
 
