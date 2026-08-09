@@ -103,18 +103,37 @@ accumulated cold hours.
 
 ## 5. Predicted sign and kill criteria
 
-**Predicted sign: positive.** Snowmaking is a load. A load raises the price at
-which the market clears. As cumulative cold hours accumulate the fleet is
-progressively brought on, so the night-day spread should widen with `cum100`
-among below-threshold nights.
+> **Amended before any price data was estimated.** The first version of this
+> section predicted a *positive* interaction, on the reasoning that the fleet is
+> progressively brought on as cold accumulates. That is backwards, and it is
+> backwards against this project's own mechanism. Section 4 of the root README
+> is explicit: the base gets built and the guns stop, so the snowmaking effect is
+> front-loaded and **decays** with accumulated cold. That is why the
+> pre-registered load coefficient in root README section 5 is predicted negative
+> and why a positive load coefficient fires a kill criterion. The price
+> prediction has to inherit the same sign, and now does. The amendment is here,
+> in its own commit, before a single price coefficient was estimated, rather than
+> discovered afterwards.
+
+**Predicted sign: negative**, matching the load test.
+
+Snowmaking is a load, and a load raises the price at which the market clears. On
+a cold night early in the season, with no base built, a resort runs everything it
+owns and the night-day spread should carry that. On an equally cold night in late
+December, after 900 hours of accumulated cold have already put snow on the
+ground, the same weather draws much less power. The threshold effect on price
+therefore shrinks as `cum100` rises, which is a negative `below:cum100`.
+
+A heating confound cannot produce that shape. Heating responds to how cold
+tonight is, not to how many cold hours the season has already delivered.
 
 Fixed before estimation:
 
-1. **Supports the mechanism** if `below:cum100` is positive, significant at 5%,
+1. **Supports the mechanism** if `below:cum100` is negative, significant at 5%,
    and its implied magnitude is within an order of magnitude of the price impact
    the power gate in section 7 computes from the market's own supply slope.
-2. **Rejects the mechanism** if the 95% interval excludes that implied impact
-   while the test is powered to have found it.
+2. **Rejects the mechanism** if the coefficient is zero or positive while the
+   test is powered to have found the implied impact.
 3. **Uninformative** if the minimum detectable effect exceeds the implied
    impact. In that case the coefficient is reported and no claim is made from
    it, the way Switzerland's load coefficient was handled.
