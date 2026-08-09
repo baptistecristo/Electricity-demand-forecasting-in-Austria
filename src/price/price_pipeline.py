@@ -67,11 +67,11 @@ SEASON_MONTHS = (11, 12)
 # in each replication's own write-up. It is what the power gate is measured
 # against; it is an input to this script, not an output of it.
 MARKETS = [
-    ("AT", "Austria",     "AT",       "Europe/Vienna", "EUR",
+    ("at", "Austria",     "AT",       "Europe/Vienna", "EUR",
      "data/night_panel.csv",                    427),
-    ("IT", "Italy-North", "IT-North", "Europe/Rome",   "EUR",
+    ("itnorth", "Italy-North", "IT-North", "Europe/Rome",   "EUR",
      "src/it_north/night_panel_it.csv",         463),
-    ("CH", "Switzerland", "CH",       "Europe/Zurich", "EUR",
+    ("ch", "Switzerland", "CH",       "Europe/Zurich", "EUR",
      "src/swiss/ch_night_panel.csv",            200),
 ]
 
@@ -116,21 +116,25 @@ def ec_series(path: str, key: str, year: int, tz: str, **params) -> pd.Series:
     return j
 
 
-def price_series(bzn: str, years, tz: str) -> pd.Series:
-    """Hourly day-ahead spot price, local clock, currency per MWh."""
-    out = []
-    for y in years:
-        try:
-            j = ec_series("price", bzn, y, tz, bzn=bzn)
-        except RuntimeError as e:
-            print(f"    {bzn} {y}: {e}")
-            continue
-        idx = pd.to_datetime(j["unix_seconds"], unit="s", utc=True)
-        s = pd.Series(j["price"], index=idx.tz_convert(tz), name="price")
-        out.append(s[~s.index.duplicated()])
-    if not out:
+def price_series(key: str, tz: str) -> pd.Series:
+    """Hourly day-ahead spot price on the local clock, currency per MWh.
+
+    Read from the CSV that `src/price/fetch_prices.py` writes rather than
+    fetched here. That script handles two things a naive fetcher gets wrong and
+    gets them wrong silently: energy-charts rate-limits bursts with responses
+    that look like missing data rather than like errors, and from 2025-10-01 the
+    European day-ahead auction clears on a 15-minute MTU for AT and IT-North
+    (but not CH), which has to be averaged into the hour rather than deduplicated
+    down to the first quarter.
+    """
+    f = CACHE / f"price_{key}.csv"
+    if not f.exists():
+        print(f"    {f} missing -- run src/price/fetch_prices.py first")
         return pd.Series(dtype=float)
-    return pd.concat(out).sort_index()
+    d = pd.read_csv(f, parse_dates=["ts_utc"])
+    s = pd.Series(d.price_eur_mwh.values,
+                  index=pd.DatetimeIndex(d.ts_utc).tz_convert(tz), name="price")
+    return s.sort_index()
 
 
 def residual_load_series(country: str, years, tz: str) -> pd.Series:
@@ -168,10 +172,14 @@ def night_and_midday(px: pd.Series) -> pd.DataFrame:
         return pd.DataFrame()
     d = pd.DataFrame({"price": px.values}, index=px.index)
     d["H"] = d.index.hour
-    d["cal"] = d.index.normalize()
+    # Drop the zone offset once the local hour has been read off it. The night
+    # panels this joins onto carry naive local dates, and a tz-aware key will
+    # not merge against a naive one.
+    d["cal"] = d.index.normalize().tz_localize(None)
 
     nights = d[d.H.isin(NIGHT_HOURS)].copy()
-    nights["night_date"] = (nights.index - pd.Timedelta(hours=7)).normalize()
+    nights["night_date"] = ((nights.index - pd.Timedelta(hours=7))
+                            .normalize().tz_localize(None))
     gn = nights.groupby("night_date")["price"]
     night = pd.DataFrame({"p_night": gn.mean(), "n_night": gn.size()})
     night = night[night.n_night >= MIN_NIGHT_HOURS]
@@ -259,7 +267,8 @@ def power_gate(p: pd.DataFrame, y: str, rl: pd.Series, tz: str,
     else:
         n = rl[rl.index.hour.isin(NIGHT_HOURS)]
         nd = pd.DataFrame({"rl": n.values}, index=n.index)
-        nd["night_date"] = (nd.index - pd.Timedelta(hours=7)).normalize()
+        nd["night_date"] = ((nd.index - pd.Timedelta(hours=7))
+                            .normalize().tz_localize(None))
         g = nd.groupby("night_date")["rl"].mean().rename("rl_gw") / 1000.0
         q = p.merge(g.reset_index(), on="night_date", how="inner")
         if len(q) < 40:
@@ -280,11 +289,18 @@ def power_gate(p: pd.DataFrame, y: str, rl: pd.Series, tz: str,
         print("    minimum detectable effect: not estimable")
         return
     se = m.bse["below:cum100"]
-    end = (p.cum_cold_h.max() - p.cum_cold_h.median()) / 100.0
-    mde = 1.96 * se * end
-    print(f"    s.e. {se:.4f} {unit}/MWh per 100 h; at end-of-season "
-          f"cum100 = {end:.1f} the minimum detectable effect is "
-          f"{mde:.3f} {unit}/MWh")
+    # The quantity to detect is the whole seasonal swing: the fleet runs early
+    # and stops late, so snowmaking's price footprint should fall from about the
+    # implied impact to about zero over the season. That swing is beta x R, and
+    # it is detectable when 1.96 x s.e. x R is below the implied impact.
+    half = (p.cum_cold_h.max() - p.cum_cold_h.median()) / 100.0
+    full = (p.cum_cold_h.max() - p.cum_cold_h.min()) / 100.0
+    mde, mde_full = 1.96 * se * half, 1.96 * se * full
+    print(f"    s.e. {se:.4f} {unit}/MWh per 100 h")
+    print(f"    minimum detectable seasonal swing: {mde:.3f} {unit}/MWh over "
+          f"the median-to-max range (cum100 {half:.1f}), "
+          f"{mde_full:.3f} over the full range ({full:.1f})")
+    print(f"    the verdict below uses the SMALLER, more favourable scale")
     if np.isnan(impact):
         verdict = "UNKNOWN (no supply slope)"
     elif mde > abs(impact):
@@ -319,7 +335,7 @@ def run_market(key, label, bzn, tz, unit, panel, increment) -> None:
     print("=" * 74)
     panel_all = pd.read_csv(ROOT / panel, parse_dates=["night_date"])
     years = sorted(panel_all.season.unique())
-    px = price_series(bzn, years, tz)
+    px = price_series(key.lower(), tz)
     describe(px, f"{bzn} day-ahead spot", unit)
     out = night_and_midday(px)
     if not len(out):
@@ -330,8 +346,17 @@ def run_market(key, label, bzn, tz, unit, panel, increment) -> None:
           f"spread mean {p.spread.mean():+.2f} (sd {p.spread.std():.2f}) {unit}/MWh")
 
     if not sanity_gate(p, "spread", f"{label} gate"):
-        print("  SANITY GATE FAILED -- coefficients below are not interpretable")
-    rl = residual_load_series(bzn.split("-")[0].lower(), years, tz)
+        print("  SANITY GATE FAILED on the primary outcome -- read the")
+        print("  coefficients below in that light, not around it.")
+    # POST-HOC, added after the Austrian spread gate came back marginal. The
+    # gate is registered on the primary outcome and stays scored there; this
+    # second line only establishes whether a marginal spread gate means a broken
+    # price panel or a spread that is doing its job and differencing Christmas
+    # out of both windows at once.
+    print("  POST-HOC, same gate on the night LEVEL rather than the spread:")
+    sanity_gate(p, "p_night", f"{label} gate, level")
+    rl = residual_load_series(bzn.split("-")[0].lower(),
+                              sorted(p.season.unique()), tz)
     power_gate(p, "spread", rl, tz, increment, unit)
 
     estimate(p, "spread", f"{label}: PRIMARY, night-minus-midday spread")

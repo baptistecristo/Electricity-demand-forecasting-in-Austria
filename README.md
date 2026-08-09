@@ -706,6 +706,58 @@ a different forecaster can miss it at Vermont scale. What the pair rules out is
 the strong claim that this load is invisible everywhere, and the strong claim that
 it is visible nowhere. Full write-up and every gate in `src/vermont/README.md`.
 
+### 8.8c The price test: overnight, those megawatts are worth almost nothing
+
+§9 notes that a load forecast error is the TSO's error and not the market's, and
+that a null on load does not rule out a price effect. That test is now
+pre-registered and run, in `src/price/`. It is on the **day-ahead spot auction**,
+which is the only instrument that clears on a snowmaking decision's eighteen-hour
+horizon; a quarterly baseload futures contract averages away the day-to-day
+wet-bulb variation this design runs on, so no futures contract is tested.
+
+The outcome is the night-minus-midday spread, which differences out the fuel cost
+that dominates the level through the crisis winters. The right-hand side is the
+load test's, unchanged, joined onto the same night panels.
+
+**All three European markets come back underpowered**, and the power gate says so
+before any coefficient is printed:
+
+| | seasons | nights | supply slope | whole fleet is worth | detectable swing | short by |
+|---|---|---|---|---|---|---|
+| **Austria** | 5 (2018–22) | 300 | +15.6 €/MWh per GW | +6.65 €/MWh | 18.0 €/MWh | 2.7× |
+| **Italy-North** | 7 | 420 | +3.5 | +1.63 | 14.4 | 8.8× |
+| **Switzerland** | 9 | 540 | +7.7 | +1.55 | 5.9 | 3.8× |
+
+The reason is physical and more seasons do not fix it. The overnight merit order
+is nearly flat, so Austria's own night data prices its entire 427 MW snowmaking
+fleet at about **6.65 €/MWh** at the margin, against a night-day spread whose
+standard deviation is **43 €/MWh**. A load test can find a few hundred megawatts
+because load is measured in megawatts. A price test has to find what they are
+worth, and overnight they are worth almost nothing.
+
+Three things came out of it that are worth more than the coefficients:
+
+- **The Christmas sanity gate fails again, for a second and independent reason.**
+  §8.8b showed it fails against a forecaster good enough to predict the shutdown.
+  Here it fails because the shutdown removes demand from the midday window and
+  the night window at once, so an outcome built to be insensitive to common
+  demand shocks is insensitive to the reference effect too. The gate fails on the
+  spread in all three markets. This design now has no working sensitivity check
+  on price.
+- **Switzerland produces yet another significant coefficient that cannot be
+  real**, +1.46 (0.40), p = 0.0003, wrong-signed, in a market the power gate has
+  already ruled unable to see the effect. §9 of the price pre-registration named
+  hydro reservoir arbitrage on the night-day spread as a confound *before* the
+  data was estimated, and Switzerland is the most hydro-dominated of the three.
+- **Austria's price panel is 5 seasons, not 13.** The AT bidding zone did not
+  exist before 1 October 2018, established from the data rather than assumed, so
+  only 300 of the load test's 780 nights carry a price at all. Austria and
+  Italy-North are also equal to the cent in 16.0% of shared hours, which is
+  Brenner market coupling working normally and means those two are close to one
+  observation rather than two.
+
+Full write-up, every gate and the two data traps in `src/price/README.md`.
+
 ### 8.9 The ENTSO-E token was never necessary
 
 Two data findings, either of which would have saved days of assumed waiting.

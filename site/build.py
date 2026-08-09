@@ -882,6 +882,59 @@ at Austrian scale while another misses it at Vermont scale. What the pair rules
 out is the strong version of either claim &mdash; that this load is invisible
 everywhere, or that it is visible nowhere.</p>
 
+<h3>8.2 The price test: overnight, those megawatts are worth almost nothing</h3>
+<p>A load forecast error is the grid operator's error, not the market's, so a null
+on load does not rule out a price effect. That test is pre-registered and run in
+<code>src/price/</code>. It is on the <b>day-ahead spot auction</b> — the only
+instrument that clears on a snowmaking decision's eighteen-hour horizon. A
+quarterly baseload futures contract averages away the day-to-day wet-bulb
+variation the design runs on, so no futures contract is tested. The outcome is the
+night-minus-midday price spread, which differences out the fuel cost that dominates
+the level through the crisis winters; the right-hand side is the load test's,
+unchanged.</p>
+
+<table>
+<thead><tr><th>Market</th><th class="num">Seasons</th><th class="num">Nights</th>
+  <th class="num">Supply slope</th><th class="num">Fleet is worth</th>
+  <th class="num">Detectable</th><th class="num">Short by</th></tr></thead>
+<tbody>
+<tr class="hl"><td>Austria</td><td class="num">5</td><td class="num">300</td>
+  <td class="num">+15.6</td><td class="num">+6.65</td><td class="num">18.0</td>
+  <td class="num">2.7×</td></tr>
+<tr><td>Italy-North</td><td class="num">7</td><td class="num">420</td>
+  <td class="num">+3.5</td><td class="num">+1.63</td><td class="num">14.4</td>
+  <td class="num">8.8×</td></tr>
+<tr><td>Switzerland</td><td class="num">9</td><td class="num">540</td>
+  <td class="num">+7.7</td><td class="num">+1.55</td><td class="num">5.9</td>
+  <td class="num">3.8×</td></tr>
+</tbody></table>
+<p class="tcap"><b>Table 6.</b> The price power gate, which prints before any
+coefficient by design. Supply slope in €/MWh per GW, estimated from each market's
+own night residual load. Everything else in €/MWh.</p>
+
+<p><b>All three come back underpowered, and more seasons will not fix it.</b> The
+overnight merit order is nearly flat, so Austria's own night data prices its entire
+427 MW snowmaking fleet at about €6.65/MWh at the margin, against a night-day
+spread whose standard deviation is €43/MWh. A load test can find a few hundred
+megawatts because load is measured in megawatts. A price test has to find what
+those megawatts are worth, and overnight they are worth almost nothing. Section 5
+of the pre-registration named this outcome in advance and said what to do about
+it: report the coefficients, claim nothing from them.</p>
+
+<p>Three things came out of it worth more than the coefficients. <b>The Christmas
+sanity gate fails again, for a second and independent reason</b> — section 8.1
+showed it fails against a forecaster good enough to predict the shutdown; here it
+fails because Christmas removes demand from the midday window and the night window
+at once, so an outcome built to be insensitive to common demand shocks is
+insensitive to the reference effect too. <b>Switzerland produces yet another
+significant coefficient that cannot be real</b>, +1.46 (0.40), wrong-signed, in a
+market already ruled unable to see the effect; the pre-registration named hydro
+reservoir arbitrage on the night-day spread as a confound before the data was
+estimated, and Switzerland is the most hydro-dominated of the three. And
+<b>Austria's price panel is five seasons, not thirteen</b>, because the Austrian
+bidding zone did not exist before 1 October 2018, so only 300 of the load test's
+780 nights carry a price at all.</p>
+
 <h2 class="sec">9. Limitations</h2>
 <ul>
 <li>Roughly 360 relevant hours per season, heavily autocorrelated. Effective sample

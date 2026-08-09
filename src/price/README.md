@@ -1,12 +1,20 @@
 # Does the day-ahead spot price move with snowmaking weather?
 
-> **STATUS: PRE-REGISTRATION. No price coefficient has been estimated yet.**
+> **STATUS: sections 1 to 9 are the pre-registration, section 10 is the result.**
 >
-> The commit that adds this file and `price_pipeline.py` contains no results.
-> Read `git log --oneline` to confirm that the results commit comes after it.
-> That ordering is the only thing that makes the answer, whatever it turns out
-> to be, worth reading. The load test in the repository root was built the same
-> way for the same reason.
+> Sections 1 to 9 were committed before any price coefficient was estimated, and
+> the commit that added them contains no results. Section 5's predicted sign was
+> amended once, in its own commit, still before estimation, and the amendment is
+> printed inside section 5 rather than substituted for what it replaced. Section
+> 10 came later. `git log --oneline -- src/price/` shows all three in order, and
+> that ordering is the only thing that makes the answer worth reading.
+>
+> **The answer is that the day-ahead spot price cannot settle this in any of the
+> three European markets.** The power gate, which prints before every
+> coefficient by design, says each test is between three and nine times short of
+> being able to detect the effect. Section 5 named that outcome in advance and
+> said what to do about it, which is to report the coefficients and make no claim
+> from them.
 
 The load test asks whether the grid operator's day-ahead forecast misses
 snowmaking. This asks a different question about the same load: whether the
@@ -230,7 +238,106 @@ Four other things this cannot settle:
   Vermont and Rhode Island LMPs are equal to the cent is reported for exactly
   this reason.
 
-## 10. Run it
+## 10. Results: the day-ahead spot price cannot answer this question
+
+Outcome 3 of section 5 fired in all three European markets. The power gate,
+printed before any coefficient as designed, says the test could not have detected
+the effect it was looking for. The coefficients are reported below and no claim
+is made from them.
+
+| market | seasons | nights | supply slope | implied impact | min. detectable swing | short by |
+| --- | --- | --- | --- | --- | --- | --- |
+| **Austria** | 5 (2018–22) | 300 | +15.6 €/MWh per GW | +6.65 €/MWh | 18.0 €/MWh | 2.7× |
+| **Italy-North** | 7 | 420 | +3.5 | +1.63 | 14.4 | 8.8× |
+| **Switzerland** | 9 | 540 | +7.7 | +1.55 | 5.9 | 3.8× |
+
+The reason is physical rather than statistical, and more data does not fix it.
+The overnight merit order is close to flat: Austria's own night data puts the
+supply slope at 15.6 €/MWh per gigawatt, so the entire 427 MW Austrian
+snowmaking fleet is worth about **6.65 €/MWh** at the margin. The night-minus-
+midday spread it would have to be found in has a standard deviation of
+**43 €/MWh**. Gas, hydro scheduling and the 2021–22 crisis are all larger than
+the thing being measured. Italy-North is worse: a flatter slope, 3.5 €/MWh per
+GW, puts its whole fleet at 1.6 €/MWh.
+
+The megawatt-detection arithmetic in §6 of the root README does not carry over.
+A load test can find a few hundred megawatts because load is measured in
+megawatts. A price test has to find what those megawatts are worth, and overnight
+they are worth almost nothing.
+
+The scale used above is the favourable one. Measuring the detectable swing over
+the full observed range of accumulated cold rather than from the median gives
+28.5, 26.7 and 7.9 €/MWh. The verdict does not turn on that choice.
+
+### 10.1 The sanity gate failed, and how it failed is informative
+
+| market | `holiday` on the spread | on the night level |
+| --- | --- | --- |
+| Austria | −15.10 (8.09), t = −1.86 | −6.64 (16.32), t = −0.41 |
+| Italy-North | +1.97 (6.50), t = +0.30 | −11.19 (11.20), t = −1.00 |
+| Switzerland | +0.66 (2.20), t = +0.30 | **−7.84 (2.62), t = −2.99** |
+
+The gate is registered on the primary outcome and is scored there: it fails in
+all three. The level column was added after seeing that and is labelled post-hoc
+in the pipeline output; it is there to distinguish a broken price panel from a
+spread doing its job, not to move the goalposts.
+
+It says the panel is not broken. Switzerland recovers Christmas cleanly on the
+level, and the Austrian and Italian level coefficients are negative but drowned
+by crisis-winter variance. What the spread column shows is that the Christmas
+shutdown removes demand from the midday window and the night window at once, so
+differencing them removes most of the effect too. That is the spread doing
+exactly what section 3 built it to do. It is also a warning: **an outcome
+constructed to be insensitive to common demand shocks is insensitive to the
+Christmas reference effect as well**, which leaves this design with no working
+sensitivity check on price. §8.8b of the root README already found the Christmas
+gate fails against a good forecaster. This is a second, independent way to lose
+it.
+
+### 10.2 Switzerland produces another significant coefficient that cannot be real
+
+`below:cum100` on the Swiss spread is **+1.46 (0.40), z = +3.65, p = 0.0003**:
+significant, and pointing the wrong way. It is reported as a confound rather than
+a finding, on the same grounds Switzerland's load coefficient was, and section 9
+named the mechanism in advance:
+
+> *Hydro reservoirs in Austria, Switzerland and Italy-North shift water between
+> hours in response to the same weather, which moves the night-day spread for
+> reasons unrelated to snowmaking.*
+
+Switzerland is the most hydro-dominated market of the three and is where that
+confound should bite hardest. It does. The coefficient is also five times smaller
+than the market's own minimum detectable swing, so under the pre-registered rule
+it is uninformative regardless of its p-value.
+
+Austria shows a weaker version of the same thing on the level sensitivity,
++4.86 (1.99), p = 0.015, also wrong-signed, also inside a market the power gate
+has already declared unable to see the effect.
+
+### 10.3 Two data facts worth recording
+
+**The Austrian price panel is five seasons, not thirteen.** The AT bidding zone
+did not exist before 1 October 2018, and this was established from the data
+rather than assumed: energy-charts serves no AT price before that instant, SMARD
+begins its AT and DE-LU series at the same epoch, and OPSD's DE-LU column is
+empty for the earlier autumns. Nothing was back-filled from the common DE-AT-LU
+price. So 300 of the load test's 780 nights carry a price at all.
+
+**Austria and Italy-North are not independent tests on price.** Their day-ahead
+prices are equal to the cent in **16.0 %** of shared hours, against 0.1 % for
+Austria and Switzerland and 0.2 % for Switzerland and Italy-North. That is market
+coupling across the Brenner working normally, and it is not a data defect, but it
+means the Austrian and Italian price results are close to one observation rather
+than two.
+
+**A trap for anyone rerunning this.** From 1 October 2025 the European day-ahead
+auction clears on a 15-minute MTU for AT and IT-North, and Switzerland did not
+switch. A fetcher that de-duplicates timestamps instead of averaging the four
+quarters keeps only the first quarter of each hour and never says so.
+`fetch_prices.py` averages them, and the averaging was checked against two
+independent publishers on a known hour.
+
+## 11. Run it
 
 ```
 python src/price/price_pipeline.py
