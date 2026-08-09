@@ -847,11 +847,12 @@ def estimate(p: pd.DataFrame, label: str, extra: str = "", quiet: bool = False):
 # -------------------------------------------------------------- post hoc -----
 # EVERYTHING BELOW THIS LINE WAS ADDED AFTER SEEING THE PRIMARY RESULT.
 # It is not pre-registered and is labelled POST-HOC wherever it prints. It
-# exists because the primary coefficient came back significant with the wrong
-# sign, and a wrong-signed significant coefficient needs an explanation that is
-# tested rather than asserted. The design commit for this pipeline predates
-# these functions in the history, which is the only reason the distinction is
-# checkable at all.
+# exists because the primary coefficient came back significant and in the
+# predicted direction, in the one market in this project with the power to have
+# found the effect. A result that agrees with the hypothesis deserves harder
+# scrutiny than one that does not, not less. The design commit for this pipeline
+# predates these functions in the history, which is the only reason the
+# distinction is checkable at all.
 
 DAY_HOURS = set(range(10, 17))       # 10:00-16:59 local
 
@@ -878,13 +879,16 @@ def posthoc_afternoon(h: pd.DataFrame, wb: pd.Series, good_seasons) -> None:
     Snow is made at night. If the night wet-bulb history predicts the share
     error just as well in the following afternoon -- when the guns are largely
     off -- then whatever the coefficient is picking up is not snowmaking, it is
-    a regional temperature response that happens to run all day.
+    a regional temperature response that happens to run all day. Note before
+    reading the output that the afternoon share error is substantially noisier
+    than the night's, so this test can fail to discriminate rather than
+    discriminate against.
     """
     print("\n" + "=" * 72)
     print("POST-HOC PLACEBO -- same regressors, afternoon outcome (10:00-16:59)")
     print("=" * 72)
     print("  NOT PRE-REGISTERED. Added after the primary result came back")
-    print("  significant with the sign reversed.")
+    print("  significant and in the predicted direction.")
     for zone in (VT, RI):
         p = night_panel(screen_outliers(h, zone), wb)
         p = p[p.season.isin(good_seasons)]
@@ -915,10 +919,14 @@ def posthoc_latitude(rows) -> None:
     print(t.sort_values("lat", ascending=False)
           [["zone", "lat", "coef", "se", "p"]].round(4).to_string(index=False))
     print(f"  Spearman(latitude, below:cum100) = {rho:+.3f}  (p = {pv:.3f})")
-    print("  Maine and New Hampshire are large snowmaking states too, so in")
-    print("  this cross-section 'northern' and 'has ski resorts' are the same")
-    print("  grouping. The eight-zone table cannot separate them; only the")
-    print("  afternoon placebo above holds geography fixed.")
+    print("  Read this carefully in both directions. The eight share errors sum")
+    print("  to zero by construction, so a real snowmaking effect in Vermont,")
+    print("  Maine and New Hampshire MUST push the southern zones the other")
+    print("  way and would produce exactly this gradient. Maine and New")
+    print("  Hampshire are also large snowmaking states, so 'northern' and 'has")
+    print("  ski resorts' are the same eight-way split here. This table is")
+    print("  consistent with the hypothesis and with a north-south temperature")
+    print("  response, and it does not separate them.")
 
 
 # ------------------------------------------------------------------ main -----
@@ -1070,9 +1078,20 @@ def main() -> None:
               f"{100*(wb2 < WB_THRESHOLD).mean():.1f}% below {WB_THRESHOLD} C")
         print("\n  season coverage:")
         print(weather_coverage(wb2).to_string())
+        # Mount Washington has usable coverage in all seven seasons while the
+        # RWIS index has five, so "all seasons" changes the index AND the
+        # sample at once. Both cuts are printed; only the second is a
+        # like-for-like swap of the weather index.
         for zone in (VT, RI):
             p = night_panel(screen_outliers(h, zone), wb2)
-            estimate(p, f"MWN index -- {zone} (all seasons)")
+            estimate(p, f"MWN index -- {zone} (all 7 seasons)")
+            estimate(p[p.season.isin(good_seasons)],
+                     f"MWN index -- {zone} (same 5 seasons as the primary)")
+        # ... and the primary index on all seven seasons, the other half of the
+        # same comparison.
+        for zone in (VT, RI):
+            p = night_panel(screen_outliers(h, zone), wb)
+            estimate(p, f"RWIS index -- {zone} (all 7 seasons, low coverage in)")
 
 
 if __name__ == "__main__":

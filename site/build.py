@@ -417,14 +417,17 @@ the forecast rather than missed by it, because thirteen years of cold alpine
 nights <em>are</em> snowmaking nights, so the forecast's temperature response
 already prices it in.</p>
 
-<p><span class="lead">Then the same test, run elsewhere</span>
-Italy-North gives the same answer: <b>+4.3 ± 10.2</b>. Switzerland is reported as
-unreadable, because the arithmetic says it could never have found the effect even
-if it were there. And Vermont — the one market with real room to spare, able to
-detect <b>10.9 MW</b> against a fleet drawing thirty to a hundred and ten —
-finds a significant effect <b>pointing the wrong way</b>. Three follow-up tests
-trace it to how ISO-NE splits New England's demand between north and south, not
-to snow guns.</p>
+<p><span class="lead">Then the same test, run elsewhere — and one market disagrees</span>
+Italy-North gives the same answer as Austria: <b>+4.3 ± 10.2</b>. Switzerland is
+reported as unreadable, because the arithmetic says it could never have found the
+effect even if it were there. But <b>Vermont</b> — the one market with real room
+to spare, able to detect <b>10.9 MW</b> against a fleet drawing thirty to a
+hundred and ten — <b>finds what the pre-registration predicted</b>: the cold-night
+effect fades as the season's cold piles up, by about 25 MW from November to
+late December, with the no-snowmaking neighbour showing nothing. It does not
+survive swapping the weather stations, so it is reported as suggestive rather
+than settled. Austria's null stands on Austria's data; Vermont is a different
+forecaster at a tenth of the scale.</p>
 
 <div class="stats">
   <div class="stat"><span class="v">281</span>
@@ -432,9 +435,9 @@ to snow guns.</p>
   <div class="stat"><span class="v">8–15%</span>
     <span class="k">of overnight demand, at realistic coincidence</span></div>
   <div class="stat key"><span class="v">+5.1</span>
-    <span class="k">MW ± 11.9 — the effect looked for, and not found</span></div>
-  <div class="stat"><span class="v">4</span>
-    <span class="k">markets tested; none supports the prediction</span></div>
+    <span class="k">MW ± 11.9 — the effect looked for in Austria, and not found</span></div>
+  <div class="stat"><span class="v">1 of 4</span>
+    <span class="k">markets where it does show up — the best-powered one</span></div>
 </div>
 
 <p class="more">Everything below is the long version: how the load was sized, how
@@ -650,7 +653,9 @@ specification. The holiday control is strongly significant in every specificatio
 </tbody></table>
 <p class="tcap"><b>Table 3.</b> The scenario where α should be highest, because
 autoregressive terms have not yet caught up. Both dummies enter the same
-specification. Zero, and the first night carries the wrong sign.</p>
+specification. The profile is flat, which is what the kill criterion names. The
+first night's +6.3 is in the predicted direction and is a ninth of its own
+standard error; the second night is wrong-signed and equally insignificant.</p>
 
 <h3>7.1 Why this is a null rather than an absence of evidence</h3>
 <p>The specification is not underpowered for effects of the relevant size. On the same
@@ -661,6 +666,15 @@ visible to this design. The snowmaking interaction is +5 ± 12.</p>
 <p>The most likely explanation is the one anticipated in §3. The +131 MW November
 bias survives as a real seasonal feature; it is simply not attributable to snowmaking
 by this design.</p>
+<div class="verdict" style="margin:1.2rem 0"><strong>Two limits on the paragraph
+above, both established after it was written.</strong> The Christmas argument is
+about Austria and does not travel: it works because APG leaves the shutdown in its
+residual, and Terna and Swissgrid do not. Section 8.1 has the numbers. And "not
+underpowered for effects of the relevant size" is a claim about 274 MW, not about
+snowmaking. Austria can detect 427 MW against a fleet drawing an estimated 427 MW,
+which is the edge of the envelope rather than headroom. The one test here with
+genuine room to spare is Vermont, at 10.9 MW against 30&ndash;110 MW, and it does
+not return a null.</div>
 
 <h3>7.2 The opening-date test cannot be identified from calendar dates</h3>
 <p>Austrian opening dates are tightly clustered — glaciers from late September at
@@ -769,9 +783,9 @@ change.</p>
 <tr><td>Italy-North (Terna)</td><td class="num">7</td><td class="num">420</td>
   <td class="num">+4.3 (10.2)</td><td class="num">&mdash;</td>
   <td>Null, but uncertified</td></tr>
-<tr><td>Vermont (ISO-NE)</td><td class="num">5</td><td class="num">297</td>
+<tr class="hl"><td>Vermont (ISO-NE)</td><td class="num">5</td><td class="num">297</td>
   <td class="num">&minus;2.5 (0.9)</td><td class="num">10.9 vs 30&ndash;110 MW</td>
-  <td>Rejected, wrong sign</td></tr>
+  <td>Predicted sign, significant, index-dependent</td></tr>
 <tr><td>Switzerland</td><td class="num">9</td><td class="num">540</td>
   <td class="num">&minus;42.5 (14.3)</td><td class="num">314 vs ~200 MW</td>
   <td>Not interpretable</td></tr>
@@ -802,38 +816,56 @@ finding: it implies a swing in the load level larger than the entire Swiss fleet
 and the Swiss night-level calibration slope of 0.71 passes load&ndash;weather
 structure straight into the residual.</p>
 
-<p><b>Vermont rejects the prediction, with the sign reversed.</b> On five usable
-seasons and 297 nights the interaction is &minus;0.0211 percentage points of system
-share per 100 cold hours (HC1 0.0073, p = 0.004), about &minus;16 &plusmn; 11 MW at
-the coldest point of a season. Positive was predicted. Rhode Island, the
-no-snowmaking placebo in the same feed, stays null.</p>
+<p><b>Vermont meets the pre-registered prediction.</b> On five usable seasons and
+297 nights the interaction is &minus;0.0211 percentage points of system share per
+100 cold hours (HC1 0.0073, p = 0.004). One point of share is 120 MW, so the
+cold-night effect decays by about 25 MW across a season's accumulated cold.
+Negative is what section 5 predicted, before any load data was opened. Rhode
+Island, the no-snowmaking placebo in the same feed, stays null at +0.0019
+(0.0037). Bonferroni across the four markets leaves it at p = 0.016.</p>
 
-<p>Three follow-ups, all run after seeing that coefficient and all labelled
-post-hoc where they print, say this is ISO-NE's regional temperature response
-rather than snow guns. Swapping the eight Vermont road stations for the Mount
-Washington summit at 1,910 m &mdash; colder, purer, and the index a physical
-reading of the hypothesis would prefer &mdash; collapses it to &minus;0.0057
-(0.0056). Across all eight reliability regions the coefficients line up almost
-monotonically with latitude, Spearman &minus;0.886: every northern zone negative,
-every southern zone but Rhode Island positive, with Vermont the most negative of
-eight rather than different in kind from Maine or New Hampshire. And moving only
-the outcome window from the night to the following afternoon drops the estimate
-sixfold, but the afternoon is 2.3&times; noisier and its interval still contains the
-night estimate, so that placebo is reported as inconclusive rather than as
-support.</p>
+<p>The first supporting prediction is met too. The campaign-start dummy &mdash;
+the first night of a cold snap, when a resort with no base runs everything it owns
+and an autoregressive forecast has not caught up &mdash; is +0.076 pp (s.e. 0.031,
+p = 0.016), about +9 MW, and the second night is +0.048 (0.031), about +6 MW.
+Positive, decaying, which is the predicted shape and not what a flat temperature
+confound gives. Both Rhode Island equivalents are null.</p>
 
-<p>One Vermont result points the other way and is reported without being leaned on:
-the campaign-start dummy, the first night of a cold snap, is +0.076 pp
-(s.e. 0.031), about +9 &plusmn; 7 MW, with a null placebo. It rests on 27 campaign
-starts, carries no multiplicity correction, and is a tenth of the fleet's plausible
-draw.</p>
+<p><b>And it does not survive a change of weather index, which is why it is
+reported as suggestive rather than as a finding.</b> Swapping the eight Vermont
+road stations for the Mount Washington summit at 1,910 m gives &minus;0.0058
+(0.0068) on the identical five seasons. The sample is not the explanation: the
+road index on all seven seasons gives &minus;0.0232 (0.0070), p = 0.001, and Mount
+Washington on all seven gives &minus;0.0057 (0.0056). Which index is the better
+instrument is genuinely unsettled. Mount Washington is a true summit in the
+altitude band the Austrian design specified, but it sits 100 km away in another
+state, and 70.6% of its hours fall below the threshold against the road network's
+40.9%, which saturates the accumulated-cold regressor and leaves little variation
+in the threshold dummy. Neither reading is established here.</p>
+
+<p>Two further checks, both run after seeing the coefficient and labelled post-hoc
+where they print, fail to discriminate rather than cutting either way. Across all
+eight reliability regions the coefficients line up almost monotonically with
+latitude, Spearman &minus;0.886 &mdash; but the eight share errors sum to zero by
+construction, so a real effect in the three northern snowmaking states must
+produce that see-saw, and so would a northern temperature response that is simply
+too strong. And moving only the outcome window from the night to the following
+afternoon drops the estimate sixfold, but the afternoon is 2.3&times; noisier and
+its interval still contains the night estimate.</p>
 
 <p><b>Why Vermont's answer weighs more than the other three.</b> Its minimum
 detectable effect is 10.9 MW against a fleet drawing an estimated 30&ndash;110 MW:
 powered by a factor of three to ten. Austria sits exactly at its own limit,
 Switzerland is five times short. Vermont is the one place in this project where the
 instrument was sharp enough that the answer is about the world rather than about
-the instrument.</p>
+the instrument &mdash; which is also why its one failed robustness check matters.</p>
+
+<p><b>This does not overturn the Austrian null.</b> Austria is a much larger
+system with a fleet worth 43 GWh per gigawatt of overnight load against Vermont's
+68&ndash;153. The two results are compatible: one forecaster can absorb snowmaking
+at Austrian scale while another misses it at Vermont scale. What the pair rules
+out is the strong version of either claim &mdash; that this load is invisible
+everywhere, or that it is visible nowhere.</p>
 
 <h2 class="sec">9. Limitations</h2>
 <ul>

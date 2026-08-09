@@ -9,12 +9,21 @@
 > `night_panel_*.csv` files in this directory are the real panels rather than the
 > two-season smoke test that was deliberately withheld.
 >
-> **Read section 6 before anything else. The pre-registered prediction is
-> rejected here, and it is rejected with a significant coefficient of the wrong
-> sign rather than with a null.** Vermont is also the only test in this project
-> with the statistical power to have found the effect it was looking for, which
-> makes it the one place where a null would have meant something and the
-> rejection means more.
+> **Read section 6 before anything else. The pre-registered prediction is met
+> here.** The primary interaction is negative and significant at p = 0.004, which
+> is the direction section 5 of the root README committed to before any load data
+> was opened, and Vermont is the only market in this project with the statistical
+> power to have found an effect of the size snowmaking would produce. Section 6.3
+> gives the reasons to hold it loosely anyway, the strongest of which is that it
+> does not survive a change of weather index.
+>
+> **Correction, same day.** The first version of sections 6.2 to 6.5 described
+> this coefficient as *rejecting* the prediction with the sign reversed. That was
+> a misreading of the pre-registration by the author of that draft, not a change
+> of result: the predicted sign is negative, per root README section 5 and the
+> kill criterion in section 8.5 that fires on a coefficient that is "zero or
+> positive." The numbers below are unchanged from the run; the reading of them is
+> corrected. Both commits are in the history.
 
 A replication of the Austrian test in `src/apg_pipeline.py` on the system with
 the best snowmaking-to-winter-overnight-load ratio anywhere. Austria returned a
@@ -298,41 +307,94 @@ out.
     below:cum100  =  -0.0211 pp per 100 cold hours
                      (HC1 s.e. 0.0073, z = -2.89, p = 0.004, n = 297)
 
-**Significant at the 1 % level, and the sign is the opposite of the prediction.**
+**Negative, significant at the 1 % level, and that is the direction the
+pre-registration predicted.**
 
-The prediction in section 3 was positive. Snowmaking is unforecast load; adding
-unforecast load to Vermont pushes the realised share *above* the day-ahead share;
-the gap should widen as the season's cold accumulates and the fleet comes on.
-What the data shows is that as cumulative cold accumulates, Vermont's realised
-share comes in progressively *below* what ISO-NE forecast. At the maximum
-observed `cum_cold_h` that is **−16.1 ± 10.9 MW**.
+The prediction, fixed in section 5 of the root README before any load data was
+opened, is that the threshold effect *shrinks* as season-to-date accumulated cold
+rises: the base gets built, the guns stop, and the same cold night draws less
+power in late December than in early November. A memoryless temperature model
+cannot produce that shape and no heating confound mimics it, which is why the
+interaction and not the level is the coefficient the design rests on.
+
+In megawatts, one point of Vermont's share is 120 MW, so the coefficient is
+**−2.53 MW per 100 accumulated cold hours**. Across the observed range of
+`cum_cold_h`, 0 to 972 hours, the cold-night effect falls by about **25 MW** from
+the start of a season to the end of it. The `below` main effect at the median
+accumulated cold is **+0.0726 pp (s.e. 0.0288, p = 0.012)**, or +8.7 MW, so
+extrapolated back to the start of a season a below-threshold night is
+under-forecast by roughly 17 MW and by the end of one is not. Against a fleet
+whose coincident draw is estimated at 30–110 MW, that is an unexplained share α of
+somewhere between a sixth and a half early in the season. The `below` level is
+the contaminated coefficient section 4 of the root README warns about, so it is
+read as a scale for the interaction and not as evidence on its own.
 
 It is stable across the specification variants: −0.0208 with the campaign-start
-dummy, −0.0210 with campaign start plus second night, −0.0232 with the
-low-coverage seasons put back. The bandwidth restriction to |wb + 2| ≤ 3 °C
+dummy, −0.0210 with campaign start plus second night, −0.0232 (p = 0.001) with
+the low-coverage seasons put back. The bandwidth restriction to |wb + 2| ≤ 3 °C
 halves it and loses significance (−0.0139, s.e. 0.0104), which is what a
-139-night subsample would do to any of these.
+122-night subsample does to any of these.
 
 **The placebo is clean.** Rhode Island, which makes no snow, returns
 +0.0019 (0.0037), p = 0.61, and stays null in every variant.
 
-### 6.3 Why this is not evidence of snowmaking, in three steps
+**Multiplicity.** Four markets were tested on this coefficient. A Bonferroni
+correction across the four puts Vermont at p = 0.016, still under 5 %. That is
+the whole correction, and it is the right family: the four markets were the
+pre-planned replication set, not a search.
 
-A wrong-signed significant coefficient needs an explanation that is tested rather
-than asserted. Everything in this subsection was written **after** seeing 6.2 and
-is labelled POST-HOC in the pipeline output. The design commit for this pipeline
+### 6.3 Supporting prediction 1 is also met
+
+The pre-registration's first supporting prediction is that the error spikes on
+the first night of a campaign and decays over the following 24 to 48 hours,
+because APG-style autoregressive forecasts have not yet caught up on night one.
+A temperature confound gives a flat profile instead.
+
+| term | coefficient (pp) | s.e. | p | in MW |
+| --- | --- | --- | --- | --- |
+| `campaign_start`, first night of a cold snap | **+0.0757** | 0.0313 | **0.016** | +9.1 |
+| `campaign_night2` | +0.0476 | 0.0312 | 0.127 | +5.7 |
+
+Positive, larger on night one, smaller on night two, which is the predicted
+shape. Rhode Island returns −0.0125 (0.0161) and −0.0177 (0.0151), both null.
+
+Held loosely: this rests on 27 campaign starts, the night-two coefficient is not
+significant on its own, and two points do not establish a decay curve. It is
+consistent with the prediction rather than a demonstration of it.
+
+### 6.4 Four reasons to hold all of this loosely
+
+A result that agrees with the hypothesis deserves harder scrutiny than one that
+does not. Everything in this subsection was run **after** seeing 6.2 and is
+labelled POST-HOC in the pipeline output. The design commit for this pipeline
 predates it in the git history, which is the only reason the distinction is
 checkable.
 
-**Step 1. It is not robust to the weather index.** Swapping the eight road
-stations for the Mount Washington summit ASOS at 1,910 m — a colder, purer,
-more snowmaking-relevant index, and the one a physical reading of the hypothesis
-would prefer — gives **−0.0057 (0.0056), p = 0.31**. The result depends on which
-thermometers you pick.
+**1. It does not survive a change of weather index, and this is the real
+problem.** Swapping the eight Vermont road stations for the Mount Washington
+summit ASOS at 1,910 m gives **−0.0058 (0.0068), p = 0.39** on the identical five
+seasons: same sign, a quarter of the size, no significance. The sample is not the
+explanation — the primary index on all seven seasons gives −0.0232 (0.0070),
+p = 0.001, and Mount Washington on all seven gives −0.0057 (0.0056), p = 0.31. It
+is the thermometers.
 
-**Step 2. It is one end of a north–south gradient across all eight zones.** The
-eight share errors sum to zero by construction, so the eight coefficients do too
-(they sum to +0.0005). Ranked by latitude:
+Which index deserves more weight is genuinely unsettled, and this write-up does
+not pick a winner. Mount Washington is a true summit at 1,910 m, in the altitude
+band the Austrian design specified, where the road stations sit 500 m too low.
+Against that, it is in New Hampshire about 100 km from the nearest Vermont
+resort, and 70.6 % of its hours fall below the threshold against the road
+network's 40.9 %, which accumulates roughly 1,500 cold hours a season against
+about 800. A site that is below threshold most of the time has little variation
+left in `below` and a saturated `cum_cold_h`, so it may be the weaker instrument
+rather than the purer one. Both readings are available and neither is
+established. **The honest summary is that the headline coefficient is
+index-dependent, and that is the strongest argument against taking it at face
+value.**
+
+**2. The eight-zone gradient is consistent with the hypothesis and with a
+confound, and separates neither.** The eight share errors sum to zero by
+construction, so the eight coefficients do too (they sum to +0.0005). Ranked by
+latitude:
 
 | zone | lat | `below:cum100` | s.e. | p |
 | --- | --- | --- | --- | --- |
@@ -346,44 +408,37 @@ eight share errors sum to zero by construction, so the eight coefficients do too
 | Connecticut | 41.5 | +0.0252 | 0.0134 | 0.06 |
 
 Spearman(latitude, coefficient) = **−0.886**, p = 0.003. Every northern zone is
-negative and every southern zone except Rhode Island is positive. Vermont is the
-most negative, but it is not doing anything the rest of northern New England is
-not also doing. This is the signature of ISO-NE's regional model over-responding
-to accumulated cold in the north, and the compositional constraint then forces
-the mirror image onto the south.
+negative and every southern zone except Rhode Island is positive.
 
-Maine and New Hampshire are large snowmaking states too, so in this
-cross-section "northern" and "has ski resorts" are the same eight-way split. The
-zone table cannot separate them.
+This cuts both ways and the pipeline prints it saying so. Vermont, Maine and New
+Hampshire are the three snowmaking states in New England, and they are also the
+three northernmost zones. Under the compositional constraint a real snowmaking
+effect in those three *must* push the southern five the other way, so a genuine
+finding would produce exactly this gradient. So would a regional forecast model
+whose temperature response is simply too strong in the north. The table is
+consistent with both and discriminates between neither. What it does establish is
+that Vermont is the most negative of eight rather than different in kind from its
+neighbours, which is what a state-level physical mechanism shared across northern
+New England would look like, and also what a latitude artifact would look like.
 
-**Step 3. The one test that could separate them is inconclusive.** Holding the
-right-hand side fixed and moving only the outcome window from the night to the
-following afternoon (10:00–16:59), when the guns are largely off, gives
+Normalising by each zone's own load rather than by system share tilts slightly
+toward the first reading: per gigawatt of zonal night load the effect is 0.43 %
+in Vermont, 0.21 % in Maine and 0.12 % in New Hampshire, which is the order of
+their snowmaking intensity relative to their own demand. That ordering is a
+descriptive observation on three points and is not offered as a test.
+
+**3. The one test that could separate night from day is inconclusive.** Holding
+the right-hand side fixed and moving only the outcome window from the night to
+the following afternoon (10:00–16:59), when the guns are largely off, gives
 **−0.0037 (0.0169)** against the night's −0.0211 (0.0073) on the same 297 nights.
-The point estimate is a sixth of the night's, which looks like night-specificity,
-but the afternoon share error is 2.3 times noisier and the interval comfortably
-contains the night estimate. **This placebo does not discriminate and is not
-offered as if it did.** It fails to establish night-specificity and equally
-fails to rule it out.
+The point estimate is a sixth of the night's, which is what night-specificity
+would look like, but the afternoon share error is 2.3 times noisier and its
+interval comfortably contains the night estimate. **This placebo does not
+discriminate and is not offered as if it did.** It neither establishes
+night-specificity nor rules it out.
 
-Steps 1 and 2 are enough on their own. A coefficient that reverses when you
-change thermometers, and that sits on a monotone latitude gradient shared by
-seven other zones, is a property of the forecaster's regional temperature
-response, not of snow guns.
-
-### 6.4 The one result that points the other way
-
-The campaign-start dummy — the first night of a cold snap after two mild ones,
-which is when a resort with no base has the strongest reason to run everything it
-owns — comes back **+0.0757 pp (HC1 s.e. 0.0313, p = 0.016)**, or **+9.1 ± 7.4 MW**.
-Correctly signed, and the Rhode Island placebo is null at −0.0125 (0.0161).
-
-It is reported because it is the only Vermont result consistent with the
-hypothesis, and it is not leaned on, for three reasons. It rests on 27 campaign
-starts. It is one coefficient among the several specifications run here, with no
-multiplicity correction. And 9 MW is a tenth of the Vermont fleet's plausible
-coincident draw, so even taken at face value it describes a forecaster that
-misses a small fraction of one night rather than a systematic blind spot.
+**4. The same-publisher arm is missing and the gap it would close moves with
+temperature.** See section 7.1. This is the loosest thread in the replication.
 
 ### 6.5 Power: this is the one test that could have found the effect
 
@@ -395,9 +450,15 @@ campaign implies a coincident draw somewhere between 30 and 110 MW.
 The test is powered by a factor of three to ten. Compare the rest of the project:
 Austria's minimum detectable effect is 427 MW against a 427 MW fleet, right at
 the edge; Switzerland's is 314 MW against ~200 MW, hopeless. Vermont is the only
-one of the four with real headroom, which is why its answer carries weight —
-and why the answer being a *reversed sign* rather than a null is the more
-interesting outcome.
+one of the four with real headroom.
+
+That is what makes this result worth something and also what makes the failure in
+6.4 point 1 worth taking seriously. A well-powered test is one that would have
+seen the effect if it were there, and it is equally one that will see whatever
+else is there. The verdict this section supports is **predicted sign,
+significant, in the only powered market, and index-dependent**. That is
+suggestive. It is not confirmation, and it does not overturn the Austrian null,
+which was measured on a different forecaster at a different scale.
 
 ## 7. Honest limitations
 
