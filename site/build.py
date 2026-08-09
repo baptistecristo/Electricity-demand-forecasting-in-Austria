@@ -420,12 +420,13 @@ already prices it in.</p>
 <p><span class="lead">Then the same test, run elsewhere — and one market disagrees</span>
 Italy-North gives the same answer as Austria: <b>+4.3 ± 10.2</b>. Switzerland is
 reported as unreadable, because the arithmetic says it could never have found the
-effect even if it were there. But <b>Vermont</b> — the one market with real room
-to spare, able to detect <b>10.9 MW</b> against a fleet drawing thirty to a
-hundred and ten — <b>finds what the pre-registration predicted</b>: the cold-night
-effect fades as the season's cold piles up, by about 25 MW from November to
-late December, with the no-snowmaking neighbour showing nothing. It does not
-survive swapping the weather stations, so it is reported as suggestive rather
+effect even if it were there. But <b>Vermont</b> — the best-powered of the
+four, able to catch a forecaster missing a third of its snowmaking where Austria
+needs half — <b>finds what the pre-registration predicted</b>: the cold-night
+effect fades as the season's cold piles up, by about 25 MW from November to late
+December, with the no-snowmaking neighbour showing nothing. It clears its own
+detection threshold by almost nothing, 25 MW found against 24 MW detectable, and
+it does not survive swapping the weather stations, so it is reported as suggestive rather
 than settled. Austria's null stands on Austria's data; Vermont is a different
 forecaster at a tenth of the scale.</p>
 
@@ -470,12 +471,12 @@ the operator's use of lagged actual load carries a running campaign into the nex
 day's forecast. Two of three pre-registered kill criteria fired.</p>
 <p>The same specification was then run in three further markets. Italy-North
 reproduces the null at <b>+4.3 (10.2)</b>. Switzerland is reported as
-uninterpretable because its minimum detectable effect exceeds the load it is
-looking for. Vermont, whose ISO-NE regional forecast can be tested at a
-<b>10.9 MW</b> resolution against a fleet drawing an estimated 30–110 MW, returns
-<b>−0.0211 percentage points of system share per 100 accumulated cold hours
-(s.e. 0.0073)</b> with a clean placebo — the predicted sign, in the only market
-with the power to have found it, and not robust to a change of weather index. A
+uninterpretable because it would need its forecaster to be missing 201% of Swiss
+snowmaking before the test could see anything. Vermont, the best-powered of the
+four at 34%, returns <b>−0.0211 percentage points of system share per 100
+accumulated cold hours (s.e. 0.0073)</b> with a clean placebo — the predicted
+sign, sitting on its own detection threshold, and not robust to a change of
+weather index. A
 separate pre-registered test on the day-ahead spot price is underpowered in all
 three European markets by a factor of three to nine, because overnight the whole
 Austrian fleet is worth about €6.65/MWh at the margin.</p>
@@ -707,10 +708,12 @@ above, both established after it was written.</strong> The Christmas argument is
 about Austria and does not travel: it works because APG leaves the shutdown in its
 residual, and Terna and Swissgrid do not. Section 8.1 has the numbers. And "not
 underpowered for effects of the relevant size" is a claim about 274 MW, not about
-snowmaking. Austria can detect 427 MW against a fleet drawing an estimated 427 MW,
-which is the edge of the envelope rather than headroom. The one test here with
-genuine room to spare is Vermont, at 10.9 MW against 30&ndash;110 MW, and it does
-not return a null.</div>
+snowmaking. The smallest seasonal swing the fitted Austrian model could have
+detected at 80% power is 426 MW, against a fleet drawing an estimated 900 MW, so
+Austria could only ever have caught a forecaster missing 47% or more. That is a
+real bound and a loose one. The best-powered test here is Vermont at 34%, better
+by a factor of 1.4 rather than by an order of magnitude, and it does not return a
+null.</div>
 
 <h3>7.2 The opening-date test cannot be identified from calendar dates</h3>
 <p>Austrian opening dates are tightly clustered — glaciers from late September at
@@ -811,22 +814,38 @@ change.</p>
 
 <table>
 <thead><tr><th>System</th><th class="num">Seasons</th><th class="num">Nights</th>
-  <th class="num">below &times; cum100</th><th class="num">Detectable vs fleet</th>
+  <th class="num">below &times; cum100</th><th class="num">Swing found</th>
+  <th class="num">Detectable</th><th class="num">Needs &alpha;</th>
   <th>Verdict</th></tr></thead>
 <tbody>
 <tr class="hl"><td>Austria</td><td class="num">13</td><td class="num">780</td>
-  <td class="num">+5.1 (11.9)</td><td class="num">427 vs 427 MW</td>
-  <td>Null, at the edge of what it could see</td></tr>
+  <td class="num">+5.1 (11.9)</td><td class="num">+65</td>
+  <td class="num">426</td><td class="num">47%</td>
+  <td>Null</td></tr>
 <tr><td>Italy-North (Terna)</td><td class="num">7</td><td class="num">420</td>
-  <td class="num">+4.3 (10.2)</td><td class="num">&mdash;</td>
-  <td>Null, but uncertified</td></tr>
+  <td class="num">+4.3 (10.2)</td><td class="num">+61</td>
+  <td class="num">403</td><td class="num">87%</td>
+  <td>Null, and uncertified</td></tr>
 <tr class="hl"><td>Vermont (ISO-NE)</td><td class="num">5</td><td class="num">297</td>
-  <td class="num">&minus;2.5 (0.9)</td><td class="num">10.9 vs 30&ndash;110 MW</td>
-  <td>Predicted sign, significant, index-dependent</td></tr>
+  <td class="num">&minus;2.5 (0.9)</td><td class="num">&minus;25</td>
+  <td class="num">24</td><td class="num">34%</td>
+  <td>Predicted sign, on its own threshold</td></tr>
 <tr><td>Switzerland</td><td class="num">9</td><td class="num">540</td>
-  <td class="num">&minus;42.5 (14.3)</td><td class="num">314 vs ~200 MW</td>
+  <td class="num">&minus;42.5 (14.3)</td><td class="num">&minus;427</td>
+  <td class="num">402</td><td class="num">201%</td>
   <td>Not interpretable</td></tr>
 </tbody></table>
+<p><b>How to read the power columns.</b> The coefficient is per 100 accumulated
+cold hours and a season delivers about a thousand of them, so the quantity the
+mechanism actually predicts is the <em>seasonal swing</em>: the coefficient times
+each market's observed range of accumulated cold. "Detectable" is 2.80 &times; the
+fitted standard error &times; that same range &mdash; the smallest seasonal swing
+each estimated model could have found at 80% power. "Needs &alpha;" is that
+divided by the market's estimated coincident snowmaking draw: the share of the
+fleet a forecaster has to be missing before this design sees anything at all.
+Read that column down and the whole programme is visible in one place.
+<b>No test here could see a forecaster missing less than a third of the snowmaking
+load, and three of the four could not see one missing less than half.</b></p>
 <p class="tcap"><b>Table 5.</b> Replications. Coefficients in MW, HC1 standard
 errors in parentheses. Vermont's outcome is the regional <em>share</em>; its native
 coefficient is &minus;0.0211 percentage points per 100 cold hours, converted here
@@ -890,12 +909,18 @@ too strong. And moving only the outcome window from the night to the following
 afternoon drops the estimate sixfold, but the afternoon is 2.3&times; noisier and
 its interval still contains the night estimate.</p>
 
-<p><b>Why Vermont's answer weighs more than the other three.</b> Its minimum
-detectable effect is 10.9 MW against a fleet drawing an estimated 30&ndash;110 MW:
-powered by a factor of three to ten. Austria sits exactly at its own limit,
-Switzerland is five times short. Vermont is the one place in this project where the
-instrument was sharp enough that the answer is about the world rather than about
-the instrument &mdash; which is also why its one failed robustness check matters.</p>
+<p><b>Why Vermont's answer weighs more than the other three, and by how much.</b>
+It needs its forecaster to be missing 34% of the Vermont fleet before the effect
+becomes visible, against Austria's 47%, Italy's 87% and Switzerland's 201%. Best of
+the four, and better than Austria by a factor of about 1.4 rather than by an order
+of magnitude.</p>
+
+<p><b>And it clears that threshold by almost nothing.</b> The seasonal swing
+Vermont finds is &minus;25 MW against a smallest detectable swing of 24 MW. The
+effect sits on its own noise floor. A pre-registered prediction met at p = 0.004
+with a clean placebo is still what it is, but an effect this close to the floor is
+exactly the kind that moves when an input changes &mdash; which is what the Mount
+Washington swap does to it.</p>
 
 <p><b>This does not overturn the Austrian null.</b> Austria is a much larger
 system with a fleet worth 43 GWh per gigawatt of overnight load against Vermont's

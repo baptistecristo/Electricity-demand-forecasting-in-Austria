@@ -15,13 +15,18 @@ have to produce. It does not see snowmaking.
 **Then it was run in three more markets (§8.8b), and one of them does not agree.**
 Italy-North reproduces the Austrian null at **+4.3 ± 10.2**. Switzerland is
 reported as not interpretable because it could never have detected the effect.
-Vermont — the only one of the four with real statistical headroom, able to detect
-10.9 MW against a 30–110 MW fleet — **meets the pre-registered prediction**:
-−2.5 MW per 100 accumulated cold hours, p = 0.004, with a clean placebo and the
-predicted decaying campaign-start profile. It does not survive a change of
-weather index, so it is reported as suggestive rather than as confirmation. The
-Austrian null stands on its own data; Vermont is a different forecaster at a
-tenth of the scale.
+Vermont — the best-powered of the four, able to see a forecaster missing 34% of
+its snowmaking fleet where Austria needs 47% and Switzerland 201% — **meets the
+pre-registered prediction**: −2.5 MW per 100 accumulated cold hours, p = 0.004,
+with a clean placebo and the predicted decaying campaign-start profile. It also
+clears its own detection threshold by almost nothing (−25 MW found against 24 MW
+detectable) and does not survive a change of weather index, so it is reported as
+suggestive rather than as confirmation. The Austrian null stands on its own data;
+Vermont is a different forecaster at a tenth of the scale.
+
+**The bound behind all four results:** no test in this project could see a
+forecaster missing less than a third of the snowmaking load, and three of the
+four could not see one missing less than half.
 
 ---
 
@@ -520,11 +525,13 @@ attributable to snowmaking by this design.
 > §8.8b sets out the numbers. Read §8.6 as a claim about the Austrian panel only.
 >
 > **"Not underpowered for effects of the relevant size" is a statement about
-> 274 MW, not about the snowmaking effect.** Austria's minimum detectable effect
-> is 427 MW against a fleet whose coincident draw is estimated at 427 MW, which
-> is the edge of the envelope rather than headroom. The one test in this project
-> with genuine power is Vermont, at 10.9 MW against a 30–110 MW fleet, and §8.8b
-> reports what it found.
+> 274 MW, not about the snowmaking effect.** The smallest seasonal swing the
+> fitted Austrian model could have detected at 80% power is **426 MW**, against a
+> fleet whose coincident draw is estimated near 900 MW. So Austria could only
+> ever have seen a forecaster missing **47%** or more of Austrian snowmaking. It
+> is a real bound and it is a loose one. The best-powered test in the project is
+> Vermont at 34%, which is better by a factor of 1.4 rather than by an order of
+> magnitude, and §8.8b has the full comparison.
 
 ### 8.7 What would still be worth doing
 
@@ -611,17 +618,37 @@ Same specification, same wet-bulb solver with the station-pressure correction,
 same 20:00–06:59 night, same fixed effects, same night-level estimation. Only the
 load and weather sources change. Code in `src/it_north/` and `src/swiss/`.
 
-| | Seasons | Nights | `below:cum100` | MDE vs fleet | Verdict |
-|---|---|---|---|---|---|
-| **Austria** | 13 | 780 | **+5.1** (11.9) MW | 427 vs 427 MW | Null, at the edge of what it could see |
-| **Italy-North** (Terna, North zone) | 7 | 420 | **+4.3** (10.2) MW | — | Null, but uncertified — see below |
-| **Vermont** (ISO-NE, share outcome) | 5 | 297 | **−2.5** (0.9) MW | **10.9 vs 30–110 MW** | Predicted sign, significant, index-dependent — see below |
-| **Switzerland** (energy-charts) | 9 | 540 | −42.5 (14.3) MW | 314 vs ~200 MW | Not interpretable; see below |
+| | Seasons | Nights | `below:cum100` | Seasonal swing found | Detectable at 80% | Fleet | Required α | Verdict |
+|---|---|---|---|---|---|---|---|---|
+| **Austria** | 13 | 780 | **+5.1** (11.9) MW | +65 MW | 426 MW | ~900 MW | **47%** | Null |
+| **Italy-North** (Terna, North zone) | 7 | 420 | **+4.3** (10.2) MW | +61 MW | 403 MW | ~463 MW | **87%** | Null, and uncertified — see below |
+| **Vermont** (ISO-NE, share outcome) | 5 | 297 | **−2.5** (0.9) MW | **−25 MW** | 24 MW | 30–110 MW | **34%** | Predicted sign, significant, right at its own threshold — see below |
+| **Switzerland** (energy-charts) | 9 | 540 | −42.5 (14.3) MW | −427 MW | 402 MW | ~200 MW | **201%** | Not interpretable; see below |
+
+**How to read the power columns.** `below:cum100` is per 100 accumulated cold
+hours, and a season delivers roughly 1,000 of them, so the *seasonal swing* — the
+coefficient times each market's observed range of `cum_cold_h` — is the quantity
+the mechanism actually predicts, and it is what has to be detectable. "Detectable
+at 80%" is 2.80 × the fitted standard error × that same range: the smallest
+seasonal swing the estimated model could have found at 80% power and 5%
+two-sided. Required α is that divided by the market's estimated coincident
+snowmaking draw, which is the share of the fleet the forecaster must be missing
+before this design can see anything at all.
+
+This is a different calculation from the ex-ante one in §6, which assumed a
+forecast error standard deviation rather than using the fitted one, and it
+supersedes it now that the models have been estimated. §6's 27.4% pass mark for
+Austria is the ex-ante number; 47% is what the fitted model delivers.
 
 Vermont's coefficient is natively −0.0211 pp of system share per 100 cold hours;
-the megawatt figure above is that times the 120 MW that one point of share is
-worth. Its outcome variable is the regional *share*, not megawatts, for the
-reason set out in `src/vermont/README.md` §1.
+the megawatt figures are that times the 120 MW one point of share is worth. Its
+outcome variable is the regional *share*, not megawatts, for the reason set out
+in `src/vermont/README.md` §1.
+
+Read down the "required α" column and the whole programme is visible in one
+place. **No test here could see a forecaster missing less than a third of the
+snowmaking load, and three of the four could not see one missing less than half.**
+That is the finding behind all the individual findings.
 
 **Italy-North replicates the null.** Terna publishes actual and day-ahead
 forecast for the North bidding zone in one file, with no login, back to 2019.
@@ -701,12 +728,19 @@ Moving only the outcome window from night to the following afternoon drops the
 estimate sixfold to −0.0037, but the afternoon is 2.3× noisier and its interval
 contains the night estimate.
 
-**Why Vermont's answer weighs more than the other three.** Its minimum detectable
-effect is 10.9 MW against a fleet drawing an estimated 30–110 MW: powered by a
-factor of three to ten. Austria sits exactly at its own limit and Switzerland is
-five times short of hers. Vermont is the one place in this project where the
-instrument was sharp enough that the answer is about the world rather than about
-the instrument, which is also why its one failed robustness check matters.
+**Why Vermont's answer weighs more than the other three, and by how much.** Its
+required α is 34% against Austria's 47%, Italy's 87% and Switzerland's 201%: the
+best of the four, and better than Austria by about a factor of 1.4 rather than by
+an order of magnitude. It is the only market where a coefficient of the predicted
+sign cleared the threshold at all.
+
+**And it cleared it by almost nothing.** The seasonal swing Vermont finds is
+−25 MW against a smallest-detectable swing of 24 MW. The effect sits on its own
+detection threshold. That is not a reason to discard it — a pre-registered
+prediction met at p = 0.004 with a clean placebo is what it is — but it is the
+reason the Mount Washington failure is fatal to reading it as settled rather than
+merely awkward. An effect this close to the noise floor is exactly the kind that
+moves when you change an input.
 
 **This does not overturn §8.5.** Austria's null is measured on APG, a much larger
 system, with a fleet that is 43 GWh per gigawatt against Vermont's 68–153. The two

@@ -12,10 +12,10 @@
 > **Read section 6 before anything else. The pre-registered prediction is met
 > here.** The primary interaction is negative and significant at p = 0.004, which
 > is the direction section 5 of the root README committed to before any load data
-> was opened, and Vermont is the only market in this project with the statistical
-> power to have found an effect of the size snowmaking would produce. Section 6.3
-> gives the reasons to hold it loosely anyway, the strongest of which is that it
-> does not survive a change of weather index.
+> was opened, and Vermont is the best-powered of the four markets tested. Sections
+> 6.4 and 6.5 give the reasons to hold it loosely anyway: it does not survive a
+> change of weather index, and the effect clears its own detection threshold by
+> almost nothing.
 >
 > **Correction, same day.** The first version of sections 6.2 to 6.5 described
 > this coefficient as *rejecting* the prediction with the sign reversed. That was
@@ -440,25 +440,35 @@ night-specificity nor rules it out.
 **4. The same-publisher arm is missing and the gap it would close moves with
 temperature.** See section 7, item 1. This is the loosest thread in the replication.
 
-### 6.5 Power: this is the one test that could have found the effect
+### 6.5 Power: the best of the four, and the effect sits on its own threshold
 
-At the maximum observed `cum_cold_h` the standard error corresponds to a
-**minimum detectable effect of 10.9 MW**. Vermont's snowmaking energy is
-40–90 GWh a season (section 8.8 of the root README), which spread over a
-campaign implies a coincident draw somewhere between 30 and 110 MW.
+The quantity the mechanism predicts is a *seasonal swing*: `below:cum100` times
+the range of accumulated cold a season delivers. Vermont's `cum_cold_h` runs 0 to
+972, so the range is 9.72 and the fitted standard error of 0.0073 pp gives a
+smallest detectable swing of 2.80 × 0.0073 × 9.72 = 0.199 pp, or **23.8 MW** at
+80% power and 5% two-sided.
 
-The test is powered by a factor of three to ten. Compare the rest of the project:
-Austria's minimum detectable effect is 427 MW against a 427 MW fleet, right at
-the edge; Switzerland's is 314 MW against ~200 MW, hopeless. Vermont is the only
-one of the four with real headroom.
+Vermont's snowmaking energy is 40–90 GWh a season (§8.8 of the root README),
+which spread over a campaign implies a coincident draw between 30 and 110 MW. So
+this test can see a forecaster missing **22% to 79%** of the Vermont fleet,
+centring near **34%** at a 70 MW draw.
 
-That is what makes this result worth something and also what makes the failure in
-6.4 point 1 worth taking seriously. A well-powered test is one that would have
-seen the effect if it were there, and it is equally one that will see whatever
-else is there. The verdict this section supports is **predicted sign,
-significant, in the only powered market, and index-dependent**. That is
-suggestive. It is not confirmation, and it does not overturn the Austrian null,
-which was measured on a different forecaster at a different scale.
+On the same arithmetic the rest of the project needs Austria 47%, Italy-North
+87%, Switzerland 201%. **Vermont is the best-powered of the four, by a factor of
+about 1.4 over Austria rather than by an order of magnitude.**
+
+**And the effect it found clears that threshold by almost nothing.** The estimated
+seasonal swing is −0.0211 × 9.72 × 120 = **−24.6 MW**, against a smallest
+detectable swing of 23.8 MW. The coefficient sits on its own noise floor. A
+pre-registered prediction met at p = 0.004 with a clean placebo is still what it
+is, but an effect this close to the floor is precisely the kind that moves when
+an input changes, which is what 6.4 point 1 reports happening.
+
+The verdict this section supports is **predicted sign, significant, in the
+best-powered of four markets, at the edge of what that market could resolve, and
+not robust to the weather index**. That is suggestive. It is not confirmation,
+and it does not overturn the Austrian null, which was measured on a different
+forecaster at a different scale.
 
 ## 7. Honest limitations
 
