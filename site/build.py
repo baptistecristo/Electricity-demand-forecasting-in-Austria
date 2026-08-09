@@ -873,7 +873,10 @@ replication against a good forecaster needs a different reference effect.</p>
 
 <p><b>Switzerland could never have detected the effect.</b> The minimum detectable
 effect is 314 MW against a plausible Swiss coincident snowmaking load near 200 MW,
-so the required &alpha; is 157% &mdash; above the ceiling. Its primary coefficient
+so the required &alpha; is 157% &mdash; above the ceiling. That is the Swiss
+pipeline's own episode-based calculation; Table 5 puts it at 201% on the
+fitted-standard-error basis used for all four markets. Either way it is past the
+ceiling, and no amount of Swiss data moves it under. Its primary coefficient
 is significant and correctly signed, and is reported as a confound rather than a
 finding: it implies a swing in the load level larger than the entire Swiss fleet,
 and the Swiss night-level calibration slope of 0.71 passes load&ndash;weather

@@ -688,7 +688,10 @@ needed, not this one.
 fixed effects is 587 MW on 9 usable seasons, giving a minimum detectable effect of
 **314 MW** against a plausible Swiss coincident snowmaking load of about 200 MW.
 The required α is 157%, above the 100% ceiling: a forecaster modelling *none* of
-Swiss snowmaking would still be invisible. The primary coefficient does come back
+Swiss snowmaking would still be invisible. That is the Swiss pipeline's own
+episode-based calculation; the table above puts it at 201% on the fitted-standard-
+error basis used for all four markets. Either way it is past the ceiling, and no
+amount of Swiss data moves it under. The primary coefficient does come back
 significant and correctly signed (−42.5, z = −2.97), and it is reported as a
 confound rather than a finding, because it implies a swing in the load level
 larger than the entire Swiss snowmaking fleet, and because the Swiss night-level
