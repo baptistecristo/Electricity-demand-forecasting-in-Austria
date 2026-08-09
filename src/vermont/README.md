@@ -537,7 +537,17 @@ happens to sit at the north end of.
    error is measured against seven other zones that must absorb the mirror image.
    The latitude result in 6.3 is a consequence of taking that seriously rather
    than a separate finding.
-6. **The price test on the same two zones has since run, and it belongs next to
+6. **Water temperature is an omitted state that mimics the finding.** Snowmaking
+   at the margin needs water below about +2 °C, and reservoir water cools through
+   the season, so an identical wet bulb produces more snow in late December than
+   in early November. That is a seasonal trend pointing the same way as the
+   base-building fade this test is looking for, and it would produce a negative
+   `below:cum100` with no path dependence involved at all. It is an alternative
+   explanation for section 6.2 that nothing here can rule out, and separating the
+   two needs reservoir water temperature, which no operator publishes. See the
+   root README §9.
+
+7. **The price test on the same two zones has since run, and it belongs next to
    section 6.4 point 2.** `src/price/README.md` §10.3 puts this exact right-hand
    side against the Vermont day-ahead LMP spread and gets −1.47 (0.54),
    p = 0.007 — and Rhode Island returns −1.33 (0.52). There the placebo

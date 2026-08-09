@@ -184,10 +184,23 @@ Salzburg 0.24, Vorarlberg 0.10, Steiermark 0.09, Kärnten 0.05.
 
 ### On the threshold value
 
-There is no lance-versus-fan-gun threshold split. Olefs et al. (2010) report that
-manufacturers quote −1.5 °C wet bulb for both air-water lances and fan guns, and
-round to −2 °C; TechnoAlpin quotes −2.5 °C with no equipment distinction. The
-documented lance/fan difference is water loss (15–40% vs 5–15%), not temperature.
+There is no lance-versus-fan-gun threshold split. TechnoAlpin quotes −2.5 °C with
+no equipment distinction, and the documented lance/fan difference is water loss
+(15–40% vs 5–15%), not temperature.
+
+> **Correction to this paragraph's citation.** An earlier version attributed to
+> Olefs et al. (2010) a manufacturer figure of −1.5 °C for both lances and fan
+> guns. The published abstract does not contain −1.5 °C and does not distinguish
+> the two. What it says is that technical specifications of snow guns were used
+> "to define a wet-bulb temperature threshold value of **−2 °C** for snowmaking
+> **and a relationship between wet-bulb temperature and snowmaking capacity**".
+> The −2 °C threshold this project uses is therefore correctly sourced. The
+> −1.5 °C figure and the equipment comparison are not, and are withdrawn pending
+> access to the full text.
+>
+> The second half of that sentence matters more than the correction. **The source
+> the threshold comes from describes a capacity *curve*, not a switch** — and §4's
+> `below` dummy discards it. §9 now carries that as a limitation.
 
 The threshold is soft for economic reasons instead: marginal production starts
 near −2 °C, efficient production wants −4 °C or colder, and how early a resort
@@ -996,6 +1009,42 @@ calculation stand as committed.
 - `cum_cold_h` proxies the snow stock with accumulated hours below threshold. It
   ignores melt, and it counts cold hours whether or not guns actually ran. A true
   stock variable would need production data no resort publishes.
+- **`below` is a switch and the physics is a staircase.** Olefs et al. (2010),
+  the source of the −2 °C threshold, defines a *relationship between wet-bulb
+  temperature and snowmaking capacity* alongside it. The hardware is built that
+  way too: SUFAG's Taurus 2.0 auto-selects among eight temperature-indexed
+  production thresholds, DemacLenko's EOS 8 has eight water-flow steps roughly
+  1–2 °C apart, and HKD's Impulse R5 spans 8 to 48 cfm of compressed air — which
+  in the US Northeast is the dominant electrical load. A binary treatment throws
+  away the intensity margin, and much of the megawattage lives there. `below:dist`
+  captures part of it linearly; the true shape is a staircase capped by plant
+  capacity.
+- **Crossing the threshold is documented as not sufficient, and the selection sits
+  inside the bandwidth.** Stratton's snowmaking manager: *"Many times it's best to
+  wait for ideal temperatures rather than take advantage of barely freezing and
+  less-than-good snowmaking temps."* Startup has a fixed cost, so marginal nights
+  just below threshold are precisely the ones operators skip. That attenuates
+  `below` and it happens exactly in the ±3 °C window §4 proposed as the primary
+  sample.
+- **Water temperature is an omitted state variable that mimics the predicted
+  effect.** Production at the margin needs water below about +2 °C, and reservoir
+  water cools as the season progresses. So an identical wet bulb is *more*
+  productive in late December than in early November — a seasonal trend running in
+  the same direction as the base-building fade the design is looking for. **This is
+  an alternative explanation for a negative `below:cum100` that owes nothing to
+  snowmaking's path dependence**, and it applies to Vermont's result as much as to
+  anyone's. Separating them needs reservoir water temperature, which no operator
+  publishes.
+- **Water volume decouples from accumulated cold.** A resort that has emptied its
+  reservoir cannot run on the next cold night whatever the wet bulb says.
+  `cum_cold_h` proxies base built, not water remaining, and the two come apart
+  after a warm spell.
+- **Electricity price already enters the decision in at least some documented
+  cases**, which makes the load partly endogenous to the outcome the price test
+  uses. Plattekill defers the start of snowmaking past the monthly meter read to
+  avoid a demand charge; Snow Trails makes snow "at night when rates are down";
+  SMI's control software supports explicit constraints on electrical load. All
+  three are small US areas and it is not known whether this generalises.
 
 ## 10. Reproduce
 
