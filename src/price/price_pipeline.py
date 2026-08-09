@@ -63,14 +63,33 @@ MIN_MIDDAY_HOURS = 4
 SEASON_MONTHS = (11, 12)
 
 # (key, label, bidding zone, tz, currency, night panel, snowmaking increment MW)
-# The increment is the fleet draw estimated in section 2 of the root README and
-# in each replication's own write-up. It is what the power gate is measured
-# against; it is an input to this script, not an output of it.
+#
+# The increment is each market's estimated COINCIDENT snowmaking draw. It is an
+# input to the power gate rather than an output of this script, so every value
+# carries its source:
+#
+#   Austria      900 MW  root README section 2. 281 GWh over 184.6 operating
+#                        hours is a 1.52 GW fleet ceiling; 50-60% coincidence
+#                        gives 0.76-0.91 GW. 900 MW is also the figure section
+#                        6's alpha pass mark divides by.
+#   Italy-North 1500 MW  src/it_north/README.md. ~560 GWh derived, scaled by the
+#                        same 184.6 hours to a ~3.0 GW ceiling, at 50%
+#                        coincidence.
+#   Switzerland  200 MW  root README section 8.8b, from the 60-65 GWh published
+#                        Swiss total.
+#   Vermont       70 MW  src/vermont/README.md section 6.5, the centre of the
+#                        30-110 MW range implied by 40-90 GWh a season.
+#
+# An earlier version of this table used 427 MW for Austria and 463 for
+# Italy-North, and both were wrong. 427 MW is Austria's mean absolute forecast
+# error from section 8.2, not a fleet size; it reached this file by the same
+# mistake that put it in the section 8.8b power table, because this file was
+# written before that mistake was found.
 MARKETS = [
     ("at", "Austria",     "AT",       "Europe/Vienna", "EUR",
-     "data/night_panel.csv",                    427),
+     "data/night_panel.csv",                    900),
     ("itnorth", "Italy-North", "IT-North", "Europe/Rome",   "EUR",
-     "src/it_north/night_panel_it.csv",         463),
+     "src/it_north/night_panel_it.csv",        1500),
     ("ch", "Switzerland", "CH",       "Europe/Zurich", "EUR",
      "src/swiss/ch_night_panel.csv",            200),
 ]
@@ -79,7 +98,7 @@ MARKETS = [
 # published ordinals rather than timestamps, and its panel is a share panel.
 ISONE = [
     ("VT", "ISO-NE Vermont",      "src/vermont/night_panel_vermont.csv",
-     "lmp_vermont.csv",      100),
+     "lmp_vermont.csv",       70),
     ("RI", "ISO-NE Rhode Island", "src/vermont/night_panel_rhodeisland.csv",
      "lmp_rhodeisland.csv",    0),
 ]

@@ -12,10 +12,10 @@
 > **Read section 6 before anything else. The pre-registered prediction is met
 > here.** The primary interaction is negative and significant at p = 0.004, which
 > is the direction section 5 of the root README committed to before any load data
-> was opened, and Vermont is the best-powered of the four markets tested. Sections
+> was opened, and Vermont is the only one of the four markets tested where a
+> coefficient of the predicted sign cleared its own detection threshold. Sections
 > 6.4 and 6.5 give the reasons to hold it loosely anyway: it does not survive a
-> change of weather index, and the effect clears its own detection threshold by
-> almost nothing.
+> change of weather index, and it clears that threshold by almost nothing.
 >
 > **Correction, same day.** The first version of sections 6.2 to 6.5 described
 > this coefficient as *rejecting* the prediction with the sign reversed. That was
@@ -440,7 +440,7 @@ night-specificity nor rules it out.
 **4. The same-publisher arm is missing and the gap it would close moves with
 temperature.** See section 7, item 1. This is the loosest thread in the replication.
 
-### 6.5 Power: the best of the four, and the effect sits on its own threshold
+### 6.5 Power, and the effect sitting on its own threshold
 
 The quantity the mechanism predicts is a *seasonal swing*: `below:cum100` times
 the range of accumulated cold a season delivers. Vermont's `cum_cold_h` runs 0 to
@@ -454,8 +454,17 @@ this test can see a forecaster missing **22% to 79%** of the Vermont fleet,
 centring near **34%** at a 70 MW draw.
 
 On the same arithmetic the rest of the project needs Austria 47%, Italy-North
-87%, Switzerland 201%. **Vermont is the best-powered of the four, by a factor of
-about 1.4 over Austria rather than by an order of magnitude.**
+27%, Switzerland 201%. **Vermont is second of the four on paper, and the gap to
+Italy-North is not real:** Italy's denominator is the one desk derivation in the
+set, with no published Italian snowmaking total behind it, so 27% and 34% sit
+inside each other's uncertainty. Vermont's own range, 22% to 79%, is wide for the
+same reason in smaller form.
+
+What Vermont has that the others do not is not power. It is the only market with
+a same-forecaster, same-weather, zero-snowmaking placebo inside the same data
+feed, and the only one outside Austria whose Christmas gate could have worked,
+because ISO-NE's regional share model is weak enough to leave something in the
+residual for it to find.
 
 **And the effect it found clears that threshold by almost nothing.** The estimated
 seasonal swing is −0.0211 × 9.72 × 120 = **−24.6 MW**, against a smallest
@@ -465,7 +474,7 @@ is, but an effect this close to the floor is precisely the kind that moves when
 an input changes, which is what 6.4 point 1 reports happening.
 
 The verdict this section supports is **predicted sign, significant, in the
-best-powered of four markets, at the edge of what that market could resolve, and
+second-best-powered of four markets, at the edge of what it could resolve, and
 not robust to the weather index**. That is suggestive. It is not confirmation,
 and it does not overturn the Austrian null, which was measured on a different
 forecaster at a different scale.

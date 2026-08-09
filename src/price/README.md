@@ -10,11 +10,12 @@
 > that ordering is the only thing that makes the answer worth reading.
 >
 > **The answer is that the day-ahead spot price cannot settle this in any of the
-> three European markets.** The power gate, which prints before every
-> coefficient by design, says each test is between three and nine times short of
-> being able to detect the effect. Section 5 named that outcome in advance and
-> said what to do about it, which is to report the coefficients and make no claim
-> from them.
+> three European markets, though Austria comes close.** The power gate, which
+> prints before every coefficient by design, puts Austria 1.3× short of being
+> able to detect the effect, Italy-North 2.7× and Switzerland 3.8×. Section 5
+> named that outcome in advance and said what to do about it, which is to report
+> the coefficients and make no claim from them. Austria is near enough that three
+> or four more winters would change the answer; section 10 says why.
 
 The load test asks whether the grid operator's day-ahead forecast misses
 snowmaking. This asks a different question about the same load: whether the
@@ -245,20 +246,29 @@ printed before any coefficient as designed, says the test could not have detecte
 the effect it was looking for. The coefficients are reported below and no claim
 is made from them.
 
-| market | seasons | nights | supply slope | implied impact | min. detectable swing | short by |
-| --- | --- | --- | --- | --- | --- | --- |
-| **Austria** | 5 (2018–22) | 300 | +15.6 €/MWh per GW | +6.65 €/MWh | 18.0 €/MWh | 2.7× |
-| **Italy-North** | 7 | 420 | +3.5 | +1.63 | 14.4 | 8.8× |
-| **Switzerland** | 9 | 540 | +7.7 | +1.55 | 5.9 | 3.8× |
+| market | seasons | nights | supply slope | fleet | implied impact | min. detectable swing | short by |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| **Austria** | 5 (2018–22) | 300 | +15.6 €/MWh per GW | 900 MW | +14.02 €/MWh | 18.0 €/MWh | **1.3×** |
+| **Italy-North** | 7 | 420 | +3.5 | 1,500 MW | +5.29 | 14.4 | 2.7× |
+| **Switzerland** | 9 | 540 | +7.7 | 200 MW | +1.55 | 5.9 | 3.8× |
 
-The reason is physical rather than statistical, and more data does not fix it.
-The overnight merit order is close to flat: Austria's own night data puts the
-supply slope at 15.6 €/MWh per gigawatt, so the entire 427 MW Austrian
-snowmaking fleet is worth about **6.65 €/MWh** at the margin. The night-minus-
-midday spread it would have to be found in has a standard deviation of
-**43 €/MWh**. Gas, hydro scheduling and the 2021–22 crisis are all larger than
-the thing being measured. Italy-North is worse: a flatter slope, 3.5 €/MWh per
-GW, puts its whole fleet at 1.6 €/MWh.
+The reason is physical rather than statistical. The overnight merit order is
+close to flat: Austria's own night data puts the supply slope at 15.6 €/MWh per
+gigawatt, so a 900 MW Austrian snowmaking fleet moves the price about
+**14 €/MWh** at the margin. The night-minus-midday spread it has to be found in
+has a standard deviation of **43 €/MWh**, inside a five-season panel two of whose
+winters are the energy crisis. Italy-North has a flatter slope still, 3.5 €/MWh
+per GW, so even a 1.5 GW fleet is worth only 5.3 €/MWh there.
+
+**Austria is the near miss and is worth flagging as one.** It falls short by 1.3×
+on the favourable scale and 2.0× on the strict one, not by the wide margin the
+other two do. Austria has five price seasons against thirteen load seasons purely
+because its bidding zone did not exist before October 2018, and the panel grows
+by one season a year on its own. This is the one arm of the project where simply
+waiting is a real strategy: three or four more winters would bring the detectable
+swing under the implied impact. Note also that its two crisis winters are 40% of
+the current panel and carry most of the variance, so the standard error should
+improve faster than the square root of the seasons.
 
 The megawatt-detection arithmetic in §6 of the root README does not carry over.
 A load test can find a few hundred megawatts because load is measured in

@@ -16,8 +16,8 @@ have to produce. It does not see snowmaking.
 **Then it was run in three more markets (§8.8b), and one of them does not agree.**
 Italy-North reproduces the Austrian null at **+4.3 ± 10.2**. Switzerland is
 reported as not interpretable because it could never have detected the effect.
-Vermont — the best-powered of the four, able to see a forecaster missing 34% of
-its snowmaking fleet where Austria needs 47% and Switzerland 201% — **meets the
+Vermont — able to see a forecaster missing 34% of its snowmaking fleet where
+Austria needs 47% and Switzerland 201% — **meets the
 pre-registered prediction**: −2.5 MW per 100 accumulated cold hours, p = 0.004,
 with a clean placebo and the predicted decaying campaign-start profile. It also
 clears its own detection threshold by almost nothing (−25 MW found against 24 MW
@@ -26,8 +26,9 @@ suggestive rather than as confirmation. The Austrian null stands on its own data
 Vermont is a different forecaster at a tenth of the scale.
 
 **The bound behind all four results:** no test in this project could see a
-forecaster missing less than a third of the snowmaking load, and three of the
-four could not see one missing less than half.
+forecaster missing less than about a quarter of the snowmaking load, and Austria,
+on the best-grounded fleet estimate of the four, could not see one missing less
+than half.
 
 ---
 
@@ -538,9 +539,10 @@ attributable to snowmaking by this design.
 > fitted Austrian model could have detected at 80% power is **426 MW**, against a
 > fleet whose coincident draw is estimated near 900 MW. So Austria could only
 > ever have seen a forecaster missing **47%** or more of Austrian snowmaking. It
-> is a real bound and it is a loose one. The best-powered test in the project is
-> Vermont at 34%, which is better by a factor of 1.4 rather than by an order of
-> magnitude, and §8.8b has the full comparison.
+> is a real bound and it is a loose one. Italy-North is nominally the tightest at
+> 27% and Vermont next at 34%, so no test in this project is powered by an order
+> of magnitude over another. §8.8b has the full comparison and the reasons its
+> denominators differ in quality.
 
 ### 8.7 What would still be worth doing
 
@@ -629,9 +631,9 @@ load and weather sources change. Code in `src/it_north/` and `src/swiss/`.
 
 | | Seasons | Nights | `below:cum100` | Seasonal swing found | Detectable at 80% | Fleet | Required α | Verdict |
 |---|---|---|---|---|---|---|---|---|
-| **Austria** | 13 | 780 | **+5.1** (11.9) MW | +65 MW | 426 MW | ~900 MW | **47%** | Null |
-| **Italy-North** (Terna, North zone) | 7 | 420 | **+4.3** (10.2) MW | +61 MW | 403 MW | ~463 MW | **87%** | Null, and uncertified — see below |
-| **Vermont** (ISO-NE, share outcome) | 5 | 297 | **−2.5** (0.9) MW | **−25 MW** | 24 MW | 30–110 MW | **34%** | Predicted sign, significant, right at its own threshold — see below |
+| **Italy-North** (Terna, North zone) | 7 | 420 | **+4.3** (10.2) MW | +61 MW | 403 MW | ~1,500 MW *(desk)* | **27%** | Null, and uncertified — see below |
+| **Vermont** (ISO-NE, share outcome) | 5 | 297 | **−2.5** (0.9) MW | **−25 MW** | 24 MW | 30–110 MW | **34%** *(22–79)* | Predicted sign, significant, right at its own threshold — see below |
+| **Austria** | 13 | 780 | **+5.1** (11.9) MW | +65 MW | 426 MW | ~900 MW *(survey)* | **47%** | Null |
 | **Switzerland** (energy-charts) | 9 | 540 | −42.5 (14.3) MW | −427 MW | 402 MW | ~200 MW | **201%** | Not interpretable; see below |
 
 **How to read the power columns.** `below:cum100` is per 100 accumulated cold
@@ -654,10 +656,19 @@ the megawatt figures are that times the 120 MW one point of share is worth. Its
 outcome variable is the regional *share*, not megawatts, for the reason set out
 in `src/vermont/README.md` §1.
 
-Read down the "required α" column and the whole programme is visible in one
-place. **No test here could see a forecaster missing less than a third of the
-snowmaking load, and three of the four could not see one missing less than half.**
-That is the finding behind all the individual findings.
+**The required-α column is only as good as its denominator, and the denominators
+differ in quality.** Austria's 900 MW comes from a published survey of 141
+resorts. Switzerland's 200 MW comes from a published national total. Vermont's
+30–110 MW is derived from published energy and is wide enough that its α runs
+22–79%. Italy-North's 1,500 MW is a desk derivation with no published Italian
+total behind it, so its 27% is the least trustworthy number in the column and the
+gap between it and Vermont is inside the uncertainty of its own numerator.
+
+Read the column with that caveat and the programme is visible in one place.
+**No test here could see a forecaster missing less than about a quarter of the
+snowmaking load, and Austria, on the best-grounded fleet estimate of the four,
+could not see one missing less than half.** That is the finding behind all the
+individual findings.
 
 **Italy-North replicates the null.** Terna publishes actual and day-ahead
 forecast for the North bidding zone in one file, with no login, back to 2019.
@@ -740,11 +751,16 @@ Moving only the outcome window from night to the following afternoon drops the
 estimate sixfold to −0.0037, but the afternoon is 2.3× noisier and its interval
 contains the night estimate.
 
-**Why Vermont's answer weighs more than the other three, and by how much.** Its
-required α is 34% against Austria's 47%, Italy's 87% and Switzerland's 201%: the
-best of the four, and better than Austria by about a factor of 1.4 rather than by
-an order of magnitude. It is the only market where a coefficient of the predicted
-sign cleared the threshold at all.
+**Why Vermont's answer weighs more than the other three, and by how much.** Not
+because it is the most powerful test on paper: Italy-North's required α is
+nominally lower at 27% against Vermont's 34%, though Italy's denominator is the
+one desk estimate in the set and the two are inside each other's uncertainty.
+Vermont weighs more for three reasons that are not about power. It is the only
+market where a coefficient of the predicted sign cleared its threshold at all. It
+is the only one with a same-forecaster, same-weather, zero-snowmaking placebo
+inside the same data feed. And its Christmas sanity gate is the only one outside
+Austria that could have worked, because ISO-NE's regional share model is weak
+enough to leave something in the residual.
 
 **And it cleared it by almost nothing.** The seasonal swing Vermont finds is
 −25 MW against a smallest-detectable swing of 24 MW. The effect sits on its own
@@ -777,18 +793,26 @@ load test's, unchanged, joined onto the same night panels.
 **All three European markets come back underpowered**, and the power gate says so
 before any coefficient is printed:
 
-| | seasons | nights | supply slope | whole fleet is worth | detectable swing | short by |
-|---|---|---|---|---|---|---|
-| **Austria** | 5 (2018–22) | 300 | +15.6 €/MWh per GW | +6.65 €/MWh | 18.0 €/MWh | 2.7× |
-| **Italy-North** | 7 | 420 | +3.5 | +1.63 | 14.4 | 8.8× |
-| **Switzerland** | 9 | 540 | +7.7 | +1.55 | 5.9 | 3.8× |
+| | seasons | nights | supply slope | fleet | fleet is worth | detectable swing | short by |
+|---|---|---|---|---|---|---|---|
+| **Austria** | 5 (2018–22) | 300 | +15.6 €/MWh per GW | 900 MW | +14.02 €/MWh | 18.0 €/MWh | **1.3×** |
+| **Italy-North** | 7 | 420 | +3.5 | 1,500 MW | +5.29 | 14.4 | 2.7× |
+| **Switzerland** | 9 | 540 | +7.7 | 200 MW | +1.55 | 5.9 | 3.8× |
 
-The reason is physical and more seasons do not fix it. The overnight merit order
-is nearly flat, so Austria's own night data prices its entire 427 MW snowmaking
-fleet at about **6.65 €/MWh** at the margin, against a night-day spread whose
-standard deviation is **43 €/MWh**. A load test can find a few hundred megawatts
-because load is measured in megawatts. A price test has to find what they are
-worth, and overnight they are worth almost nothing.
+The reason is physical. The overnight merit order is nearly flat, so Austria's
+own night data prices a 900 MW snowmaking fleet at about **14 €/MWh** at the
+margin, against a night-day spread whose standard deviation is **43 €/MWh** in a
+five-season panel two of whose winters are the energy crisis. A load test can
+find a few hundred megawatts because load is measured in megawatts. A price test
+has to find what they are worth, and overnight they are worth much less than the
+noise they sit in.
+
+**Austria is a near miss, and that is the one place in this project where waiting
+works.** It is short by 1.3× on the favourable scale and 2.0× on the strict one,
+not by the wide margin the other two carry. Its price panel is five seasons only
+because the Austrian bidding zone did not exist before October 2018, and it grows
+by one winter a year without anyone doing anything. Three or four more would
+bring the detectable swing under the implied impact.
 
 Three things came out of it that are worth more than the coefficients:
 
@@ -904,7 +928,7 @@ calculation stand as committed.
   consensus. A systematic bias in it demonstrates a blind spot in APG's forecast,
   **not** a market mispricing. The day-ahead spot price was tested separately as
   the outcome (§8.8c) and cannot settle it either: overnight the whole Austrian
-  fleet is worth about 6.65 €/MWh against a spread whose standard deviation is 43.
+  fleet is worth about 14 €/MWh against a spread whose standard deviation is 43.
   Imbalance volumes and prices remain untried and are the better instrument.
 - **This design no longer has a working sensitivity check outside Austria.** The
   Christmas control certifies the Austrian load test and nothing else. It returns
