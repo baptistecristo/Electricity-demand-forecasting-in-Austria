@@ -6,6 +6,10 @@ data/*.parquet
 !data/opening_dates.csv
 *.parquet
 
+# Tidy ENTSO-E outputs: 17 MB, and fetch_entsoe.py regenerates them from the
+# cache in seconds. The cache itself lives outside the repository.
+src/imbalance/*.csv
+
 # Python
 __pycache__/
 *.py[cod]
