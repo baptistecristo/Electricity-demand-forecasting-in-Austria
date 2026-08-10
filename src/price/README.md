@@ -46,6 +46,18 @@ So the outcome here is a **day-ahead auction clearing price**. It is a spot
 price. It is called spot everywhere in this directory, in the code, and in the
 paper. Nothing in this test touches a futures contract.
 
+> **Since written:** `src/futures/README.md` takes up the one futures question
+> this section does not dispose of. The argument above is about *day-to-day*
+> wet-bulb news, which a calendar-month contract does average away. It leaves
+> open the seasonal level — whether the winter off-peak months in a snowmaking
+> zone carry a premium the market has priced — which is asked at the horizon
+> snowmaking is *planned* at rather than dispatched at. That leg was run on the
+> ISO-NE New Hampshire zone and stops at the liquidity gate: the contract is
+> listed on CME (AU3), ICE (IHD) and Nodal (AAV), and in sixteen years of CFTC
+> Commitments of Traders it has never once had twenty traders holding
+> twenty-five lots, on any of the three. The sentence above stands; the reason
+> futures are untested is now measured rather than assumed.
+
 ## 2. What the price test can add that the load test cannot
 
 The two tests fail in different ways, which is the reason to run both.

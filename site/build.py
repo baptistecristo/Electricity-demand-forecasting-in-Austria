@@ -1089,6 +1089,77 @@ compositional outcome that made the load test possible is exactly what blunted i
 placebo; the price outcome, useless for power, is where the placebo becomes
 sharp.</p>
 
+<h3>8.3 The futures leg: nobody has ever hedged this load</h3>
+
+<p>Section 8.2 tests the day-ahead spot auction, because a calendar-month futures
+contract averages away the day-to-day wet-bulb variation this design runs on. That
+is right about the <em>daily</em> signal, and it leaves one futures question open:
+the <b>seasonal level</b> — whether the winter off-peak months in a snowmaking zone
+carry a premium — asked at the horizon at which snowmaking is planned rather than
+dispatched. That leg was run, and it does not get past the liquidity gate.</p>
+
+<p>The instrument is the ISO-NE <b>New Hampshire</b> zone off-peak calendar-month
+day-ahead contract, listed on three venues: <b>CME AU3</b> (5 MW), <b>ICE IHD</b>
+and <b>Nodal AAV</b> (1 MW each). New Hampshire rather than Vermont because
+Vermont — the zone where section 8.1 found its coefficient — has no listed
+contract on any exchange, and nor does Rhode Island. Open interest comes from the
+<b>CFTC Commitments of Traders</b>, 2010&ndash;2025, the regulator's own publication
+of exchange-reported open interest and the only openly redistributable source:
+CME's terms of use prohibit automated access, ICE sits behind Cloudflare and Nodal
+behind a captcha.</p>
+
+<table>
+<thead><tr><th>ISO-NE location</th><th class="num">Off-peak markets in COT</th>
+  <th>Venues</th><th class="num">Peak OI (lots)</th></tr></thead>
+<tbody>
+<tr><td>Mass Hub / Internal Hub</td><td class="num">7</td>
+  <td>CME, ICE, Nodal</td><td class="num">3,078,747</td></tr>
+<tr><td>Connecticut</td><td class="num">2</td>
+  <td>CME, ICE</td><td class="num">672,838</td></tr>
+<tr class="hl"><td>New Hampshire</td><td class="num">0</td>
+  <td>&mdash;</td><td class="num">0</td></tr>
+<tr><td>Maine, NEMA, WC Mass, SE Mass</td><td class="num">0</td>
+  <td>&mdash;</td><td class="num">0</td></tr>
+<tr><td>Vermont, Rhode Island (never listed)</td><td class="num">0</td>
+  <td>&mdash;</td><td class="num">0</td></tr>
+</tbody></table>
+<p class="tcap"><b>Table 7.</b> Open interest in the ISO New England off-peak
+complex, CFTC Commitments of Traders, 2010&ndash;2025, all venues.</p>
+
+<p><b>Connecticut is what makes this a finding rather than a truism.</b> A zonal
+off-peak contract can support a reportable market — Connecticut's did, on two
+venues, at 672,838 lots. New Hampshire's never has, in sixteen years, on any of
+the three exchanges that list it.</p>
+
+<p>The claim is bounded and not overstated. The COT publishes a market when
+<b>twenty or more traders</b> hold at or above the reporting level, which for
+electricity is the <em>All Other Commodities</em> row of 17 CFR 15.03(b),
+<b>25 contracts</b>. Absence means "fewer than twenty traders holding twenty-five
+lots", not "zero open interest". That bound is enough here because of the size of
+the thing being hedged: spread across the 1,960 off-peak hours of
+November&ndash;March, New Hampshire's 22&ndash;54 GWh of snowmaking is
+<b>11&ndash;28 MW</b>, under 2.2% of the zone's winter overnight load. One
+reportable position on CME's 5 MW contract is 125 MW. <b>The entire state's
+snowmaking load is between a tenth and a fifth of a single reportable
+position</b> (0.09&ndash;0.22&times;), and the report needs twenty such traders
+before it prints a line. Concentrating the same energy into the ~45 productive
+nights of a real season — the framing favourable to the instrument — still only
+reaches 0.49&ndash;1.20&times;, about one trader's position against the twenty
+required.</p>
+
+<p>Two things fall out of the same data. CME still publishes a product page for
+AU3, but <b>CME has had no CFTC-reportable electricity market of any kind since
+2018</b> — thirty-two of them in 2010, none from 2019 — the franchise having moved
+to ICE and Nodal, so there is nothing on CME to test against regardless. And the
+off-peak block (23:00&ndash;07:00) misses the 20:00&ndash;23:00 evening ramp, when
+the wet bulb has just crossed the threshold and the decision has just been taken,
+so the contract was never well matched to the treatment even had it been liquid.</p>
+
+<p>This is a negative result about the instrument and not about the hypothesis,
+and it lands next to section 8.2 from the other side. Section 8.2 found those
+overnight megawatts are worth almost nothing in the spot auction. This finds that
+nobody has ever bothered to hedge them.</p>
+
 <h2 class="sec">9. Limitations</h2>
 <ul>
 <li>Roughly 360 relevant hours per season, heavily autocorrelated. Effective sample

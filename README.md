@@ -576,7 +576,9 @@ attributable to snowmaking by this design.
 - **Price as an outcome.** §9 notes that a load forecast error is the TSO's error,
   not the market's, and that a null here does not rule out a price effect. That
   test is now pre-registered in `src/price/README.md` for all four markets, on
-  the day-ahead spot auction rather than on futures, and §8.8c reports it.
+  the day-ahead spot auction rather than on futures, and §8.8c reports it. The
+  futures leg was taken up separately in `src/futures/` and stops at the
+  liquidity gate; §8.8d reports it.
 
 ### 8.8 Was Austria a badly chosen case? Mostly not
 
@@ -893,6 +895,70 @@ becomes sharp.
 
 Full write-up, every gate and the two data traps in `src/price/README.md`.
 
+### 8.8d The futures leg: nobody has ever hedged this load
+
+§8.8c tests the day-ahead spot auction and says no futures contract is touched,
+because a calendar-month contract averages away the day-to-day wet-bulb variation
+this design runs on. That is right about the *daily* signal and it leaves one
+futures question open: the **seasonal level**, whether the winter off-peak months
+in a snowmaking zone carry a premium, asked at the horizon at which snowmaking is
+planned rather than dispatched. `src/futures/` asks it and does not get past the
+liquidity gate.
+
+The instrument is the ISO-NE **New Hampshire** zone off-peak calendar-month
+day-ahead contract, listed on three venues — **CME AU3** (5 MW), **ICE IHD** and
+**Nodal AAV** (1 MW each), all settling on `.Z.NEMHAMPSHIRE`. New Hampshire
+rather than Vermont because Vermont, the zone where §8.8b found its coefficient,
+has no listed contract on any exchange; nor does Rhode Island.
+
+Open interest comes from the **CFTC Commitments of Traders**, 2010–2025, which is
+the regulator's own publication of exchange-reported open interest and the only
+openly redistributable source — CME's Terms of Use prohibit automated access and
+its site answers 403, ICE sits behind Cloudflare, Nodal behind a captcha.
+
+| ISO-NE location | off-peak markets in COT | venues | peak OI (lots) |
+|---|---|---|---|
+| Mass Hub / Internal Hub | 7 | CME, ICE, Nodal | **3,078,747** |
+| Connecticut | 2 | CME, ICE | **672,838** |
+| **New Hampshire** | **0** | — | **0** |
+| Maine, NEMA, WC Mass, SE Mass | 0 | — | 0 |
+| Vermont, Rhode Island *(never listed)* | 0 | — | 0 |
+
+**Connecticut is what makes this a finding rather than a truism.** A zonal
+off-peak contract can support a reportable market — Connecticut's did, on two
+venues, at 672,838 lots. New Hampshire's never has, in sixteen years, on any of
+the three exchanges that list it.
+
+The precise claim is bounded and not overstated: the COT publishes a market when
+**20 or more traders** hold at or above the reporting level, which for
+electricity is the *All Other Commodities* row of 17 CFR 15.03(b), **25
+contracts**. Absence is therefore "fewer than twenty traders holding twenty-five
+lots", not "zero open interest".
+
+That bound is enough, because of the size of the thing being hedged. Spread
+across the 1,960 off-peak hours of November–March, New Hampshire's 22–54 GWh of
+snowmaking is **11–28 MW**, or 0.9–2.2% of the zone's winter overnight load. One
+reportable position on CME's 5 MW contract is 125 MW. **The entire state's
+snowmaking load is between a tenth and a fifth of a single reportable
+position** (0.09–0.22×), and the COT needs twenty such traders before it prints a
+line. Concentrating the same energy into the ~45 productive nights of a real
+season — the framing favourable to the instrument — still only reaches
+0.49–1.20×, about one trader's position against the twenty required.
+
+Two further points fall out of the same data. CME still publishes a product page
+for AU3, but **CME has had no CFTC-reportable electricity market of any kind
+since 2018** — 32 of them in 2010, zero from 2019 — the franchise having moved to
+ICE and Nodal; so there is nothing on CME to run this test against regardless.
+And the off-peak block itself (HE01–07 plus HE24, i.e. 23:00–07:00) misses the
+20:00–23:00 evening ramp, so the contract was never well matched to the treatment
+even had it been liquid.
+
+This is a negative result about the instrument, not the hypothesis, and it lands
+next to §8.8c from the other side. §8.8c found those overnight megawatts are
+worth almost nothing in the spot auction. §8.8d finds nobody has ever bothered to
+hedge them. Full write-up, the three-venue cross-reference and six limitations in
+`src/futures/README.md`.
+
 ### 8.9 The ENTSO-E token was never necessary
 
 Two data findings, either of which would have saved days of assumed waiting.
@@ -919,7 +985,10 @@ containing no forecasting at all. Both seasons were dropped, which is why §8.8b
 reports 9 Swiss seasons and not 11. Check the ratio's variance before trusting
 this series for any zone.
 
-On futures: EEX and ICE historical settlement data is paywalled (EEX Group
+On futures — this paragraph is about the *European* arms and is superseded for
+North America by §8.8d, which found a free source (the CFTC Commitments of
+Traders) and a harder answer than paywalling: on ISO-NE the contract exists and
+nobody holds it. EEX and ICE historical settlement data is paywalled (EEX Group
 DataSource, roughly €45–80/month, redistribution prohibited), so a futures-lag test
 is not feasible on free data. Day-ahead *spot* is free from the endpoint above and is
 the honest substitute, labelled as spot rather than futures.
