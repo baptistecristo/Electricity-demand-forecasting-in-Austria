@@ -95,9 +95,15 @@ RESORT_ZONES = {
     "Eastern Chittenden": "Bolton / Stowe approach",
     "Lamoille": "Stowe / Smugglers' Notch",
     "Washington": "Sugarbush / Northfield",
-    "Western Windsor": "Okemo / Killington south",
     "Orange": "central Green Mountains",
 }
+# Windsor -- Okemo, Suicide Six -- is deliberately NOT in that set. NWS split
+# the county zone into Eastern and Western Windsor at the start of season 2022,
+# so `Windsor` exists 2016-2021 and `Western Windsor` exists 2022-2025 and they
+# are different geographies. Splicing them would give the panel one zone whose
+# definition changes mid-sample, which is worse in a pre-registered design than
+# losing the zone. See README section 6, amendment 2.
+SPLIT_ZONES = ("Windsor", "Eastern Windsor", "Western Windsor")
 # README section 6: the primary treatment averages these four.
 CORE_ZONES = ("Eastern Rutland", "Eastern Addison",
               "Eastern Franklin", "Lamoille")
@@ -207,13 +213,25 @@ def to_inches(tok: str | None, lower: bool = False) -> float | None:
     return float(m.group(1)) if m else None
 
 
+def zone_name(raw: str) -> str:
+    """Normalise a zone label to title case.
+
+    Season 2016 prints every zone name in upper case -- `EASTERN RUTLAND` --
+    and seasons 2017 onward print `Eastern Rutland`. Keyed verbatim, those are
+    two different zones, and any downstream match on the modern spelling drops
+    the whole of season 2016 without raising. `.title()` is idempotent on the
+    modern names and correct on the old ones, including `ST. LAWRENCE`.
+    """
+    return raw.strip().rstrip("-").strip().title()
+
+
 def zone_blocks(lines: list[str]):
     """Yield (zone_name, block_lines) for each zone section of a product."""
     starts = [i for i, l in enumerate(lines) if ZONE_RE.match(l)]
     for a, i in enumerate(starts):
         j = starts[a + 1] if a + 1 < len(starts) else len(lines)
         if i + 1 < len(lines):
-            yield lines[i + 1].strip().rstrip("-"), lines[i:j]
+            yield zone_name(lines[i + 1]), lines[i:j]
 
 
 def parse_block(zone: str, block: list[str]) -> tuple[list[dict], bool]:
@@ -381,7 +399,7 @@ def audit() -> None:
 def main() -> None:
     files = sorted(CACHE.glob("*.txt"))
     print(f"{len(files)} cached products")
-    out, bad_blocks, bad_files = [], 0, 0
+    out, bad_blocks, bad_files, empty = [], 0, 0, []
     for f in files:
         try:
             rows, bad = parse_product(f.read_text(encoding="utf-8"))
@@ -389,6 +407,8 @@ def main() -> None:
             print(f"  {f.name}: {e}")
             bad_files += 1
             continue
+        if not rows:
+            empty.append(f.stem)
         bad_blocks += bad
         for r in rows:
             r["product"] = f.stem
@@ -410,6 +430,11 @@ def main() -> None:
     print(f"issued {d['issued_utc'].min()} .. {d['issued_utc'].max()}")
     print(f"dropped {bad_blocks} zone blocks whose two header rows disagreed, "
           f"{bad_files} unreadable files")
+    # A product that parses cleanly but carries no zone block at all is a
+    # truncated transmission, not a parser failure. Name them rather than let
+    # the product count quietly differ from the issuance count.
+    print(f"{len(empty)} products with no zone block"
+          + (f": {', '.join(empty)}" if empty else ""))
     print(f"lead time: {d.lead_h.min():.0f} .. {d.lead_h.max():.0f} h, "
           f"median {d.lead_h.median():.0f} h")
     print(f"wet bulb present on {100*d.wb_c.notna().mean():.1f}% of rows")

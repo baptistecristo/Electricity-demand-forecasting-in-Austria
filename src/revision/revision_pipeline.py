@@ -449,7 +449,7 @@ def main() -> None:
         print(line(fit(b), "rev_post"))
 
     for lbl, kw in (
-            ("s6    all eight resort zones, not the four core",
+            ("s6    all seven resort zones, not the four core",
              dict(zones=tuple(RESORT_ZONES))),
             ("s12   range lower bound, trace exactly zero",
              dict(snow_col="snow_in_lo")),

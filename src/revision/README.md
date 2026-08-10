@@ -102,7 +102,7 @@ and recorded in `provenance_isone.md`, and re-confirmed for this arm by pulling
 needed; it now accepts `--seasons 2016-2018` so the cache can be extended
 backwards without touching what the price test reads.
 
-### 4.1 Six things found by inspection that would have failed silently
+### 4.1 Seven things found by inspection that would have failed silently
 
 1. **The row is `Snow 12hr`, not `SNOW 12HR`.** Older products use upper case and
    modern ones mixed case. An exact-case match returns nothing across ten years
@@ -129,17 +129,53 @@ backwards without touching what the price test reads.
    hardcoded at a fixed UTC hour — as an earlier draft of this file had it, at
    "15:30 UTC in winter" — misclassifies the first week of every season. The gate
    is applied in `America/New_York` and converted per date.
+7. **Season 2016 prints the zone names in upper case.** `EASTERN RUTLAND` in
+   2016, `Eastern Rutland` from 2017 on. Keyed verbatim these are two zones, and
+   any downstream match on the modern spelling deletes the whole first season
+   without raising: the archive appeared to hold 52 zones when it holds 27, and
+   the four-zone core panel came out 54,618 rows when it is 60,738. Nothing about
+   the aggregate counts looked wrong — this is the failure mode this list exists
+   for, and it was invisible in the 2,476-product snapshot because that snapshot
+   started in 2016 and every product in it was internally consistent. Zone labels
+   are now normalised to title case at parse time.
 
 ## 5. What the parse yields
 
-> Provisional: measured on the first 2,113 of roughly 5,000 products, seasons
-> 2016 to late 2020. Collection is still running and these counts will be
-> restated on the full archive before any estimation. They are here to show that
-> the treatment has variation, not to characterise the final panel.
+Final, measured on the complete archive: **5,063 products, all ten seasons,
+640 of 640 dates, no gaps and no fetch failures.** One product
+(`202412231433-KBTV-FOUS51-AFMBTV`) is a 31-character truncated transmission
+carrying no zone block; it is dropped and named in the parse output, which is
+why the run reports 5,062 issuances against 5,063 files.
 
-157,359 rows over 50 zones. Across the four core resort zones, **29.3% of
-forecast periods carry non-zero snow and 6.4% carry two inches or more**, maximum
-7.5 inches per 12-hour period.
+**385,602 rows over 27 zones**, issued 2016-10-29 01:39Z to 2025-12-31 21:02Z.
+Every zone block's reconstructed time grid was checked against that product's own
+UTC header row: **0 disagreements in 5,062 issuances.** Lead time runs 5 to 44
+hours, median 24. Wet bulb resolves on 99.5% of rows; the remainder are periods
+with fewer than three of the four 3-hourly steps, which are set missing rather
+than averaged over a short window.
+
+Seven resort zones are continuous across all ten seasons — 106,293 rows, no
+missing `Snow 12hr` cells within them:
+
+| zone | rows | non-zero | ≥ 2 in |
+| --- | --- | --- | --- |
+| Eastern Franklin | 15,186 | 4,740 | 964 |
+| Eastern Chittenden | 15,186 | 4,259 | 786 |
+| Eastern Rutland | 15,186 | 3,127 | 677 |
+| Washington | 15,186 | 3,828 | 756 |
+| Lamoille | 15,183 | 4,771 | 974 |
+| Eastern Addison | 15,183 | 3,674 | 684 |
+| Orange | 15,183 | 2,625 | 509 |
+
+Across the four core zones of §6: **60,738 rows, 26.9% of forecast periods carry
+non-zero snow and 5.4% carry two inches or more**, maximum 10.0 inches per
+12-hour period.
+
+The provisional counts this section carried before collection finished — 157,359
+rows, 50 zones, 29.3% non-zero — were measured on the first 2,113 products and
+are superseded. Two of the three differences are just sample size; the zone count
+fell from 50 to 27 because of the casing defect in §4.1 item 7, not because zones
+disappeared.
 
 Each issuance gives roughly two to three forward 12-hour snow forecasts per zone,
 so revisions are measurable at **zero-to-two-day lead**.
@@ -163,6 +199,17 @@ for Vermont as a whole (root README §2) and no defensible per-resort split;
 inventing weights would be a free parameter. A night is kept only if at least
 three of the four zones have a non-missing value at every anchor in §7.
 Sensitivity: all eight zones of `RESORT_ZONES`.
+
+> **Amendment 2, 2026-08-10, made before any coefficient was estimated.**
+> The sensitivity is **seven** zones, not eight. Parsing the full archive showed
+> that NWS split the Windsor county zone into **Eastern Windsor** and **Western
+> Windsor** at the start of season 2022: `Windsor` exists 2016–2021 and
+> `Western Windsor` — the one holding Okemo — exists 2022–2025, and they are
+> different geographies. Splicing them gives one zone whose definition changes
+> mid-sample, which is worse in a pre-registered design than losing the zone, so
+> Windsor is excluded from `RESORT_ZONES` altogether. The registered sensitivity
+> is now *the seven resort zones present in all ten seasons*. **The primary
+> treatment is untouched** — none of the four core zones is affected.
 
 The outcome is a single statewide zonal price, so zone-level treatment against
 it would repeat one outcome across four rows and manufacture precision. The
