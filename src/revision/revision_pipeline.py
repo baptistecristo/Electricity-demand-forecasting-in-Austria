@@ -478,5 +478,59 @@ def main() -> None:
             print(line(fit(sub), "rev_post"))
 
 
+def review_diagnostics(afm: pd.DataFrame | None = None) -> None:
+    """The checks `revision-arm-review.md` asked for. README section 15.5.
+
+    The review's substantive point is that `rev_pre` and `rev_post` share
+    anchor B, so an error u in S(B) enters one with a plus and the other with a
+    minus and induces covariance -var(u) whether or not the forecast is
+    efficient. That could fire kill criterion 1 mechanically. Its own
+    discriminating test, run first as it asked: regress rev_post on rev_pre. A
+    negative slope is the shared rounding error, a positive one is revision
+    momentum, near zero means the concern is idle.
+    """
+    afm = load_afm() if afm is None else afm
+    panels = build(afm=afm)
+    p = panels["Vermont"]
+
+    print("=" * 74)
+    print("REVIEW 2  rev_pre and rev_post share anchor B")
+    print("=" * 74)
+    for tag, col in (("snow_in ", "snow_in"), ("snow_in_lo", "snow_in_lo")):
+        q = p if col == "snow_in" else build(afm=afm, snow_col=col)["Vermont"]
+        m = smf.ols("rev_post ~ rev_pre", data=q).fit(cov_type="HC1")
+        b, se = m.params["rev_pre"], m.bse["rev_pre"]
+        print(f"  {tag}  corr {q[['rev_pre', 'rev_post']].corr().iloc[0, 1]:+.4f}"
+              f"   slope {b:+.4f} ({se:.4f})  t={b / se:+.2f}  "
+              f"p={m.pvalues['rev_pre']:.4f}")
+        if col == "snow_in":
+            # slope = -var(u)/var(rev_pre), so sd(u) = sqrt(-slope)*sd(rev_pre)
+            sd = p.rev_pre.std()
+            f = (lambda x: np.sqrt(max(-x, 0.0)) * sd)
+            print(f"            implied sd(u) = {f(b):.4f} in  "
+                  f"(95% CI {f(b + 1.96 * se):.4f} .. {f(b - 1.96 * se):.4f}), "
+                  f"vs sd(rev_pre) {sd:.4f} in and a 1.0 in range grain")
+    print("  The contamination biases TOWARD firing kill criterion 1. If the")
+    print("  criterion passed, this channel cannot be why.")
+
+    print("\n" + "=" * 74)
+    print("REVIEW 4b  does the four-zone mean float between three and four?")
+    print("=" * 74)
+    print(f"  {p.n_zones.value_counts().sort_index().to_dict()}   "
+          f"nights below four: {int((p.n_zones < len(CORE_ZONES)).sum())} "
+          f"of {len(p)}")
+
+    print("\n" + "=" * 74)
+    print("REVIEW 1  anchors, re-run on the post-casing-fix parse")
+    print("=" * 74)
+    print(f"  rev_pre  non-missing {p.rev_pre.notna().mean() * 100:5.1f}%   "
+          f"exactly zero {(p.rev_pre == 0).mean() * 100:5.1f}%")
+    print(f"  rev_post non-missing {p.rev_post.notna().mean() * 100:5.1f}%   "
+          f"exactly zero {(p.rev_post == 0).mean() * 100:5.1f}%")
+
+
 if __name__ == "__main__":
-    main()
+    if "--review" in sys.argv:
+        review_diagnostics()
+    else:
+        main()

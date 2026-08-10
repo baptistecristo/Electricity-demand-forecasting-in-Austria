@@ -18,8 +18,9 @@
 >
 > **The result is outcome 4 of the five registered in section 10: the
 > falsification test passes, and the coefficient is too imprecise to be read.**
-> Section 15.2 gives the arithmetic, and 15.4 the one thing worth carrying
-> forward.
+> Section 15.2 gives the arithmetic, 15.4 the one thing worth carrying forward,
+> and 15.5 the answers to an independent review of the specification written
+> before the coefficient existed.
 
 ## 1. Why this exists
 
@@ -468,6 +469,7 @@ python src/revision/parse_afm.py --audit       # check the column alignment
 python src/price/fetch_lmp.py --seasons 2016-2018 --no-october   # ten seasons
 python src/revision/fetch_isne_load.py         # ISO-NE demand, for the slope
 python src/revision/revision_pipeline.py       # gates first, then coefficients
+python src/revision/revision_pipeline.py --review   # the section 15.5 checks
 ```
 
 An earlier version of this section said the archive takes about 45 minutes cold.
@@ -574,7 +576,78 @@ assumption-free bound** — which no arm in this project has managed. That is th
 one genuinely new thing this run produced, and it bears directly on §13: the
 reason to run this again is not a better instrument but a better-chosen outcome.
 
-### 15.5 What this run settles
+### 15.5 Answers to the independent review
+
+A second session reviewed §1–14 at commit `1d8af41`, before any coefficient
+existed, and wrote it up in `revision-arm-review.md`. It raised four points. All
+four are answered here on the post-casing-fix parse, including the two it
+flagged as needing restatement.
+
+**1. Anchor collapse — confirmed clean.** The review checked that "the last
+issuance at or before" never silently returns the previous anchor's product, and
+found 0 of 600 nights where A and B or B and C resolve to the same product. On
+the fixed parse both revisions are non-missing on **100% of nights**. `rev_pre`
+is exactly zero on 62.3% and `rev_post` on 64.2%, which is the forecast not
+changing rather than the anchors collapsing.
+
+**2. `rev_pre` and `rev_post` share anchor B — real mechanism, small magnitude,
+and it could not have caused the result.** The review is right that an error `u`
+in `S(B)` enters `rev_pre` with a plus and `rev_post` with a minus, inducing
+covariance `−var(u)` whether or not the forecast is efficient. It asked for the
+discriminating regression first, so here it is:
+
+    corr(rev_pre, rev_post)  = -0.106
+    rev_post on rev_pre      = -0.0985  (0.0969)   t = -1.02   p = 0.31
+    same, snow_in_lo         = -0.1214  (0.0868)   p = 0.16
+
+The **sign is the one the review predicted** — shared rounding error, not
+revision momentum — and it survives the range-lower-bound treatment, so it is a
+property of the construction rather than of the midpoint rule. But the magnitude
+is small. The slope identifies `var(u)/var(rev_pre)`, giving an implied
+**sd(u) ≈ 0.083 in, 95% CI [0.000, 0.142]** — a third of sd(`rev_pre`) and an
+order of magnitude below the 1.0-inch grain of an `01-03` range. The review's
+worry that the error is "comparable to the signal" is not borne out at the level
+of the four-zone nightly mean, and the arithmetic of why is in point 5 below.
+
+The decisive point is directional. This contamination biases **toward** firing
+kill criterion 1, and **criterion 1 did not fire** (`rev_post` p = 0.74). A
+channel that could only have produced a false INVALID cannot explain a pass. The
+criterion stands as written, and the review's own stopping rule — "if it is near
+zero the concern is idle" — is met. The second falsification specification it
+offered as a fallback is therefore not run, on its own condition.
+
+**3. "SUPPORTS" had no object — conceded.** §10 outcome 2 should have read
+"supports the claim that the day-ahead **price** impounds pre-gate snow news,"
+which is a statement about the market and not about the load-forecaster blind
+spot that §1 motivates the arm from. The arm escapes the `cum_cold_h`
+collinearity but it does not produce an α. The clause is not being retrofitted
+into §10 — amending a registered criterion after estimation is exactly what this
+file exists to prevent — so the correction is recorded here instead. It costs
+nothing in this run: outcome 2 did not fire.
+
+**4a. Multiplicity was unregistered — conceded, and it did not bite.** Roughly
+ten looks at 5% carry about a 40% chance of one false positive. Registering it
+afterwards is worth nothing, so the honest statement is the count: **0 of the
+sensitivities came back significant**, which is what a genuine null looks like
+and is the opposite of the failure mode multiplicity creates. For any successor
+arm: sensitivities are descriptive and cannot upgrade a null primary.
+
+**4b. The zone mean does not float.** §6 keeps a night on three of four zones,
+and the review was right to ask how often that fires. It fires **never**: all
+**600 of 600** nights carry all four core zones. `MIN_ZONES = 3` is dead code on
+this archive, so the treatment is a four-zone mean on every night and none of the
+night-to-night variation is zone-set churn.
+
+**5. The review's own caveats, discharged.** Its descriptives predated the
+casing fix and so excluded season 2016; it asked for them to be restated, and
+§5 and this section are the restatement. Its sd of **0.534 in** for a successive
+revision is not comparable to sd(`rev_pre`) = **0.263 in**, and the gap is not a
+correction: theirs is a single zone-period revision, `rev_pre` is a mean over
+four zones for one 12Z period, and averaging four imperfectly correlated zones is
+most of the factor of two. Its own judgement that the `222` figure should not be
+quoted is correct and it is not quoted anywhere here.
+
+### 15.6 What this run settles
 
 `rev_post` is flat, so the falsification the design was built around holds and the
 arm is structurally sound. The nightly snowfall-revision channel is not visible
