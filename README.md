@@ -907,7 +907,7 @@ liquidity gate.
 
 The instrument is the ISO-NE **New Hampshire** zone off-peak calendar-month
 day-ahead contract, listed on three venues — **CME AU3** (5 MW), **ICE IHD** and
-**Nodal AAV** (1 MW each), all settling on `.Z.NEMHAMPSHIRE`. New Hampshire
+**Nodal AAV** (1 MW each), all settling on `.Z.NEWHAMPSHIRE`. New Hampshire
 rather than Vermont because Vermont, the zone where §8.8b found its coefficient,
 has no listed contract on any exchange; nor does Rhode Island.
 

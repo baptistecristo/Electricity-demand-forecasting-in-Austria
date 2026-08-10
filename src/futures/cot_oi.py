@@ -164,20 +164,26 @@ def read_year(path: Path) -> list[dict]:
     hdr = [h.strip() for h in rows[0]]
     iN = hdr.index("Market_and_Exchange_Names")
     iOI = hdr.index("Open_Interest_All")
-    # The date column is named differently across vintages.
-    iD = next((hdr.index(c) for c in
-               ("Report_Date_as_YYYY-MM-DD", "Report_Date_as_MM_DD_YYYY",
-                "As_of_Date_In_Form_YYMMDD") if c in hdr), None)
+    # `Report_Date_as_...` is spelled differently across vintages, but
+    # As_of_Date_In_Form_YYMMDD is in every one of them. Parse it to a real date:
+    # THE FILES RUN NEWEST FIRST, so anything that takes "the last row" as "the
+    # latest week" reads the January figure and calls it December. Sort, always.
+    iD = hdr.index("As_of_Date_In_Form_YYMMDD")
     out = []
     for x in rows[1:]:
         if not x:
             continue
         full = x[iN].strip()
         venue = full.split(" - ")[-1].strip()
+        raw = x[iD].strip()
+        try:
+            d = dt.date(2000 + int(raw[:2]), int(raw[2:4]), int(raw[4:6]))
+        except (ValueError, IndexError):
+            continue
         out.append({
             "market": full[: len(full) - len(venue) - 3].strip(),
             "venue": venue,
-            "date": x[iD].strip() if iD is not None else "",
+            "date": d.isoformat(),
             "oi": int(x[iOI]) if x[iOI].strip() else 0,
         })
     return out
@@ -263,16 +269,16 @@ def main() -> None:
     print("-" * 78)
     by_market = collections.defaultdict(list)
     for r in isone_rows:
-        by_market[(r["market"], r["venue"])].append((r["year"], r["oi"]))
-    print(f"   {'market':34s} {'venue':22s} {'years':11s} {'peak OI':>10s} "
-          f"{'last OI':>10s}")
+        by_market[(r["market"], r["venue"])].append((r["date"], r["oi"]))
+    print(f"   {'market':34s} {'venue':22s} {'weeks spanned':13s} {'peak OI':>10s} "
+          f"{'latest OI':>10s} {'on':>11s}")
     for (m, v), vals in sorted(by_market.items(),
                                key=lambda kv: -max(o for _, o in kv[1])):
-        yrs = sorted({y for y, _ in vals})
-        span = f"{yrs[0]}-{yrs[-1]}" if len(yrs) > 1 else str(yrs[0])
-        last = [o for y, o in vals if y == yrs[-1]][-1]
-        print(f"   {m[:34]:34s} {v[:22]:22s} {span:11s} "
-              f"{max(o for _, o in vals):10,} {last:10,}")
+        vals.sort()                      # by date, not by file order
+        span = f"{vals[0][0][:4]}-{vals[-1][0][:4]}"
+        print(f"   {m[:34]:34s} {v[:22]:22s} {span:13s} "
+              f"{max(o for _, o in vals):10,} {vals[-1][1]:10,} "
+              f"{vals[-1][0]:>11s}")
     print()
 
     # ---- C. the venue census: where did CME's electricity book go? ---------

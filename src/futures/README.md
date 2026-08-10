@@ -41,8 +41,10 @@ a tradable snowmaking premium, it is this one.
 ## 2. The instrument
 
 The same instrument is listed on three exchanges. All three settle on the
-day-ahead LMP at ISO-NE's New Hampshire load zone, node `.Z.NEMHAMPSHIRE` (4002),
-averaged over the off-peak block of a calendar month.
+day-ahead LMP at ISO-NE's New Hampshire load zone, **`.Z.NEWHAMPSHIRE`**, zone id
+4002, averaged over the off-peak block of a calendar month. That is the spelling
+ISO-NE publishes and the one `src/vermont/vt_pipeline.py` uses; ICE's contract
+text renders it `.Z.NEMHAMPSHIRE`, which is ICE's spelling and not the ISO's.
 
 | venue | code | size | product |
 | --- | --- | --- | --- |
@@ -153,8 +155,14 @@ peaked at 672,838 lots. A zone *can* support a reportable off-peak market. Six o
 the eight, New Hampshire among them, never have.
 
 The hub is alive today and is not a historical artifact: the ICE Mass Hub
-day-ahead off-peak contract stood at 73,668 lots at the end of 2025 and Nodal's
-Internal Hub off-peak at 79,667. The liquidity exists. It sits at the hub.
+day-ahead off-peak contract stood at 71,307 lots on 30 December 2025 and Nodal's
+Internal Hub off-peak at 88,617. The liquidity exists. It sits at the hub.
+
+**On reading the OI column across venues.** Lot sizes differ — the 3,078,747
+peak is a 1 MW ICE mini, CME's 1,256,026 hub swap is 5 MW — so the column
+compares reportable size and trader interest, not megawatts. Nothing in §6
+turns on a cross-venue megawatt comparison, and the megawatt arithmetic in §6.4
+is done per contract at that contract's own size.
 
 ### 6.3 CME has had no electricity market of any kind in the COT since 2018
 
@@ -249,7 +257,7 @@ auction. This says nobody has ever bothered to hedge them.
    years.
 4. **The off-peak block misses the evening ramp**, per §2. The instrument was
    never well matched to the treatment even if it had been liquid.
-5. **`.Z.NEMHAMPSHIRE` is a load zone, not the mountains.** Every zonal criticism
+5. **`.Z.NEWHAMPSHIRE` is a load zone, not the mountains.** Every zonal criticism
    in `src/vermont/README.md` §7 applies here and with more force, because New
    Hampshire's zone contains Manchester and Nashua as well as the White
    Mountains.
