@@ -485,8 +485,15 @@ constant rather than naming a path of their own.
 
 ## 15. Result
 
-Everything above this line was committed before the pipeline was run once.
-`git log --oneline -- src/revision/` is the check.
+Everything registered was committed at `52e9a6e`, before the pipeline was run
+once. The check is `git diff 52e9a6e..HEAD -- src/revision/README.md`, and it
+must be stated precisely enough to survive being run: that diff touches text
+above this line in exactly two places, the STATUS block at the top and the
+`--review` line in §14's run instructions. **Sections 6 to 11 — the unit of
+observation, the treatment, the outcome, the specification, the predicted sign,
+the kill criteria and the power gate — carry no post-estimation edit at all.**
+Where §15.5 concedes that a registered criterion was worded badly, it says so
+here rather than correcting it up there, for the same reason.
 
 **Panel.** 600 nights, exactly 60 in each of the ten seasons, 2016–2025. A
 genuinely later anchor C exists on 100% of nights, so the falsification test is
@@ -579,7 +586,9 @@ reason to run this again is not a better instrument but a better-chosen outcome.
 ### 15.5 Answers to the independent review
 
 A second session reviewed §1–14 at commit `1d8af41`, before any coefficient
-existed, and wrote it up in `revision-arm-review.md`. It raised four points. All
+existed. Its write-up is committed unedited beside this file as
+[`review.md`](review.md) — answering it point by point while leaving the reader
+unable to read it would be worth little. It raised four points. All
 four are answered here on the post-casing-fix parse, including the two it
 flagged as needing restatement.
 
