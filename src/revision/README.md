@@ -357,7 +357,11 @@ So the gate is:
    the six-season one, and print both.
 
 Because the bound is an upper bound, a verdict of "underpowered" from this gate
-is assumption-free, which no other power gate in this project has managed.
+is assumption-free, which no other power gate in this project has managed. The
+converse does not hold and the pipeline prints it that way: an MDE *below* the
+bound certifies nothing, because a one-standard-deviation revision plainly does
+not shut down the whole fleet and this gate has no way to say what fraction it
+does shut down. The gate can fire outcome 4. It cannot rule it out.
 
 ## 12. What this test cannot do
 
