@@ -1,17 +1,25 @@
 # Snowfall-forecast revisions as the treatment
 
-> **STATUS: sections 1 to 12 are the pre-registration. There is no result here.**
+> **STATUS: sections 1 to 14 are the pre-registration. Section 15 is the result.**
 >
 > Sections 6 to 11 fix the unit of observation, the treatment, the outcome, the
 > specification, the predicted sign, the kill criteria and the power gate. They
 > were committed before a single coefficient was estimated, the way
 > `src/price/README.md` sections 1 to 9 were, and for the same reason: the
 > ordering in `git log --oneline -- src/revision/` is the only thing that makes
-> whatever comes next worth reading.
+> section 15 worth reading.
 >
-> Everything printed below is either a design choice or a descriptive count of
-> the forecast archive. No number below is a coefficient, a standard error, or a
-> p-value.
+> Nothing in sections 1 to 14 is a coefficient, a standard error, or a p-value;
+> every number there is a design choice or a descriptive count of the forecast
+> archive. Two amendments were needed after the archive was complete and before
+> anything was estimated — anchor A in section 7 and the Windsor zone split in
+> section 6. Both are printed where they apply rather than substituted for the
+> text they correct.
+>
+> **The result is outcome 4 of the five registered in section 10: the
+> falsification test passes, and the coefficient is too imprecise to be read.**
+> Section 15.2 gives the arithmetic, and 15.4 the one thing worth carrying
+> forward.
 
 ## 1. Why this exists
 
@@ -472,3 +480,106 @@ an interrupted run costs nothing but the date it was on.
 The cache path at the top of `fetch_afm.py` is the only thing that needs changing
 on another machine. `parse_afm.py` and `revision_pipeline.py` import that
 constant rather than naming a path of their own.
+
+## 15. Result
+
+Everything above this line was committed before the pipeline was run once.
+`git log --oneline -- src/revision/` is the check.
+
+**Panel.** 600 nights, exactly 60 in each of the ten seasons, 2016–2025. A
+genuinely later anchor C exists on 100% of nights, so the falsification test is
+available everywhere and is not being read off a subsample. `rev_pre` has
+sd 0.263 in and is non-zero on 37.7% of nights; `rev_post` sd 0.244 in, non-zero
+on 35.8%. The outcome has sd 14.60 USD/MWh.
+
+### 15.1 Kill criterion 1 — passes
+
+    rev_post   -0.8585  (2.5755)   t = -0.33   p = 0.74
+
+The day-ahead price does not respond to news that postdates it. The design is
+not invalidated, so `rev_pre` may be read. §10 registered this as a weak pass and
+it is one: `rev_post` carries less variance than `rev_pre`, its own MDE is
+1.231 USD/MWh, and a null against that is survival, not certification.
+
+### 15.2 The registered gate fires outcome 4
+
+    rev_pre  MDE   4.303 USD/MWh per inch   (1.96 x HC1 s.e. 2.196)
+
+§11 registered two scalings and did not say which governs when they disagree.
+They disagree here: scaled to one sd the MDE is 1.134 against a bound of 1.673,
+scaled to the full observed range it is 16.622. **The ambiguity is resolved here,
+after estimation, in the direction adverse to the design** — that is the only
+direction in which resolving a registered ambiguity post-hoc is defensible, and
+it is also the logically correct one. The bound caps the effect *of a revision*,
+not the effect per inch: under the linear model in §9, `β·r ≤ 1.673` must hold at
+every observed `r`, so the largest admissible slope is `1.673 / max r`. The
+one-sd comparison embeds an impossible premise — if a 0.26-inch revision shut off
+the whole fleet, a full-range revision would shut off fifteen of them.
+
+| bound | scaling | β_max | MDE / β_max |
+| --- | --- | --- | --- |
+| inherited 1.673 | span 3.862 in | 0.432 | **9.9×** |
+| inherited 1.673 | max\|rev\| 2.380 in | 0.703 | **6.1×** |
+| re-estimated 1.536 | span 3.862 in | 0.397 | **10.8×** |
+| re-estimated 1.536 | max\|rev\| 2.380 in | 0.645 | **6.7×** |
+
+Underpowered by six to eleven times, under every combination of the two slopes
+§11 item 4 registered and both scalings. **Outcome 4. The coefficient is reported
+and no claim is made from it**, the same treatment Switzerland's load coefficient
+and all four price coefficients received.
+
+### 15.3 The coefficients, reported and not claimed
+
+    Vermont      rev_pre   +0.2023  (2.1956)   t = +0.09   p = 0.93
+    RhodeIsland  rev_pre   +0.0834  (2.2365)   t = +0.04   p = 0.97
+    VT - RI      rev_pre   +0.1189  (0.2038)   t = +0.58   p = 0.56
+
+The point estimate carries the *wrong* sign — §10 predicted negative — and it is
+nowhere near significance. Outcome 3 (REJECTS) explicitly requires that §11 find
+the test powered, and §11 did not, so the wrong sign is given no weight in either
+direction. Every registered sensitivity is null: 10:00 gate (4 of 600 nights
+change, 0.7%), seven zones, range lower bound with trace at zero, the straddling
+11-hour block, HAC(7), night level rather than spread, and the six-season
+restriction to the load panel's own nights.
+
+**Outcome 5 is mechanically met and is vacuous.** Rhode Island reproduces
+`rev_pre` to within 0.12 USD/MWh against a half-standard-error threshold of about
+1.1. The rule exists to catch a region-wide signal masquerading as a Vermont one;
+here there is no signal to attribute to anywhere, and it should not be read as a
+second finding.
+
+### 15.4 One thing worth carrying forward, labelled post-hoc
+
+This was not registered and is not scored. Differencing Vermont against Rhode
+Island removes the ISO-NE-wide component of the night spread and cuts the
+standard error by a factor of about eleven, from 2.196 to 0.204. That puts the
+differential's MDE at 0.399 USD/MWh per inch — **0.57× to 0.92× the whole-fleet
+bound, and 1.01× under the re-estimated slope.** Its 95% CI, [−0.28, +0.52],
+excludes the whole-fleet effect in all four cells of the table above.
+
+Three reasons that is not a rejection, all of which have to be said for the
+paragraph to be honest. It is knife-edge: a verdict that holds under one
+registered slope and fails under the other by one percent is a boundary, not a
+result. The CI exclusion depends partly on the point estimate landing at +0.12;
+with the same standard error and an estimate of −0.31 the whole-fleet effect
+would sit inside it. And translated into the fraction α of the fleet that
+responds, the differential can only detect **α ≳ 0.57 to 0.92** — excluding "a
+quarter-inch forecast revision shuts down sixty to ninety percent of Vermont's
+snowmaking" excludes nothing anybody believed.
+
+The value is in the design, not the inference. **A successor arm that registers
+the Vermont-minus-Rhode-Island differential as its primary specification, with
+the §11 power gate computed on that specification, starts out powered against the
+assumption-free bound** — which no arm in this project has managed. That is the
+one genuinely new thing this run produced, and it bears directly on §13: the
+reason to run this again is not a better instrument but a better-chosen outcome.
+
+### 15.5 What this run settles
+
+`rev_post` is flat, so the falsification the design was built around holds and the
+arm is structurally sound. The nightly snowfall-revision channel is not visible
+in the ISO-NE day-ahead night spread at a precision that could see it — and §13
+predicted exactly that, for the reason it gave, before the numbers existed. What
+`src/revision/` adds to the project is not a coefficient. It is a treatment
+variable with real high-frequency variation, a falsification test that passes, and
+a specification whose standard error is small enough to be worth a second look.
