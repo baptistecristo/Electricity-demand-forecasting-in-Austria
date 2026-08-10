@@ -405,12 +405,23 @@ loudly, and it is the one to watch.
 ## 14. Run it
 
 ```
-python src/revision/fetch_afm.py     # ~5,000 products, ~45 min cold, cached
-python src/revision/parse_afm.py     # writes afm_snow.csv
-python src/revision/parse_afm.py --audit    # check the column alignment
+python src/revision/fetch_afm.py               # forward, and in another shell:
+python src/revision/fetch_afm.py --reverse     # newest first; they meet
+python src/revision/parse_afm.py               # writes afm_snow.csv
+python src/revision/parse_afm.py --audit       # check the column alignment
 
 python src/price/fetch_lmp.py --seasons 2016-2018 --no-october   # ten seasons
+python src/revision/fetch_isne_load.py         # ISO-NE demand, for the slope
+python src/revision/revision_pipeline.py       # gates first, then coefficients
 ```
 
+An earlier version of this section said the archive takes about 45 minutes cold.
+It does not. The measured rate is around 1.5 dates a minute, so one pass over
+640 dates is closer to seven hours, and IEM's latency rather than this script's
+`PACE` is what sets it. Running the forward and reverse passes together roughly
+halves that. Both are resumable: a date is skipped once its marker exists, so
+an interrupted run costs nothing but the date it was on.
+
 The cache path at the top of `fetch_afm.py` is the only thing that needs changing
-on another machine.
+on another machine. `parse_afm.py` and `revision_pipeline.py` import that
+constant rather than naming a path of their own.
