@@ -44,6 +44,14 @@ is what the panel needs and keeps the cache inspectable.
 
     python fetch_lmp.py            # fetch (resumable) + build CSVs + provenance
     python fetch_lmp.py --no-fetch # rebuild outputs from cache only
+    python fetch_lmp.py --seasons 2016-2018 --no-october   # extend the cache back
+
+`--seasons` exists because src/revision/ needs ten seasons where the price test
+needed seven. It only widens what is downloaded; the cache is additive and the
+zone CSVs are rebuilt from everything on disk, so the price panel is unaffected
+either way -- price_pipeline.py joins onto a night panel that starts in 2019 and
+ignores the earlier hours. Archive depth is not a constraint: the earliest day
+returning real data is 2015-12-03 (provenance_isone.md, "Archive depth").
 """
 from __future__ import annotations
 
@@ -133,9 +141,9 @@ def _zone_slice(text: str) -> str | None:
     return "\n".join(head + zrows) + "\n"
 
 
-def target_dates(months=PANEL_MONTHS) -> list[str]:
+def target_dates(months=PANEL_MONTHS, seasons=None) -> list[str]:
     out = []
-    for y in SEASONS:
+    for y in (SEASONS if seasons is None else seasons):
         for m in months:
             d = dt.date(y, m, 1)
             while d.month == m:
@@ -253,19 +261,29 @@ def expected_hours(season: int, months) -> int:
     return n
 
 
-def main(do_fetch: bool = True, with_october: bool = True) -> None:
+def main(do_fetch: bool = True, with_october: bool = True,
+         seasons=None) -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     fails: list[str] = []
     if do_fetch:
-        n1, f1 = ensure_cache(target_dates(PANEL_MONTHS))
+        n1, f1 = ensure_cache(target_dates(PANEL_MONTHS, seasons))
         fails += f1
         print(f"Nov-Dec: {n1} newly cached, {len(f1)} misses", flush=True)
         if with_october:
-            n2, f2 = ensure_cache(target_dates(EXTRA_MONTHS))
+            n2, f2 = ensure_cache(target_dates(EXTRA_MONTHS, seasons))
             fails += f2
             print(f"October: {n2} newly cached, {len(f2)} misses", flush=True)
-        (OUT / "fetch_failures.json").write_text(json.dumps(fails, indent=1),
-                                                encoding="utf-8")
+        # Additive: a second run for a different season range must not erase the
+        # first run's failure list.
+        prev = []
+        fp = OUT / "fetch_failures.json"
+        if fp.exists():
+            try:
+                prev = json.loads(fp.read_text(encoding="utf-8"))
+            except Exception:                            # noqa: BLE001
+                prev = []
+        fp.write_text(json.dumps(sorted(set(prev) | set(fails)), indent=1),
+                      encoding="utf-8")
 
     df = load_panel()
     if not len(df):
@@ -279,5 +297,16 @@ def main(do_fetch: bool = True, with_october: bool = True) -> None:
           f"{df.date.nunique()} days cached")
 
 
+def _seasons_arg(argv: list[str]) -> range | None:
+    """--seasons 2016-2018 -> range(2016, 2019); absent -> None (use SEASONS)."""
+    if "--seasons" not in argv:
+        return None
+    spec = argv[argv.index("--seasons") + 1]
+    a, _, b = spec.partition("-")
+    return range(int(a), int(b or a) + 1)
+
+
 if __name__ == "__main__":
-    main(do_fetch="--no-fetch" not in sys.argv)
+    main(do_fetch="--no-fetch" not in sys.argv,
+         with_october="--no-october" not in sys.argv,
+         seasons=_seasons_arg(sys.argv))
