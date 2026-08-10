@@ -172,17 +172,41 @@ aggregation to one number per night is deliberate and is not a convenience.
 
 Three anchors, all defined on the wall clock in `America/New_York`:
 
-| anchor | definition | what it represents |
-| --- | --- | --- |
-| **A** | last issuance at or before `g(D) − 24h` | the view one auction earlier |
-| **B** | last issuance at or before `g(D)` | **the view the auction had** |
-| **C** | last issuance strictly before 19:00 ET on `D` | the view when the guns start |
-
-where `g(D)` is the day-ahead bid deadline on day `D`, which prices operating day
-`D+1`.
+| anchor | definition | what it represents | typical package |
+| --- | --- | --- | --- |
+| **A** | last issuance at or before `g(D) − 12h` | last night's view | ~21:00 ET on `D−1` |
+| **B** | last issuance at or before `g(D)` | **the view the auction had** | ~09:00 ET on `D` |
+| **C** | last issuance strictly before 19:00 ET on `D` | the view when the guns start | ~18:00 ET on `D` |
 
     rev_pre  = S(B) − S(A)     news the auction HAS
     rev_post = S(C) − S(B)     news the auction CANNOT have
+
+`S` is the zone-mean `Snow 12hr` forecast for the 12-hour period ending 12Z on
+`D+1`; `g(D)` is the day-ahead bid deadline on day `D`, which prices operating
+day `D+1`.
+
+> **Anchor A amended from `g(D) − 24h` to `g(D) − 12h`, before any coefficient
+> was estimated, because the original was not merely inconvenient but empty.**
+> The registered version asked for the night's snow forecast as it stood 24
+> hours before the gate. The overnight period ends at 12Z on `D+1`, so that
+> anchor needs a forecast at a lead of about 44.5 hours, and **`Snow 12hr`
+> does not reach that far**. Measured on 11,708 core-zone overnight rows from
+> the first 2,476 products: the row carries at most three forward 12-hour
+> periods, the longest observed lead is 42.8 hours, and the median longest lead
+> available for a given night and zone is 40.0 hours. A 44.5-hour anchor is
+> available on **0.0%** of night-zones; a 32.5-hour one, which is what
+> `g(D) − 12h` implies, is available on **98.1%**.
+>
+> This was found by parsing the archive rather than by reasoning about it, and
+> the amendment is printed here rather than substituted for what it replaced.
+> The replacement is also the better instrument, which is luck and is worth
+> saying out loud: the three anchors now land on the three routine packages that
+> bracket the gate, so `rev_pre` is the overnight-to-morning revision and
+> `rev_post` the morning-to-evening one, and neither anchor is chosen on the
+> weather.
+
+The horizon this buys is short, and §13 already said a short horizon may be the
+wrong one. It is now shorter than registered. Nothing else in the design moves.
 
 **The gate time changed during the sample.** ISO-NE and NEPOOL filed in September
 2020 (FERC docket ER20-2511) to extend the Day-Ahead Energy Market offer and bid
