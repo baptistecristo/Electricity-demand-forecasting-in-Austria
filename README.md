@@ -1,4 +1,4 @@
-# Snowmaking as a hidden load in Austrian day-ahead electricity forecasts
+# TO BE FINISHED: Snowmaking as a hidden load in Austrian day-ahead electricity forecasts
 
 ### 📄 [Read the paper →](https://snowmaking-load-austria.vercel.app)
 
