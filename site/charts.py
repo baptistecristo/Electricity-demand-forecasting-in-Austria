@@ -323,3 +323,134 @@ def table_coefs():
           f"[{c-1.96*s:+.0f}, {c+1.96*s:+.0f}]"]
          for t, c, s in zip(TERMS, COEFS, SES)],
         "Show the coefficients as a table")
+
+
+def _round_right(x, y, w, h, r=3):
+    """Horizontal bar with a rounded data-end."""
+    r = min(r, h / 2, max(w, 0.1))
+    return (f'M{x:.1f},{y:.1f} L{x+w-r:.1f},{y:.1f} Q{x+w:.1f},{y:.1f} '
+            f'{x+w:.1f},{y+r:.1f} L{x+w:.1f},{y+h-r:.1f} '
+            f'Q{x+w:.1f},{y+h:.1f} {x+w-r:.1f},{y+h:.1f} L{x:.1f},{y+h:.1f} Z')
+
+
+# --- the two replication gates -----------------------------------------
+# Both were tables only, and both are really one comparison against a
+# threshold, which a bar against a rule shows and a row of numbers does not.
+# Neither carries hover targets: this page ships no tooltip layer, so invisible
+# focusable rects would announce nothing. The table view under each figure is
+# the route that does not depend on reading the chart.
+
+# Required alpha is the share of each market's snowmaking fleet a forecaster
+# has to be missing before the design can detect anything at all. Above 100%
+# the test cannot work however large the real effect is, which is why the
+# ceiling is drawn rather than left to be inferred from the number.
+MARKETS = ["Italy-North", "Vermont", "Austria", "Switzerland"]
+REQ_ALPHA = [27, 34, 47, 201]
+ALPHA_SRC = ["desk estimate", "derived, 22-79%", "published survey",
+             "published total"]
+
+# Price test. Both columns are per MWh, Vermont in USD and the rest in EUR;
+# each market is read against itself only, never across.
+PRICE_WORTH = [5.29, 1.67, 14.02, 1.55]
+PRICE_DETECT = [14.4, 6.7, 18.0, 5.9]
+
+
+def alpha_chart(*, w=680, h=236, pad_l=104, pad_r=104, pad_t=40, pad_b=40):
+    hi, pw = 215.0, w - pad_l - pad_r
+    ph = h - pad_t - pad_b
+    row = ph / len(MARKETS)
+    bh = min(row - 13, 24)
+
+    def x(v):
+        return pad_l + pw * v / hi
+
+    out = []
+    for t in (0, 50, 100, 150, 200):
+        out.append(f'<line x1="{x(t):.1f}" x2="{x(t):.1f}" y1="{pad_t}" '
+                   f'y2="{pad_t+ph:.1f}" stroke="{RULE}" stroke-width="1"/>')
+        out.append(f'<text x="{x(t):.1f}" y="{pad_t+ph+16:.1f}" '
+                   f'text-anchor="middle" font-size="10.5" fill="{MUTED}">'
+                   f'{t}%</text>')
+
+    out.append(f'<line x1="{x(100):.1f}" x2="{x(100):.1f}" y1="{pad_t-14:.1f}" '
+               f'y2="{pad_t+ph:.1f}" stroke="{INK}" stroke-width="1.3" '
+               f'stroke-dasharray="4 3"/>')
+    out.append(f'<text x="{x(100):.1f}" y="{pad_t-20:.1f}" text-anchor="middle" '
+               f'font-size="10.5" font-weight="600" fill="{INK}">'
+               f'100% = the whole fleet</text>')
+
+    for i, (m, a) in enumerate(zip(MARKETS, REQ_ALPHA)):
+        cy = pad_t + row * i + (row - bh) / 2
+        col = NEUTRAL if a > 100 else (C2 if m == "Austria" else C1)
+        out.append(f'<path d="{_round_right(x(0), cy, x(a)-x(0), bh)}" '
+                   f'fill="{col}"/>')
+        out.append(f'<text x="{pad_l-10}" y="{cy+bh/2+4:.1f}" text-anchor="end" '
+                   f'font-size="11.5" fill="{INK}">{_esc(m)}</text>')
+        out.append(f'<text x="{x(a)+8:.1f}" y="{cy+bh/2+4:.1f}" font-size="11.5" '
+                   f'font-weight="600" fill="{INK}">{a}%</text>')
+
+    return _svg(w, h, "".join(out),
+                "Share of the snowmaking fleet a forecaster must be missing "
+                "before each test can detect anything; Switzerland is past the "
+                "100 percent ceiling")
+
+
+def table_alpha():
+    return data_table(
+        ["Market", "Needs α", "Fleet estimate from"],
+        [[m, f"{a}%", s] for m, a, s in zip(MARKETS, REQ_ALPHA, ALPHA_SRC)],
+        "Show the detection thresholds as a table")
+
+
+def price_chart(*, w=680, h=272, pad_l=104, pad_r=74, pad_t=44, pad_b=44):
+    hi, pw = 20.0, w - pad_l - pad_r
+    ph = h - pad_t - pad_b
+    row = ph / len(MARKETS)
+    bh = min((row - 16) / 2, 15)
+
+    def x(v):
+        return pad_l + pw * v / hi
+
+    out = []
+    for t in (0, 5, 10, 15, 20):
+        out.append(f'<line x1="{x(t):.1f}" x2="{x(t):.1f}" y1="{pad_t}" '
+                   f'y2="{pad_t+ph:.1f}" stroke="{RULE}" stroke-width="1"/>')
+        out.append(f'<text x="{x(t):.1f}" y="{pad_t+ph+16:.1f}" '
+                   f'text-anchor="middle" font-size="10.5" fill="{MUTED}">'
+                   f'{t}</text>')
+    out.append(f'<text x="{pad_l+pw/2:.1f}" y="{pad_t+ph+32:.1f}" '
+               f'text-anchor="middle" font-size="10.5" fill="{MUTED}">'
+               f'Per MWh, each market in its own currency</text>')
+
+    for j, (lab, col) in enumerate((("what the fleet is worth", C2),
+                                    ("what the test could detect", NEUTRAL))):
+        lx = pad_l + j * 200
+        out.append(f'<rect x="{lx}" y="{pad_t-30}" width="10" height="10" '
+                   f'rx="2" fill="{col}"/>')
+        out.append(f'<text x="{lx+15}" y="{pad_t-21}" font-size="10.5" '
+                   f'fill="{MUTED}">{_esc(lab)}</text>')
+
+    for i, m in enumerate(MARKETS):
+        worth, det = PRICE_WORTH[i], PRICE_DETECT[i]
+        top = pad_t + row * i + (row - 2 * bh - 4) / 2
+        out.append(f'<text x="{pad_l-10}" y="{top+bh+2:.1f}" text-anchor="end" '
+                   f'font-size="11.5" fill="{INK}">{_esc(m)}</text>')
+        for k, (v, col) in enumerate(((worth, C2), (det, NEUTRAL))):
+            cy = top + k * (bh + 4)
+            out.append(f'<path d="{_round_right(x(0), cy, x(v)-x(0), bh)}" '
+                       f'fill="{col}"/>')
+            out.append(f'<text x="{x(v)+7:.1f}" y="{cy+bh/2+4:.1f}" '
+                       f'font-size="10.5" fill="{INK}">{v:.1f}</text>')
+
+    return _svg(w, h, "".join(out),
+                "In every market the snowmaking fleet is worth less per "
+                "megawatt hour than the smallest price effect the test could "
+                "have detected")
+
+
+def table_price():
+    return data_table(
+        ["Market", "Fleet is worth", "Detectable", "Short by"],
+        [[m, f"{a:.2f}", f"{b:.1f}", f"{b/a:.1f}×"]
+         for m, a, b in zip(MARKETS, PRICE_WORTH, PRICE_DETECT)],
+        "Show the price gate as a table")

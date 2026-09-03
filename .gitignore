@@ -37,3 +37,6 @@ site/fig1.png
 
 # ggiraph ships ~19MB of Liberation fonts per figure; only site/fig/lib is kept
 site/fig/*_files/
+
+# Font subsetting keeps the full upstream faces here; only the subsets ship
+site/fonts/.src/
