@@ -74,7 +74,7 @@ Suggestions, cheapest first:
   positive slope means NWS revisions have momentum, which is a different problem
   with the opposite consequence. Run this before choosing a mitigation.
 - Print `corr(rev_pre, rev_post)` next to criterion 1. If it is near zero the
-  concern is idle and the criterion stands as written.
+  concern is idle and the criterion holds as written.
 - Register the falsification in a second specification that regresses the spread
   on `rev_post` **without** `rev_pre`. That removes the shared-error channel, but
   it opens an omitted-variable one: if revisions have momentum, `rev_pre`'s true

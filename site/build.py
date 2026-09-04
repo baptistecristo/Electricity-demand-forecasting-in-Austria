@@ -461,16 +461,15 @@ tbody tr.hl td{{font-weight:600}}
 Austrian ski resorts burn about <b>281 GWh</b> a season making artificial snow, almost all
 of it on cold November and December nights: <b>8–15% of overnight demand</b>. The guns run
 only below a wet-bulb temperature near −2 °C and stop once the base layer is built, so how
-much power a cold night draws depends on how much snow has already been made. A forecast
-that does not know this should be wrong on exactly those nights.</p>
+much power a cold night draws depends on how much snow has already been made.</p>
 
 <p><span class="lead">The answer</span>
-<b>No.</b> The prediction and the conditions for abandoning it were committed to the
-repository <b>before any load data was opened</b>. On thirteen seasons and 780 nights the
-effect is <b>+5.1 MW, give or take 11.9</b>, and two of three stopping rules fired. The
-same model on the same nights finds the Christmas industrial shutdown at <b>−274 MW</b>,
-so it can see effects of the size snowmaking would have to produce. The load is
-<b>absorbed</b> by the forecast rather than missed by it.</p>
+<b>No.</b> The prediction and the stopping rules were committed <b>before any load data was
+opened</b>. On thirteen seasons and 780 nights the effect is <b>+5.1 MW, give or take
+11.9</b>, and two of three rules fired. The same model on the same nights finds the
+Christmas industrial shutdown at <b>−274 MW</b>, so it can see effects of the size
+snowmaking would have to produce. The load is <b>absorbed</b> by the forecast rather than
+missed by it.</p>
 
 <div class="stats">
   <div class="stat"><span class="v">281</span>
@@ -491,28 +490,13 @@ overnight the supply stack is so flat that Austria's entire fleet is worth about
 <b>€14/MWh</b> against a spread whose swings are three times that.</p>
 </section>
 
-<div class="abstract">
-<h2>Abstract</h2>
-<p>Snowmaking runs only below a wet-bulb threshold near −2 °C and stops once the base
-layer is built, so how much power a cold night draws depends on how much snow has already
-been made. This paper pre-registers and tests whether that path dependence appears as a
-state-dependent error in the published day-ahead load forecast. On thirteen seasons of
-Austrian Power Grid data joined to a pressure-corrected alpine wet-bulb index, the
-interaction between the threshold and season-to-date accumulated cold is
-<b>+5.1 MW (s.e. 11.9)</b> across 780 nights, while the identical specification recovers
-the Christmas shutdown at <b>−274 MW (t = −3.3)</b>. The load is absorbed by the forecast,
-not invisible to it. Italy-North reproduces the null, Switzerland could not have detected
-the effect at any size, and Vermont returns the predicted sign but sits on its own
-detection threshold.</p>
-</div>
-
 <h2 class="sec">1. The question</h2>
 <p>Transmission system operators publish a day-ahead load forecast, and both it and the
 realised load are free. If snowmaking is invisible to the model, that error should be
 positive on nights when snowmaking runs, and the size of the miss should depend on the
-snowpack rather than on temperature alone. The interest is not the ski industry but whether
-a large, lumpy, path-dependent industrial load can hide inside a production forecast, a
-structure that recurs in Spanish irrigation pumping and North American grain drying.</p>
+snowpack rather than on temperature alone. The interest is whether a large, lumpy,
+path-dependent industrial load can hide inside a production forecast, a structure that
+recurs in Spanish irrigation pumping and North American grain drying.</p>
 
 <h2 class="sec">2. How big is the load</h2>
 <p>From a 2026 survey of 141 Austrian resorts (30 usable, 4,253 equipped hectares,
@@ -536,14 +520,14 @@ is 281 GWh ÷ 184.6 h = <b>1.52 GW</b>, a mean 41.9 kW per snowmaker while runni
 load of 7.0–7.5 GW, so snowmaking is <b>8–15% of overnight demand</b>.</p>
 
 <h2 class="sec">3. Why a forecast might miss it, and why it might not</h2>
-<p>The naive version of the hypothesis is that load forecasts are temperature models and
-temperature models have no memory. Two mechanisms argue against it, both written down
-before the data was opened. <b>A memoryless model still absorbs the average response:</b>
-the temperature coefficient is fitted on history in which cold nights are snowmaking
-nights, so the residual holds the snowmaking anomaly rather than the snowmaking load.
-<b>Production forecasts are autoregressive:</b> APG publishes at 08:00 on historical actual
-load, day type and temperature, so a lagged-load term carries a running campaign into
-tomorrow. Both push α, the share left unexplained, down, and α binds the whole design.</p>
+<p>The naive version is that load forecasts are temperature models and temperature models
+have no memory. Two mechanisms argue against it, both written down before the data was
+opened. <b>A memoryless model still absorbs the average response:</b> the temperature
+coefficient is fitted on history in which cold nights are snowmaking nights, so the residual
+holds the snowmaking anomaly rather than the load. <b>Production forecasts are
+autoregressive:</b> APG publishes at 08:00 on historical actual load, day type and
+temperature, so a lagged-load term carries a running campaign into tomorrow. Both push α,
+the share left unexplained, down, and α binds the whole design.</p>
 
 <h2 class="sec">4. Identification</h2>
 <p>The obvious test, comparing nights just below the wet-bulb threshold to nights just
@@ -580,8 +564,7 @@ load, so a cold night on its own should push the forecast error up. What identif
 snowmaking rather than heating is that the push <em>fades</em>: by late December the base is
 built and the guns are off, so the same weather draws far less power than in November. A
 fade is a negative number, and a positive interaction is the wrong shape rather than a
-bigger effect. Supporting predictions: the error spikes on the first night of a cold snap
-and decays over 24–48 hours, and the Netherlands and Denmark show nothing.</p>
+bigger effect.</p>
 <p><b>Kill criteria, committed before looking:</b></p>
 <ul class="kill">
 <li class="fired">The interaction is zero or positive with a tight confidence interval → no memory effect. Stop. <em>· fired</em></li>
@@ -679,8 +662,7 @@ standard error; the second night is wrong-signed and equally insignificant.</p>
 <h3>7.1 Why this is a null rather than an absence of evidence</h3>
 <p>The specification is not underpowered for effects of the relevant size. On the same
 780 nights it recovers the Christmas shutdown at −274 MW with t = −3.3, and the snowmaking
-interaction is +5 ± 12. The +131 MW November bias survives as a real seasonal feature not
-attributable to snowmaking. Two limits: the Christmas argument works because APG leaves the
+interaction is +5 ± 12. Two limits: the Christmas argument works because APG leaves the
 shutdown in its residual, which Terna and Swissgrid do not, and it is a claim about 274 MW.
 The smallest seasonal swing the fitted model could have detected at 80% power is 426 MW
 against a fleet drawing an estimated 900 MW, so Austria could only ever have caught a
@@ -746,11 +728,11 @@ change.</p>
   <td class="num">402</td><td class="num">201%</td>
   <td>Not interpretable</td></tr>
 </tbody></table>
-<p><b>How to read the power columns.</b> The coefficient is per 100 accumulated cold
-hours and a season delivers about a thousand, so the seasonal swing is what has to be
-detectable, and "needs &alpha;" is that divided by each market's coincident snowmaking
-draw. Austria's 900 MW comes from a published survey of 141 resorts and Italy's 1,500 MW is
-a desk derivation, so a five-point gap there is not a real difference.</p>
+<p><b>How to read the power columns.</b> The coefficient is per 100 accumulated cold hours
+and a season delivers about a thousand, so the seasonal swing is what has to be detectable,
+and "needs &alpha;" is that divided by each market's coincident snowmaking draw. Austria's
+900 MW comes from a published survey and Italy's 1,500 MW is a desk derivation, so a
+five-point gap there is not a real difference.</p>
 <p><b>No test here could see a forecaster missing less than about a quarter of the
 snowmaking load, and Austria, on the best-grounded fleet estimate of the four,
 could not see one missing less than half.</b> That is the finding behind all the
@@ -778,18 +760,14 @@ have detected the effect</b> at a required &alpha; of 201%, and its significant,
 signed coefficient implies a swing larger than the entire Swiss fleet, so it is a
 confound.</p>
 
-<p><b>Vermont meets the prediction, then fails to hold it.</b> ISO-NE publishes an
-hourly demand forecast per reliability region, and had it allocated that forecast by
-fixed load-share factors the report would be blind to anything Vermont-specific. It does
-not, so the regional share is what the test targets. On five seasons the
-interaction is &minus;0.0211 percentage points of system share per 100 cold hours
-(HC1 0.0073, p = 0.004), about 25 MW of decay, with Rhode Island, a same-forecaster zero-snowmaking placebo in the same feed, null at
-+0.0019 (0.0037).
-But Mount Washington in place of the eight road stations gives &minus;0.0058 (0.0068), the
-effect sits on its noise floor at &minus;25 MW against 24 MW detectable, and ISO-NE's own
-zonal report drops it to &minus;0.0281 (0.0188) while firing the Rhode Island placebo.
-Vermont is suggestive rather than confirmation, and the Austrian null stands: 43 GWh per
-gigawatt of overnight load against Vermont's 68&ndash;153.</p>
+<p><b>Vermont meets the prediction, then fails to hold it.</b> ISO-NE's regional forecast
+is not a fixed load-share allocation, so the share is what the test targets. On five seasons
+the interaction is &minus;0.0211 percentage points of share per 100 cold hours
+(HC1 0.0073, p = 0.004), with Rhode Island, a same-forecaster zero-snowmaking placebo in the
+same feed, null at +0.0019 (0.0037). But Mount Washington in place of the road stations gives
+&minus;0.0058 (0.0068), the effect sits on its noise floor at &minus;25 MW against 24 MW
+detectable, and ISO-NE's own zonal report drops it to &minus;0.0281 (0.0188) while firing the
+placebo. Vermont is suggestive rather than confirmation.</p>
 
 <h3>8.2 The price test: overnight, those megawatts are worth almost nothing</h3>
 <p>A load forecast error is the grid operator's error, not the market's, so a null
@@ -839,40 +817,51 @@ season of price data every winter.</figcaption>
 Austria's own night data prices a 900 MW fleet at about &euro;14/MWh at the margin against a
 night-day spread with a &euro;43/MWh standard deviation. A load test can find a few hundred
 megawatts because load is measured in megawatts; a price test has to find what they are
-worth. Austria is the near miss at 1.3&times;, and its panel grows by a winter a year. The
-Christmas gate fails here for a second, independent reason: Christmas removes midday and
-night demand at once, so an outcome built to ignore common demand shocks ignores the
-reference effect too.</p>
+worth. Austria is the near miss at 1.3&times;. The Christmas gate fails here for a second,
+independent reason: Christmas removes midday and night demand at once, so an outcome built to
+ignore common demand shocks ignores the reference effect too.</p>
 
 <p><b>In Vermont a placebo settled it.</b> Vermont's price interaction is
 <b>&minus;1.47 (0.54), p = 0.007</b>, the predicted sign, and Rhode Island, which makes no
 snow, returns <b>&minus;1.33 (0.52), p = 0.011</b>. That is a New England&ndash;wide
-relationship between accumulated cold and the spread, not a Vermont signal. It bites where
-the load placebo could not, because the eight regional shares sum to zero by construction
-and force a genuine Vermont effect to push Rhode Island the other way.</p>
+relationship between accumulated cold and the spread, not a Vermont signal. It bites where the
+load placebo could not, because the eight regional shares sum to zero by construction and force
+a genuine Vermont effect to push Rhode Island the other way.</p>
+
+<h3>8.3 A different treatment: snowfall-forecast revisions</h3>
+<p>Every test above runs on accumulated cold hours, a slow seasonal variable badly
+collinear with day-of-season, and that collinearity is what produced required &alpha; between
+27% and 201%. A fourth arm replaces it with <b>NWS snowfall-forecast revisions</b>:
+high-frequency news arriving six to ten times a day rather than nine times a season, and a
+revision to expected <em>natural</em> snowfall holding temperature fixed should not move
+heating demand at all. Because ISO-NE's day-ahead market closes mid-morning, a revision
+arriving after the close is information the price cannot contain, which makes a real
+falsification test available.</p>
+<p>On 600 nights across ten Vermont seasons that falsification passes: news postdating the
+auction moves nothing, <b>&minus;0.86 (2.58)</b>. The pre-gate coefficient is
+<b>+0.20 (2.20)</b>, wrong-signed and underpowered by six to eleven times, so it is reported
+and not read. What the arm adds is a treatment with real high-frequency variation and a
+falsification test that passes. Full write-up in <code>src/revision/README.md</code>.</p>
 
 <h2 class="sec">9. Limitations</h2>
 <ul>
 <li><b>The published forecast is the operator's transparency artefact, not the trading
 consensus.</b> A bias in it shows a blind spot in APG's forecast, <b>not</b> a market
-mispricing, and §8.2 shows the price version cannot settle it either.</li>
+mispricing.</li>
 <li><b>The treatment is a switch and the physics is a staircase.</b> Olefs et al. (2010),
 the source of the &minus;2 °C threshold, defines a <em>relationship between wet-bulb
-temperature and snowmaking capacity</em> alongside it, and SUFAG's Taurus 2.0 auto-selects
-among eight temperature-indexed thresholds. A binary treatment discards the intensity
-margin, and much of the megawattage lives there.</li>
+temperature and snowmaking capacity</em> alongside it. A binary treatment discards the
+intensity margin, and much of the megawattage lives there.</li>
 <li><b>Water temperature mimics the predicted effect.</b> Production at the margin needs
 water below about +2 °C and reservoir water cools through the season, so an identical wet
-bulb is more productive in late December than in early November. That runs in the same
-direction as the base-building fade and needs no path dependence at all. Nothing here rules
-it out, in Vermont least of all.</li>
-<li><b>There is no working sensitivity check outside Austria.</b> The Christmas control
-certifies the Austrian load test and nothing else, so every replication after the first
-carries a paper power calculation and no proof its instrument can see anything.</li>
-<li><code>cum_cold_hours</code> ignores melt and says nothing about water remaining;
-operators skip marginal nights just below threshold; APG's load excludes a Vorarlberg
-corridor carrying weight 0.10 in the index; the opening-date test was not identifiable from
-calendar dates (R&sup2; = 0.798) and the NL/DK placebo was not run.</li>
+bulb is more productive in late December. That needs no path dependence, and nothing here
+rules it out.</li>
+<li><b>No working sensitivity check exists outside Austria</b>, so every replication after
+the first carries a paper power calculation and no proof its instrument can see anything.
+<code>cum_cold_hours</code> also ignores melt and water remaining, operators skip marginal
+nights just below threshold, APG's load excludes a Vorarlberg corridor, the opening-date
+test was not identifiable from calendar dates (R&sup2; = 0.798), and the NL/DK placebo was
+not run.</li>
 </ul>
 
 <h2 class="sec">10. Data and reproduction</h2>

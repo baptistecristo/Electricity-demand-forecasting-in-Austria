@@ -12,7 +12,7 @@
 > Nothing in sections 1 to 14 is a coefficient, a standard error, or a p-value;
 > every number there is a design choice or a descriptive count of the forecast
 > archive. Two amendments were needed after the archive was complete and before
-> anything was estimated — anchor A in section 7 and the Windsor zone split in
+> anything was estimated, anchor A in section 7 and the Windsor zone split in
 > section 6. Both are printed where they apply rather than substituted for the
 > text they correct.
 >
@@ -33,7 +33,7 @@ see a forecaster missing less than about a quarter of the snowmaking load.**
 A *forecast revision* is the opposite kind of variable: high-frequency,
 plausibly exogenous news, arriving six to ten times a day instead of nine times a
 season. And a revision to expected **natural snowfall**, holding the temperature
-revision fixed, should not move heating demand at all — which is the confound
+revision fixed, should not move heating demand at all. That is the confound
 that has dogged every test here since §4.
 
 The wedge the design aims at: ISO-NE's day-ahead market closes mid-morning. A
@@ -54,7 +54,7 @@ Three independent reasons, in the order they were established.
    2024-01-19. That is two Alpine seasons. The Vermont products below run from
    2016 continuously, matching the free ISO-NE day-ahead LMP archive, for ten.
 3. **The placebo already works there.** Rhode Island has now twice discriminated
-   on ISO-NE data — once on the day-ahead LMP spread (`src/price/README.md`
+   on ISO-NE data, once on the day-ahead LMP spread (`src/price/README.md`
    §10.3) and once on the same-publisher load arm (`src/vermont/README.md` §7).
 
 ## 3. The product, and why it is not the obvious one
@@ -80,7 +80,7 @@ split east/west along the Green Mountain spine:
 | Eastern Chittenden | Bolton |
 | Washington | Sugarbush, Northfield |
 
-`RECBTV` sounds like the mountain product and is not — it forecasts wave heights
+`RECBTV` sounds like the mountain product and is not: it forecasts wave heights
 on Lake Champlain.
 
 **Zone-level is still not elevation-resolved.** Eastern Rutland spans the town
@@ -104,7 +104,7 @@ Confirmed by listing `AFMBTV` issuances on 10 December of each year:
 Continuous 2016–2025. The binding constraint is the price series, not the
 weather: free ISO-NE day-ahead LMPs start 2015-12-03, established by bisection
 and recorded in `provenance_isone.md`, and re-confirmed for this arm by pulling
-2016-11-01, 2017-11-01 and 2018-11-01 directly — all three return full files with
+2016-11-01, 2017-11-01 and 2018-11-01 directly, all three return full files with
 24 Vermont hourly rows. **Ten seasons are available on both sides of the join.**
 
 `src/price/fetch_lmp.py` took seven seasons because that is what the price panel
@@ -129,21 +129,21 @@ backwards without touching what the price test reads.
 5. **The 12-hour temperature row changes its name with the time of day.** It is
    `MIN/MAX` on an evening issuance and `MAX/MIN` on a morning one, because the
    label names the periods in the order they arrive. A parser keyed on either
-   literal silently drops half the products, and — worse — a parser that keys on
+   literal silently drops half the products, and, worse, a parser that keys on
    both but assumes a fixed order silently swaps minima for maxima on half of
    them. §9 therefore builds its temperature control from the **3-hourly `Temp`
    and `RH` rows**, which carry no such ordering, rather than from this row.
 6. **The gate is a local-time rule and the sample straddles the fall-back.**
    29 October to the first Sunday in November is EDT, the rest is EST, so a gate
-   hardcoded at a fixed UTC hour — as an earlier draft of this file had it, at
-   "15:30 UTC in winter" — misclassifies the first week of every season. The gate
+   hardcoded at a fixed UTC hour, as an earlier draft of this file had it, at
+   "15:30 UTC in winter", misclassifies the first week of every season. The gate
    is applied in `America/New_York` and converted per date.
 7. **Season 2016 prints the zone names in upper case.** `EASTERN RUTLAND` in
    2016, `Eastern Rutland` from 2017 on. Keyed verbatim these are two zones, and
    any downstream match on the modern spelling deletes the whole first season
    without raising: the archive appeared to hold 52 zones when it holds 27, and
    the four-zone core panel came out 54,618 rows when it is 60,738. Nothing about
-   the aggregate counts looked wrong — this is the failure mode this list exists
+   the aggregate counts looked wrong, this is the failure mode this list exists
    for, and it was invisible in the 2,476-product snapshot because that snapshot
    started in 2016 and every product in it was internally consistent. Zone labels
    are now normalised to title case at parse time.
@@ -163,7 +163,7 @@ hours, median 24. Wet bulb resolves on 99.5% of rows; the remainder are periods
 with fewer than three of the four 3-hourly steps, which are set missing rather
 than averaged over a short window.
 
-Seven resort zones are continuous across all ten seasons — 106,293 rows, no
+Seven resort zones are continuous across all ten seasons, 106,293 rows, no
 missing `Snow 12hr` cells within them:
 
 | zone | rows | non-zero | ≥ 2 in |
@@ -180,8 +180,8 @@ Across the four core zones of §6: **60,738 rows, 26.9% of forecast periods carr
 non-zero snow and 5.4% carry two inches or more**, maximum 10.0 inches per
 12-hour period.
 
-The provisional counts this section carried before collection finished — 157,359
-rows, 50 zones, 29.3% non-zero — were measured on the first 2,113 products and
+The provisional counts this section carried before collection finished, 157,359
+rows, 50 zones, 29.3% non-zero, were measured on the first 2,113 products and
 are superseded. Two of the three differences are just sample size; the zone count
 fell from 50 to 27 because of the casing defect in §4.1 item 7, not because zones
 disappeared.
@@ -198,7 +198,7 @@ night begins on, 1 November ≤ `D` ≤ 30 December, in each of the ten seasons.
 ending at **12Z on `D+1`**. That period is 19:00–07:00 EST, or 20:00–08:00 EDT.
 The project's night block is 20:00–06:59 local. The two windows agree on eleven
 of twelve hours in EST, which is a piece of luck rather than a design choice: the
-AFM's own overnight period is very nearly the snowmaking night this project has
+AFM's own overnight period is nearly the snowmaking night this project has
 used since `src/apg_pipeline.py`.
 
 **Zones.** The primary treatment is the unweighted mean over the four zones that
@@ -213,12 +213,12 @@ Sensitivity: all eight zones of `RESORT_ZONES`.
 > The sensitivity is **seven** zones, not eight. Parsing the full archive showed
 > that NWS split the Windsor county zone into **Eastern Windsor** and **Western
 > Windsor** at the start of season 2022: `Windsor` exists 2016–2021 and
-> `Western Windsor` — the one holding Okemo — exists 2022–2025, and they are
+> `Western Windsor`, the one holding Okemo, exists 2022–2025, and they are
 > different geographies. Splicing them gives one zone whose definition changes
 > mid-sample, which is worse in a pre-registered design than losing the zone, so
 > Windsor is excluded from `RESORT_ZONES` altogether. The registered sensitivity
 > is now *the seven resort zones present in all ten seasons*. **The primary
-> treatment is untouched** — none of the four core zones is affected.
+> treatment is untouched**, none of the four core zones is affected.
 
 The outcome is a single statewide zonal price, so zone-level treatment against
 it would repeat one outcome across four rows and manufacture precision. The
@@ -271,7 +271,7 @@ window so that it closes "thirty minutes later in the morning from 10:00 a.m. to
 later ones after it, and the public filings did not give up the effective date.
 
 Rather than assume one, bound it. **Across the 2,359 products cached so far, 38
-issuances — 1.61% — land in the disputed half-hour 10:00–10:30 ET.** The routine NWS Burlington packages land
+issuances, 1.61%, land in the disputed half-hour 10:00–10:30 ET.** The routine NWS Burlington packages land
 near 09:00, 12:00, 15:00, 18:00 and 21:00 ET, so anchor **B** is almost always
 the scheduled ~09:00 package and anchor **C** almost always the scheduled ~18:00
 one. Both anchors are therefore *scheduled* issuances rather than storm-triggered
@@ -338,7 +338,7 @@ Copied rather than re-derived.
 the same product, the same zone and the same anchors as the treatment.** `wb` is
 the wet-bulb temperature from the AFM's 3-hourly `Temp` and `RH` rows, averaged
 over the 3-hourly steps falling inside the same 12-hour period, using the
-bisection solver `wet_bulb()` in `src/apg_pipeline.py` verbatim — not the Stull
+bisection solver `wet_bulb()` in `src/apg_pipeline.py` verbatim, not the Stull
 closed form, which that function's docstring records as erring 0.7–1.0 °C below
 freezing. Station pressure is taken from a nominal 600 m via
 `pressure_from_altitude()`; because `wbrev` is a *difference* between two
@@ -369,11 +369,11 @@ reason `src/price/README.md` §5 does.
 before that news existed. This is the sharpest falsification available anywhere
 in this project and it is registered as a rule, not offered as a remark:
 
-1. **INVALID — read nothing else.** If `rev_post` is significant at 5%, the
+1. **INVALID, read nothing else.** If `rev_post` is significant at 5%, the
    day-ahead price is responding to information that did not exist when it
-   cleared. That is impossible, so `rev_post` is proxying something else —
+   cleared. That is impossible, so `rev_post` is proxying something else:
    persistent weather, or a storm the auction had already partly priced from
-   other sources — and `rev_pre` is proxying it too. In that case **no claim is
+   other sources, and `rev_pre` is proxying it too. In that case **no claim is
    made from `rev_pre` whatever it does.** This criterion is scored first and
    printed first.
 2. **SUPPORTS** if `rev_pre` is negative and significant at 5%, `rev_post` is
@@ -404,7 +404,7 @@ So the gate is:
 1. Print the minimum detectable effect: `1.96 × HC1 s.e.(rev_pre)`, scaled to a
    one-standard-deviation snowfall revision and, separately, to the full observed
    revision range.
-2. Compare it to **1.67 USD/MWh**, which is an *upper bound* — no revision turns
+2. Compare it to **1.67 USD/MWh**, which is an *upper bound*, since no revision turns
    off more than the whole fleet.
 3. If the MDE exceeds it, the test could not have seen the effect even under the
    assumption that a forecast revision shuts down every gun in Vermont, and
@@ -436,7 +436,7 @@ does shut down. The gate can fire outcome 4. It cannot rule it out.
 - **Price is worth almost nothing overnight.** Price §10 found the overnight
   merit order close to flat in all four markets. Moving from `cum_cold_h` to a
   revision fixes the treatment, not the outcome's sensitivity.
-- **The horizon may simply be the wrong one.** §13.
+- **The horizon may be the wrong one.** §13.
 
 ## 13. The open question, stated before any result exists
 
@@ -448,7 +448,7 @@ snowfall, and the one clean case of an operator stopping because snow was coming
 was a season-termination call at a ten-day horizon.
 
 **If that is right, snowfall forecasts act on the campaign margin at four-day-to-
-seasonal horizons, and this instrument — which reaches zero to two days — is
+seasonal horizons, and this instrument, which reaches zero to two days, is
 aimed at the wrong one.** That is a reason to run it and look, not a reason to
 skip it, but it should be written down before the coefficient is, and it is.
 
@@ -489,9 +489,9 @@ Everything registered was committed at `52e9a6e`, before the pipeline was run
 once. The check is `git diff 52e9a6e..HEAD -- src/revision/README.md`, and it
 must be stated precisely enough to survive being run: that diff touches text
 above this line in exactly two places, the STATUS block at the top and the
-`--review` line in §14's run instructions. **Sections 6 to 11 — the unit of
+`--review` line in §14's run instructions. **Sections 6 to 11 (the unit of
 observation, the treatment, the outcome, the specification, the predicted sign,
-the kill criteria and the power gate — carry no post-estimation edit at all.**
+the kill criteria and the power gate) carry no post-estimation edit at all.**
 Where §15.5 concedes that a registered criterion was worded badly, it says so
 here rather than correcting it up there, for the same reason.
 
@@ -501,7 +501,7 @@ available everywhere and is not being read off a subsample. `rev_pre` has
 sd 0.263 in and is non-zero on 37.7% of nights; `rev_post` sd 0.244 in, non-zero
 on 35.8%. The outcome has sd 14.60 USD/MWh.
 
-### 15.1 Kill criterion 1 — passes
+### 15.1 Kill criterion 1, passes
 
     rev_post   -0.8585  (2.5755)   t = -0.33   p = 0.74
 
@@ -517,12 +517,12 @@ it is one: `rev_post` carries less variance than `rev_pre`, its own MDE is
 §11 registered two scalings and did not say which governs when they disagree.
 They disagree here: scaled to one sd the MDE is 1.134 against a bound of 1.673,
 scaled to the full observed range it is 16.622. **The ambiguity is resolved here,
-after estimation, in the direction adverse to the design** — that is the only
+after estimation, in the direction adverse to the design**. That is the only
 direction in which resolving a registered ambiguity post-hoc is defensible, and
 it is also the logically correct one. The bound caps the effect *of a revision*,
 not the effect per inch: under the linear model in §9, `β·r ≤ 1.673` must hold at
 every observed `r`, so the largest admissible slope is `1.673 / max r`. The
-one-sd comparison embeds an impossible premise — if a 0.26-inch revision shut off
+one-sd comparison embeds an impossible premise: if a 0.26-inch revision shut off
 the whole fleet, a full-range revision would shut off fifteen of them.
 
 | bound | scaling | β_max | MDE / β_max |
@@ -543,7 +543,7 @@ and all four price coefficients received.
     RhodeIsland  rev_pre   +0.0834  (2.2365)   t = +0.04   p = 0.97
     VT - RI      rev_pre   +0.1189  (0.2038)   t = +0.58   p = 0.56
 
-The point estimate carries the *wrong* sign — §10 predicted negative — and it is
+The point estimate carries the *wrong* sign, §10 predicted negative, and it is
 nowhere near significance. Outcome 3 (REJECTS) explicitly requires that §11 find
 the test powered, and §11 did not, so the wrong sign is given no weight in either
 direction. Every registered sensitivity is null: 10:00 gate (4 of 600 nights
@@ -562,7 +562,7 @@ second finding.
 This was not registered and is not scored. Differencing Vermont against Rhode
 Island removes the ISO-NE-wide component of the night spread and cuts the
 standard error by a factor of about eleven, from 2.196 to 0.204. That puts the
-differential's MDE at 0.399 USD/MWh per inch — **0.57× to 0.92× the whole-fleet
+differential's MDE at 0.399 USD/MWh per inch, **0.57× to 0.92× the whole-fleet
 bound, and 1.01× under the re-estimated slope.** Its 95% CI, [−0.28, +0.52],
 excludes the whole-fleet effect in all four cells of the table above.
 
@@ -572,14 +572,14 @@ registered slope and fails under the other by one percent is a boundary, not a
 result. The CI exclusion depends partly on the point estimate landing at +0.12;
 with the same standard error and an estimate of −0.31 the whole-fleet effect
 would sit inside it. And translated into the fraction α of the fleet that
-responds, the differential can only detect **α ≳ 0.57 to 0.92** — excluding "a
+responds, the differential can only detect **α ≳ 0.57 to 0.92**, excluding "a
 quarter-inch forecast revision shuts down sixty to ninety percent of Vermont's
 snowmaking" excludes nothing anybody believed.
 
 The value is in the design, not the inference. **A successor arm that registers
 the Vermont-minus-Rhode-Island differential as its primary specification, with
 the §11 power gate computed on that specification, starts out powered against the
-assumption-free bound** — which no arm in this project has managed. That is the
+assumption-free bound**, which no arm in this project has managed. That is the
 one genuinely new thing this run produced, and it bears directly on §13: the
 reason to run this again is not a better instrument but a better-chosen outcome.
 
@@ -587,19 +587,19 @@ reason to run this again is not a better instrument but a better-chosen outcome.
 
 A second session reviewed §1–14 at commit `1d8af41`, before any coefficient
 existed. Its write-up is committed unedited beside this file as
-[`review.md`](review.md) — answering it point by point while leaving the reader
+[`review.md`](review.md), answering it point by point while leaving the reader
 unable to read it would be worth little. It raised four points. All
 four are answered here on the post-casing-fix parse, including the two it
 flagged as needing restatement.
 
-**1. Anchor collapse — confirmed clean.** The review checked that "the last
+**1. Anchor collapse, confirmed clean.** The review checked that "the last
 issuance at or before" never silently returns the previous anchor's product, and
 found 0 of 600 nights where A and B or B and C resolve to the same product. On
 the fixed parse both revisions are non-missing on **100% of nights**. `rev_pre`
 is exactly zero on 62.3% and `rev_post` on 64.2%, which is the forecast not
 changing rather than the anchors collapsing.
 
-**2. `rev_pre` and `rev_post` share anchor B — real mechanism, small magnitude,
+**2. `rev_pre` and `rev_post` share anchor B, real mechanism, small magnitude,
 and it could not have caused the result.** The review is right that an error `u`
 in `S(B)` enters `rev_pre` with a plus and `rev_post` with a minus, inducing
 covariance `−var(u)` whether or not the forecast is efficient. It asked for the
@@ -609,11 +609,11 @@ discriminating regression first, so here it is:
     rev_post on rev_pre      = -0.0985  (0.0969)   t = -1.02   p = 0.31
     same, snow_in_lo         = -0.1214  (0.0868)   p = 0.16
 
-The **sign is the one the review predicted** — shared rounding error, not
-revision momentum — and it survives the range-lower-bound treatment, so it is a
+The **sign is the one the review predicted**, shared rounding error, not
+revision momentum, and it survives the range-lower-bound treatment, so it is a
 property of the construction rather than of the midpoint rule. But the magnitude
 is small. The slope identifies `var(u)/var(rev_pre)`, giving an implied
-**sd(u) ≈ 0.083 in, 95% CI [0.000, 0.142]** — a third of sd(`rev_pre`) and an
+**sd(u) ≈ 0.083 in, 95% CI [0.000, 0.142]**, a third of sd(`rev_pre`) and an
 order of magnitude below the 1.0-inch grain of an `01-03` range. The review's
 worry that the error is "comparable to the signal" is not borne out at the level
 of the four-zone nightly mean, and the arithmetic of why is in point 5 below.
@@ -621,20 +621,20 @@ of the four-zone nightly mean, and the arithmetic of why is in point 5 below.
 The decisive point is directional. This contamination biases **toward** firing
 kill criterion 1, and **criterion 1 did not fire** (`rev_post` p = 0.74). A
 channel that could only have produced a false INVALID cannot explain a pass. The
-criterion stands as written, and the review's own stopping rule — "if it is near
-zero the concern is idle" — is met. The second falsification specification it
+criterion holds as written, and the review's own stopping rule, "if it is near
+zero the concern is idle", is met. The second falsification specification it
 offered as a fallback is therefore not run, on its own condition.
 
-**3. "SUPPORTS" had no object — conceded.** §10 outcome 2 should have read
+**3. "SUPPORTS" had no object, conceded.** §10 outcome 2 should have read
 "supports the claim that the day-ahead **price** impounds pre-gate snow news,"
 which is a statement about the market and not about the load-forecaster blind
 spot that §1 motivates the arm from. The arm escapes the `cum_cold_h`
 collinearity but it does not produce an α. The clause is not being retrofitted
-into §10 — amending a registered criterion after estimation is exactly what this
-file exists to prevent — so the correction is recorded here instead. It costs
+into §10, amending a registered criterion after estimation is exactly what this
+file exists to prevent, so the correction is recorded here instead. It costs
 nothing in this run: outcome 2 did not fire.
 
-**4a. Multiplicity was unregistered — conceded, and it did not bite.** Roughly
+**4a. Multiplicity was unregistered, conceded, and it did not bite.** Roughly
 ten looks at 5% carry about a 40% chance of one false positive. Registering it
 afterwards is worth nothing, so the honest statement is the count: **0 of the
 sensitivities came back significant**, which is what a genuine null looks like
@@ -660,7 +660,7 @@ quoted is correct and it is not quoted anywhere here.
 
 `rev_post` is flat, so the falsification the design was built around holds and the
 arm is structurally sound. The nightly snowfall-revision channel is not visible
-in the ISO-NE day-ahead night spread at a precision that could see it — and §13
+in the ISO-NE day-ahead night spread at a precision that could see it, and §13
 predicted exactly that, for the reason it gave, before the numbers existed. What
 `src/revision/` adds to the project is not a coefficient. It is a treatment
 variable with real high-frequency variation, a falsification test that passes, and
