@@ -20,8 +20,18 @@ Two format facts found by inspection rather than assumed:
   * `retrieve.py` answers "Could not Find: AFMBTV"; the JSON API works.
 
     python fetch_afm.py
+    python fetch_afm.py --reverse    # same work, newest date first
 
 Products are cached one file per issuance and never refetched.
+
+`--reverse` exists because IEM's latency, not this script's pacing, sets the
+throughput: the observed rate is well under one request per second whatever
+PACE is set to. Running a forward pass and a reverse pass together roughly
+halves the wall clock, and they meet in the middle. The two passes are safe to
+overlap -- a product already on disk is skipped, a date marker is written only
+after that date's products are all fetched, and writing a marker twice is
+harmless. What overlap costs is a little duplicated listing near the meeting
+point, and nothing else.
 """
 from __future__ import annotations
 
@@ -67,9 +77,12 @@ def get(url: str, **params) -> requests.Response | None:
     return None
 
 
-def main() -> None:
+def main(reverse: bool = False) -> None:
     dates = target_dates()
-    print(f"{len(dates)} dates, seasons {min(SEASONS)}-{max(SEASONS)}", flush=True)
+    if reverse:
+        dates = dates[::-1]
+    print(f"{len(dates)} dates, seasons {min(SEASONS)}-{max(SEASONS)}"
+          f"{', newest first' if reverse else ''}", flush=True)
     n_new = n_have = n_miss = 0
     for i, d in enumerate(dates):
         day = d.strftime("%Y-%m-%d")
@@ -106,4 +119,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    main(reverse="--reverse" in sys.argv)
