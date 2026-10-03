@@ -40,3 +40,7 @@ site/fig/*_files/
 
 # Font subsetting keeps the full upstream faces here; only the subsets ship
 site/fonts/.src/
+
+# PDF build intermediates: build_pdf.py and figures.py regenerate them
+site/pdf/paper.docx
+site/pdf/fig/
