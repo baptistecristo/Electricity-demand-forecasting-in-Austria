@@ -1,6 +1,6 @@
 # TO BE FINISHED: Snowmaking as a hidden load in Austrian day-ahead electricity forecasts
 
-### 📄 [Read the paper →](https://snowmaking-load-austria.vercel.app) · [PDF](site/paper.pdf)
+### 📄 [Read the paper (PDF) →](site/paper.pdf)
 
 ## In short
 
@@ -37,4 +37,4 @@ station.
 - Stull (2011). *Wet-bulb temperature from relative humidity and air temperature.* J. Appl. Meteorol. Climatol. 50(11). (Benchmark only, not used in the pipeline.)
 - [Maldonado et al., arXiv 2302.11017](https://ar5iv.labs.arxiv.org/html/2302.11017), DE-LU TSO day-ahead load forecast MAE
 
-The full reference list is on the [paper](https://snowmaking-load-austria.vercel.app).
+The full reference list is in the [paper](site/paper.pdf).
