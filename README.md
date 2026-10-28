@@ -1,32 +1,34 @@
-# TO BE FINISHED: Snowmaking as a hidden load in Austrian day-ahead electricity forecasts
+# Does Austria's electricity forecast miss snowmaking?
 
-📄 **[Read the paper (PDF)](site/paper.pdf)**
+[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/baptistecristo/Electricity-demand-forecasting-in-Austria/blob/simple/analysis.ipynb)
 
-## In short
+**Result: to be filled in after the first full run.**
 
-Austrian ski resorts use about 281 GWh of electricity a season to make artificial
-snow, almost all of it on cold November and December nights. While the snow guns
-run, that is close to 900 MW, or 8 to 15% of what Austria uses overnight.
+## The question
 
-I tested whether the grid operator's day-ahead load forecast misses this load.
-Heating also rises on cold nights, so I looked for something only snowmaking does:
-once the base layer is built the guns stop, so the same cold night should use less
-power in late December than in early November.
+Every afternoon, Austria's grid operator APG forecasts the next day's electricity use. When the forecast is wrong, someone pays to fill the gap in real time, so for a power trader forecast error is money.
 
-I wrote down this prediction, and the results that would make me stop, before
-opening any load data. The commit history shows the order.
+Ski resorts make artificial snow on cold nights, mostly in November and early December. With every snow gun running that is close to 900 MW, about a tenth of what Austria uses at night (Aigner, Steiger & Mayer, 2026). If the forecast left this out, it would be too low on exactly those nights.
 
-The answer is no. The effect is +5.1 MW, with a standard error of 11.9. The same
-test does pick up the Christmas industrial shutdown at −274 MW, so it can see effects
-of that size. Italy gives the same result, Switzerland's data could never have shown
-it, and Vermont points the predicted way but does not hold up when a different
-weather station is used.
+## The test
 
-## References
+Cold nights also mean more heating, so a forecast that is too low on cold nights would not prove anything by itself. What only snowmaking does is fade: resorts build their snow base in November and have mostly finished by mid-December.
 
-- Aigner, Steiger & Mayer (2026). *Snowmaking in Austria: resource consumption and greenhouse gas emissions.* Journal of Sustainable Tourism. [Article](https://www.tandfonline.com/doi/full/10.1080/09669582.2026.2656746) · [PDF](https://zukunft-skisport.at/wp-content/uploads/2025-09-16_IMC-Innsbruck_Snowmaking_Aigner-Steiger-Mayer_final.pdf)
-- Olefs, Fischer & Lang (2010). *Boundary conditions for artificial snow production in the Austrian Alps.* J. Appl. Meteorol. Climatol. 49(6). [Article](https://journals.ametsoc.org/view/journals/apme/49/6/2010jamc2251.1.xml)
-- Stull (2011). *Wet-bulb temperature from relative humidity and air temperature.* J. Appl. Meteorol. Climatol. 50(11). (Benchmark only, not used in the pipeline.)
-- [Maldonado et al., arXiv 2302.11017](https://ar5iv.labs.arxiv.org/html/2302.11017), DE-LU TSO day-ahead load forecast MAE
+So I compare the forecast error on cold nights (below −2 °C in the mountains) with mild nights, first in **November**, then on **11–20 December**. I stop on 20 December because the Christmas shutdown of industry distorts the forecast from the 21st. If snowmaking were missing from the forecast, the cold-night gap would be much bigger in November than in mid-December. A regression makes the comparison within the same winter and the same weekday, for the 13 winters from 2010 to 2022.
 
-The full reference list is in the [paper](site/paper.pdf).
+## Data
+
+- **Electricity:** APG's actual load and day-ahead forecast, free to download with no account.
+- **Temperature:** hourly air temperature at the highest weather stations in Tyrol and Salzburg (GeoSphere Austria, free API).
+
+The notebook downloads both itself. Open it with the Colab button and click **Runtime → Run all**; it takes about five minutes.
+
+## Limits
+
+- A handful of weather stations stand in for every ski area.
+- Snow guns depend on humidity as well as temperature; I use temperature only.
+- Some resorts keep making snow in December, which would make the November–December difference smaller and a "no" less convincing.
+
+## Reference
+
+Aigner, Steiger & Mayer (2026). *Snowmaking in Austria: resource consumption and greenhouse gas emissions.* Journal of Sustainable Tourism. [Article](https://www.tandfonline.com/doi/full/10.1080/09669582.2026.2656746)
