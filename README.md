@@ -8,7 +8,7 @@
 
 Every afternoon, Austria's grid operator APG forecasts the next day's electricity use. When the forecast is wrong, someone pays to fill the gap in real time, so for a power trader forecast error is money.
 
-Ski resorts make artificial snow on cold nights, mostly in November and early December. With every snow gun running that is close to 900 MW, about a tenth of what Austria uses at night (Aigner, Steiger & Mayer, 2026). If the forecast left this out, it would be too low on exactly those nights.
+Ski resorts make artificial snow on cold nights, mostly in November and early December. With every snow gun running that is close to 900 MW, about a tenth of what Austria uses at night ([Aigner, Steiger & Mayer, 2026](https://www.tandfonline.com/doi/full/10.1080/09669582.2026.2656746)). If the forecast left this out, it would be too low on exactly those nights.
 
 ## The test
 
