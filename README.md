@@ -51,7 +51,7 @@ If the forecast missed snowmaking, the cold-night gap would be much bigger in No
 ## 6. What it means
 
 - **The forecast falls further short on cold nights than on mild ones.** In November the gap is about 200 MW, and the 95% range (about 100 to 300 MW) does not include zero. The forecast is also slightly too low on mild nights, so this is a gap between the two, not the whole error.
-- **No sign of missing snowmaking.** If snowmaking were missing, the gap would shrink by mid-December. It does not; if anything it grows, although that difference could be chance (p = 0.25). Whatever the forecast misses on cold nights stays with the cold, not with the snowmaking season.
+- **No sign of missing snowmaking.** If snowmaking were missing, the gap would shrink by mid-December. The test finds no clear change: the estimate is +137 MW, and that could be chance (p = 0.25). Whatever the forecast misses on cold nights stays with the cold, not with the snowmaking season.
 - **What causes the gap is open.** Heating is one candidate, but this test does not measure it.
 - **How strong is the "no"?** The test would reliably find a change of about 340 MW or more. So it rules out the forecast missing most of the 900 MW, but it could miss a smaller snowmaking effect.
 
