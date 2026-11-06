@@ -6,6 +6,10 @@
 
 ![Night forecast error on cold and mild nights, 1 November to 20 December, 2010–2022](results.png)
 
+The second chart takes the same nights and sorts them by temperature: above about −2 °C the error stays flat, and below it the forecast falls about 40 MW further short with each degree colder.
+
+![Night forecast error by night temperature, 1 November to 20 December, 2010–2022](temperature.png)
+
 ## 1. The question
 
 Every afternoon, Austria's grid operator APG forecasts the next day's electricity use, hour by hour. The market and the grid plan with that forecast, and any error left on the day has to be balanced in real time, which costs money. For a power trader, forecast error is money.
